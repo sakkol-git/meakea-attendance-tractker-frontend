@@ -124,7 +124,12 @@ test('time off, correction review, request fulfillment and organization edit/del
   await page.getByRole('button', { name: 'Approve', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Approve', exact: true }).click()
   await page.getByRole('button', { name: 'Mark fulfilled' }).click()
-  await page.getByRole('alertdialog').getByRole('button', { name: 'Fulfill', exact: true }).click()
+  await page.getByRole('combobox', { name: 'Material', exact: true }).click()
+  await page.getByRole('option', { name: 'External monitor', exact: true }).click()
+  await page
+    .getByLabel('Issue reason', { exact: true })
+    .fill('Issued the approved external monitor.')
+  await page.getByRole('button', { name: 'Record issue', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Mark fulfilled' })).toHaveCount(0)
   await page.getByRole('link', { name: 'Organization', exact: true }).click()
   await page.getByRole('button', { name: 'Edit Operations', exact: true }).click()
@@ -180,4 +185,126 @@ test('all main screens remain accessible and material quantity can be edited', a
   ).toBeVisible()
   expect(failures).toEqual([])
   expect(errors).toEqual([])
+})
+
+test('all 40 business workflow screens resolve and advanced HR journeys change state', async ({
+  page,
+}) => {
+  test.setTimeout(180000)
+  const pageErrors: string[] = []
+  page.on('pageerror', (e) => pageErrors.push(e.message))
+  await page.goto('/workflows')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'Owner', exact: true }).click()
+  await expect(page.locator('.p-select-overlay')).toHaveCount(0)
+  const workflowAxeFailures: {
+    workflow: string
+    violations: { id: string; targets: unknown[] }[]
+  }[] = []
+  for (let n = 1; n <= 40; n++) {
+    const id = `BF-${String(n).padStart(3, '0')}`
+    await page.locator('a[href="/workflows"]').first().click()
+    await page.locator(`a[href="/workflows/${id}"]`).click()
+    await expect(page.locator('.page-heading h1')).toBeVisible()
+    await expect(page.locator('.loading-stack')).toHaveCount(0)
+    await expect(
+      page.getByRole('heading', { name: 'This workflow needs another role' }),
+    ).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'We couldn’t load this' })).toHaveCount(0)
+    await expect(page.locator('.p-select-overlay')).toHaveCount(0)
+    const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+    if (audit.violations.length)
+      workflowAxeFailures.push({
+        workflow: id,
+        violations: audit.violations.map((x) => ({
+          id: x.id,
+          targets: x.nodes.map((n) => n.target),
+        })),
+      })
+  }
+  expect(workflowAxeFailures).toEqual([])
+  await page.locator('a[href="/workflows"]').first().click()
+  await page.locator('a[href="/workflows/BF-005"]').click()
+  await page.getByRole('combobox', { name: 'Employee reference', exact: true }).click()
+  await page.getByRole('option', { name: 'Sok Dara', exact: true }).click()
+  await page.getByRole('combobox', { name: 'Shift reference', exact: true }).click()
+  await page.getByRole('option', { name: 'Standard workday', exact: true }).click()
+  await page.getByLabel('Effective from', { exact: true }).fill('2030-02-01')
+  await page.getByLabel('Effective through', { exact: false }).fill('2030-02-28')
+  await page.getByRole('button', { name: 'Assign a shift', exact: true }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('dialog').locator('.p-tag')).toBeVisible()
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
+  await page.locator('a[href="/workflows"]').first().click()
+  await page.locator('a[href="/workflows/BF-018"]').click()
+  await page.getByRole('combobox', { name: 'Employee reference', exact: true }).click()
+  await page.getByRole('option', { name: 'Sok Dara', exact: true }).click()
+  await page.getByRole('combobox', { name: 'Leave type', exact: true }).click()
+  await page.getByRole('option', { name: 'Annual leave', exact: true }).click()
+  await page.getByLabel('Year', { exact: true }).fill(String(new Date().getFullYear()))
+  await page.getByLabel('Adjustment in days', { exact: true }).fill('1.5')
+  await page
+    .getByLabel('Reason and supporting context', { exact: true })
+    .fill('Additional entitlement reviewed by HR.')
+  await page.getByRole('button', { name: 'Record entitlement adjustment', exact: true }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('dialog').locator('.p-tag')).toBeVisible()
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  await page
+    .locator('.p-toast-close-button')
+    .evaluateAll((nodes) => nodes.forEach((node) => (node as HTMLElement).click()))
+  await expect(page.locator('.p-toast-close-button')).toHaveCount(0)
+  await page.evaluate(() => {
+    ;(document.activeElement as HTMLElement)?.blur()
+    window.scrollTo(0, 0)
+  })
+  await page.getByRole('button', { name: /^Annual leave balance/ }).click()
+  await expect(page.getByRole('dialog').getByText('11.5', { exact: true })).toBeVisible()
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  await page.evaluate(() => {
+    ;(document.activeElement as HTMLElement)?.blur()
+    window.scrollTo(0, 0)
+  })
+  await page.screenshot({ path: 'test-results/leave-ledger-desktop.png', fullPage: true })
+  await page.locator('a[href="/workflows"]').first().click()
+  await page.locator('a[href="/workflows/BF-026"]').click()
+  await page.getByRole('combobox', { name: 'Request reference', exact: true }).click()
+  await page.getByRole('option', { name: /^Request · A monitor for my desk/ }).click()
+  await page.getByLabel('Private evidence file', { exact: true }).setInputFiles({
+    name: 'workflow-evidence.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('%PDF-1.7\nSynthetic test evidence'),
+  })
+  await page.getByRole('button', { name: 'Attach local file', exact: true }).click()
+  await expect(page.getByRole('dialog').locator('.p-tag')).toHaveText('Local Ready')
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  const fileDownload = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download', exact: true }).click()
+  expect((await fileDownload).suggestedFilename()).toBe('workflow-evidence.pdf')
+  await page.locator('a[href="/workflows"]').first().click()
+  await page.locator('a[href="/workflows/BF-030"]').click()
+  await page.getByLabel('From date', { exact: true }).fill('2026-01-01')
+  await page.getByLabel('Through date', { exact: true }).fill('2026-12-31')
+  await page.getByRole('button', { name: 'Prepare CSV export', exact: true }).click()
+  await expect(page.getByRole('dialog').locator('.p-tag')).toHaveText('Completed')
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  const reportDownload = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download', exact: true }).click()
+  expect((await reportDownload).suggestedFilename()).toBe('hrflow-leave-export.csv')
+
+  await page.locator('a[href="/workflows"]').first().click()
+  await page
+    .locator('.p-toast-close-button')
+    .evaluateAll((nodes) => nodes.forEach((node) => (node as HTMLElement).click()))
+  await expect(page.locator('.p-toast-close-button')).toHaveCount(0)
+  await page.evaluate(() => {
+    ;(document.activeElement as HTMLElement)?.blur()
+    window.scrollTo(0, 0)
+  })
+  await page.screenshot({ path: 'test-results/workflows-desktop.png', fullPage: true })
+  expect(pageErrors).toEqual([])
 })

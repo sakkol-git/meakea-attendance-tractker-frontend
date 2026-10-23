@@ -52,3 +52,11 @@ API modules retain a mutation's idempotency key after uncertain transport failur
 `tests/unit/architecture.test.ts` rejects raw HTTP, transport paths, demo access and browser persistence in presentation; it rejects upward imports and Nuxt context in API/data/schema/utility modules. Deliberately broken examples verify that the checks trigger. These source checks complement review; they are not a full TypeScript dependency graph analysis.
 
 The app uses client rendering because it is an authenticated internal workspace. No search indexing requirement is known. No backend-for-frontend or duplicate identity service is introduced. Self-host fonts, PrimeVue components, Pinia, Vue Query, Zod, date-fns, Vitest, Playwright and Prettier serve concrete UI, state, validation and testing needs. No paid UI kit is required.
+
+## Complete business workflow module
+
+`features/workflows/catalog.ts` and `forms.ts` describe all 40 source workflows and their purpose-specific actions. Nuxt routes stay in `pages/workflows/`; `WorkflowActionForm` renders accessible form fields and named reference selections. Core journeys reuse the existing feature pages and forms.
+
+`api/business.ts` is the UI-facing authorization/adapter seam. Its `BusinessPort` interface lives in `types/business.ts`. `data/business-demo.ts` implements synthetic state, receipts, review history, local files and simulated jobs. Remote mode has no default advanced adapter: it returns `CONTRACT_REQUIRED` rather than inventing URLs or falling back to fixtures. An accepted backend adapter can be injected at the composition root without changing the screens.
+
+The extended demo source serializes mutations to prevent competing adjustments from overdrawing balances. It requires material stock selection before equipment issuance, records partial quantities, and preserves original request history. These safeguards are client-demo evidence; server transactions and tenant isolation require their own acceptance tests.

@@ -50,3 +50,11 @@ CSV downloads in demo mode are formula-escaped. Remote CSV sanitization remains 
 - Review `npm audit`. The installed tree currently reports a high-severity `node-forge` advisory through Nuxt's tooling chain; compatible audit fixes were applied, but the remaining advisory has no compatible automated fix. Do not run `npm audit fix --force` blindly. Track an upstream fix and assess exposure before release.
 
 This is an engineering baseline, not certification or a compliance claim.
+
+## Advanced workflow adapter
+
+All BF-001–BF-040 screens are mapped in [Business workflow coverage](BUSINESS-WORKFLOW-COVERAGE.md). Advanced features use `BusinessPort` from `app/types/business.ts`: snapshot, versioned/idempotent execute, private upload/download and account cleanup. Inject an accepted implementation as the third argument to `BusinessApi` in `app/plugins/data.ts`. The existing role and mutation guards remain active.
+
+The default remote implementation intentionally has no invented advanced endpoints. It returns `CONTRACT_REQUIRED`; this is an integration gate rather than a fake successful operation. The typed port is tested with a supplied remote adapter. Agree and implement the server contract before replacing that gate.
+
+New core prototype operations include `POST /leave/balance-adjustments`, request draft PATCH, eligible future cancellation and quantity/material-aware fulfillment. These still need approved OpenAPI and real server transaction/stock-ledger acceptance. Half-day forms send FULL_DAY/MORNING/AFTERNOON; the demo excludes configured holidays and refuses cross-year requests while the documented settlement policy is unresolved.

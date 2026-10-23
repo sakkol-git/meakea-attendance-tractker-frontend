@@ -1,9 +1,18 @@
 import { z } from 'zod'
+const calendarDate = (message: string) =>
+  z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, message)
+    .refine((value) => {
+      const date = new Date(`${value}T12:00:00Z`)
+      return Number.isFinite(+date) && date.toISOString().slice(0, 10) === value
+    }, 'Choose a real calendar date.')
 export const leaveForm = z
   .object({
     type: z.string().min(1, 'Choose a leave type.'),
-    startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a start date.'),
-    endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose an end date.'),
+    portion: z.enum(['FULL_DAY', 'MORNING', 'AFTERNOON']).default('FULL_DAY'),
+    startDate: calendarDate('Choose a start date.'),
+    endDate: calendarDate('Choose an end date.'),
     reason: z.string().trim().min(5, 'Add at least five characters of context.').max(2000),
   })
   .refine((x) => x.endDate >= x.startDate, {
@@ -17,7 +26,7 @@ export const requestForm = z.object({
   quantity: z.number().int().min(1).max(100).default(1),
 })
 export const correctionForm = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose the affected date.'),
+  date: calendarDate('Choose the affected date.'),
   reason: z.string().trim().min(10, 'Explain the issue in at least ten characters.').max(2000),
 })
 export const employeeForm = z.object({

@@ -26,3 +26,9 @@ Run `npm run check` for formatting, type checking, the original adapter suite, n
 Architecture checks cover dependency direction, raw HTTP in presentation, raw transport paths, demo/persistence access in pages and framework context in lower modules. Unit cases cover stale versions, admin access, duplicate email, leave overlap, notification reads, preference versions, uncertain idempotency retries, contract mismatch, CSV formula safety, download-origin restriction, workspace date boundaries and refresh/logout concurrency.
 
 Production acceptance still requires real-backend integration tests, cross-tenant tests, approved policy calculations, upload/attachment security, background export lifecycle, account recovery, deployment headers, load/large-data pagination, manual keyboard/screen-reader review and operational monitoring. Automated accessibility checks sample pages; they do not establish conformance for the entire product.
+
+## Complete source-workflow pass
+
+The subsequent BF-001–BF-040 implementation adds all workflow routes, dated shift assignment/closure, exact entitlement adjustments, carry-over preview/application guards, conflict review, aggregate evidence/inference review, draft editing/history, partial stock issuance, local private files, queued export lifecycle, category/quiet-hour preferences, rules preview and explicit operations/ML inspection/simulation screens. [The workflow matrix](BUSINESS-WORKFLOW-COVERAGE.md) supersedes the earlier core-only client coverage where these additions overlap.
+
+These additions complete the mapped web screen coverage. They do not change the missing-backend and unsettled-policy acceptance limits. Native evidence collection, real training/publication, broker operations, storage scanning/retention and actual tenant security are not browser-side implementations.

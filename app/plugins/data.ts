@@ -1,3 +1,4 @@
+import { BusinessApi } from '../api/business'
 import { authenticatedSource } from '../data/authenticated'
 import { ClientData } from '../data/client'
 import { DataFailure } from '../data/source'
@@ -47,14 +48,16 @@ export default defineNuxtPlugin({
       },
     )
 
+    const workspace = new WorkspaceApi(
+      authenticated,
+      guard,
+      demo ? () => demo.exportCsv() : undefined,
+    )
     return {
       provide: {
         clientData: client,
-        workspace: new WorkspaceApi(
-          authenticated,
-          guard,
-          demo ? () => demo.exportCsv() : undefined,
-        ),
+        workspace,
+        business: new BusinessApi(workspace, guard),
         sessionService,
         demoSource: demo,
       },

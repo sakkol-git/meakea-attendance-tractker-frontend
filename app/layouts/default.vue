@@ -17,6 +17,7 @@ const roleOptions = [
 ]
 const navigation = computed(() => [
   { label: 'Overview', icon: 'home', to: '/' },
+  { label: 'Workflows', icon: 'th-large', to: '/workflows' },
   { label: 'Attendance', icon: 'clock', to: '/attendance' },
   { label: 'Time off', icon: 'sun', to: '/leave' },
   { label: 'Requests', icon: 'briefcase', to: '/requests' },

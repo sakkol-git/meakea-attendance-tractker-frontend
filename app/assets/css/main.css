@@ -2127,3 +2127,152 @@ textarea::placeholder {
 .segmented-tabs button {
   color: #526560;
 }
+.workflow-filter {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+.workflow-caption {
+  margin: 18px 0;
+}
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.workflow-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.15s;
+}
+.workflow-card:hover {
+  border-color: #71a792;
+}
+.workflow-card > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.workflow-card h2 {
+  font-size: 16px;
+}
+.workflow-card p {
+  font-size: 12px;
+  flex: 1;
+}
+.workflow-card .eyebrow {
+  margin: 0;
+}
+.workflow-intro {
+  font-size: 12px;
+  margin: 15px 0 22px;
+  line-height: 1.9;
+}
+.workflow-action-picker {
+  margin: 22px 0;
+}
+.workflow-form .span-full {
+  grid-column: 1/-1;
+}
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.checkbox-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: #006151;
+}
+.workflow-reference {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 5px;
+  font-size: 12px;
+}
+.workflow-reference code,
+.workflow-record code {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  color: #526560;
+}
+.workflow-records {
+  margin-top: 24px;
+}
+.workflow-record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 19px 0;
+  border-bottom: 1px solid var(--border);
+}
+.workflow-record > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.record-title-button {
+  border: 0;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #006151;
+  min-height: 32px;
+}
+.workflow-record small {
+  font-size: 11px;
+  color: #526560;
+}
+.workflow-history-title {
+  margin: 24px 0 15px;
+}
+.workflow-form > .p-button {
+  align-self: flex-start;
+}
+.workflow-form small {
+  color: #526560;
+}
+.workflow-detail-grid {
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .workflow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .workflow-grid,
+  .workflow-filter {
+    grid-template-columns: 1fr;
+  }
+  .workflow-record {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .workflow-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .workflow-card h2 {
+    font-size: 16px;
+  }
+}
+.back-link {
+  color: #526560;
+}
+.p-button.p-button-danger:not(.p-button-outlined):not(.p-button-text) {
+  background: #a52b25;
+  border-color: #a52b25;
+  color: #fff;
+}
+.p-button.p-button-danger:not(.p-button-outlined):not(.p-button-text):hover {
+  background: #84221e;
+  border-color: #84221e;
+}

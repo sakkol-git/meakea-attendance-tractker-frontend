@@ -30,3 +30,7 @@ npm audit
 - [Verified results and release blockers](docs/VERIFICATION.md)
 
 The backend does not yet provide the business APIs. Remote adapters are provisional and fail explicitly; this client must not be described as production-integrated until real-backend acceptance passes.
+
+## All business workflows
+
+Open `/workflows` for the searchable BF-001–BF-040 catalogue. Every documented workflow has a dedicated screen: core journeys reuse the main app, advanced HR actions include schedules/ledger/private files, and server/ML duties use clearly labeled inspection or simulation views. See [complete coverage and boundaries](docs/BUSINESS-WORKFLOW-COVERAGE.md).

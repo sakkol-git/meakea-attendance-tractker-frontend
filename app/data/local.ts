@@ -149,6 +149,7 @@ export class LocalDataSource implements DataSource {
           employeeId: 'demo-employee',
           status: resource.initialStatus,
           version: 1,
+          history: [{ status: resource.initialStatus, at: this.now().toISOString() }],
         }
         rows.push(row)
         return ok(row, 201, '"1"')
@@ -159,6 +160,18 @@ export class LocalDataSource implements DataSource {
       const row = rows.find((row) => row.id === id)
       if (!row) throw new DataFailure(404, 'NOT_FOUND', 'Record not found.')
       if (r.method === 'GET' && !action) return ok(row, 200, `"${row.version}"`)
+      if (r.method === 'PATCH' && !action && resource.path === '/requests') {
+        this.checkVersion(r, row)
+        if (row.status !== 'DRAFT')
+          throw new DataFailure(409, 'DRAFT_REQUIRED', 'Only a draft can be edited.')
+        Object.assign(row, clone(r.body ?? {}), {
+          id: row.id,
+          employeeId: row.employeeId,
+          status: 'DRAFT',
+          version: Number(row.version) + 1,
+        })
+        return ok(row, 200, `"${row.version}"`)
+      }
       const transition =
         action && Object.hasOwn(resource.transitions, action)
           ? (resource.transitions[action as keyof typeof resource.transitions] as {
@@ -171,13 +184,41 @@ export class LocalDataSource implements DataSource {
       if (!transition.roles.includes(this.actor))
         throw new DataFailure(403, 'FORBIDDEN', 'This demo role cannot perform this action.')
       this.checkVersion(r, row)
-      if (!transition.from.includes(String(row.status)))
+      const eligibleFutureCancellation =
+        resource.path === '/leave/requests' &&
+        action === 'cancel' &&
+        row.status === 'APPROVED' &&
+        String(row.startDate) >
+          new Date(this.now().getTime() + this.state.timezoneOffsetMinutes * 60000)
+            .toISOString()
+            .slice(0, 10)
+      if (!transition.from.includes(String(row.status)) && !eligibleFutureCancellation)
         throw new DataFailure(
           409,
           'INVALID_TRANSITION',
           'This action is unavailable in the current state.',
         )
-      row.status = transition.to
+      if (action === 'fulfill' && r.body?.quantity !== undefined) {
+        const quantity = Number(r.body.quantity)
+        const total = Number(row.quantity ?? 1)
+        const filled = Number(row.fulfilledQuantity ?? 0)
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > total - filled)
+          throw new DataFailure(
+            422,
+            'INVALID_QUANTITY',
+            'Issue no more than the remaining quantity.',
+          )
+        row.fulfilledQuantity = filled + quantity
+        row.status = filled + quantity === total ? 'FULFILLED' : 'APPROVED'
+      } else row.status = transition.to
+      if (r.body?.reason) row.decisionReason = r.body.reason
+      const history = Array.isArray(row.history) ? row.history : []
+      history.push({
+        status: String(row.status),
+        at: this.now().toISOString(),
+        reason: String(r.body?.reason ?? ''),
+      })
+      row.history = history
       row.version = Number(row.version) + 1
       this.notifications.push({
         id: `demo-${++this.sequence}`,

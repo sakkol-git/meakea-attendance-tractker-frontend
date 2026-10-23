@@ -7,13 +7,13 @@ Verified on 2026-10-24 in the local workspace, with Node 26.3.0 and installed Go
 | `npm run format:check` | PASS |
 | `npm run typecheck` | PASS |
 | `npm run test:data` | PASS: 8 original data-source cases |
-| `npm run test:unit` | PASS: 18 workflow, command, auth, transport, formatting and architecture cases across 4 files |
+| `npm run test:unit` | PASS: 34 workflow, command, auth, transport, formatting and architecture cases across 5 files |
 | `npm run build` | PASS: production Node server and client assets generated |
-| `npm run test:e2e` | PASS: 6 cases, 28.6 seconds including startup |
+| `npm run test:e2e` | PASS: 7 cases, 59.2 seconds including startup |
 | `git diff --check` | PASS |
 | `npm audit` | FAIL: 7 high-severity package findings in the node-forge/Nuxt tooling dependency chain; no compatible automated fix remains |
 
-`npm run check` combines the first five checks above. All six browser cases run against isolated production builds on ports 3100 and 3101, not the development server. The remote instance uses controlled HTTP responses to verify the client contract, not a running HR backend.
+`npm run check` combines the first five checks above. All seven browser cases run against isolated production builds on ports 3100 and 3101, not the development server. The remote instance uses controlled HTTP responses to verify the client contract, not a running HR backend.
 
 ## Browser evidence
 
@@ -23,8 +23,9 @@ Verified on 2026-10-24 in the local workspace, with Node 26.3.0 and installed Go
 4. Axe WCAG A/AA scans across time off, requests, attendance, approvals, people, organization, reports, notifications, settings and profile; material quantity editing; no unhandled page errors.
 5. Remote-mode sign-in, CSRF and idempotency headers, bearer token forwarding, one token refresh, explicit 503 failure without demo fallback, memory-only tokens and logout.
 6. Missing-CSRF refusal before credentials are submitted.
+7. All 40 BF workflow routes and their role/purpose screens, axe WCAG A/AA checks on every workflow, named shift assignment, exact entitlement adjustment with refreshed current balance, private evidence upload/download and queued export completion/download.
 
-Desktop overview and mobile attendance screenshots were visually inspected. Re-running the browser suite regenerates `test-results/overview-desktop.png` and `test-results/attendance-mobile.png`. These artifacts are intentionally ignored by Git.
+Desktop overview, mobile attendance and the advanced leave-ledger screen were visually inspected. The workflow suite also regenerates `test-results/workflows-desktop.png` and `test-results/leave-ledger-desktop.png`. Re-running the browser suite regenerates `test-results/overview-desktop.png` and `test-results/attendance-mobile.png`. These artifacts are intentionally ignored by Git.
 
 ## Corrections established by the tests
 
@@ -42,3 +43,12 @@ Desktop overview and mobile attendance screenshots were visually inspected. Re-r
 No real-backend transaction, cross-tenant isolation, secure refresh-cookie lifecycle, mail delivery, attachment scanning, payroll calculation, production deployment, operational recovery or load test was run. Those capabilities are not implemented by a web client. API schemas and policy/catalog assumptions remain provisional as described in [Integration](INTEGRATION.md).
 
 The audit failure remains visible as a separate failing CI job, rather than being suppressed. Compatible fixes were applied; the remaining automated suggestion is an incompatible Nuxt downgrade and was not applied. Upstream remediation and exposure review are required before release. Automated accessibility scans do not replace a complete manual keyboard and screen-reader assessment.
+
+
+## Source-complete web screen pass
+
+See [BF-001–BF-040 coverage](BUSINESS-WORKFLOW-COVERAGE.md). The final pass preserves the core screens and adds a routed screen for every source workflow, the typed `BusinessPort`, advanced HR forms/state, local private files, synthetic job stages, role/revision/replay guards and operations boundaries. The 42 non-browser tests consist of the 8 original adapter cases plus 34 unit/architecture cases. No hosted CI run is claimed.
+
+New regressions cover inclusive assignment overlap, closure, impossible dates/time values, whitespace validation, exact half-day ledger entries, overdraw under concurrency, single-application carry-over under concurrency, half-day leave and future cancellation, draft edits, partial stock fulfillment, private file headers/ownership, inference terminal states, no attendance side effect from scoring, job queue/completion, late old-account responses, accepted-adapter injection and refusal to treat tenant-owner role as an operator grant.
+
+The unchanged dependency tree retains the previously recorded audit blocker. The workflow implementation adds no dependencies. Live advanced integration remains gated by accepted backend adapters and policies; the default remote mode returns `CONTRACT_REQUIRED`, and production operator execution remains closed to a tenant owner. No unimplemented server job is described as completed in production.

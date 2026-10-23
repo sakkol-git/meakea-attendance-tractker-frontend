@@ -10,7 +10,7 @@ const isoDay = (offset: number) => {
   d.setUTCDate(d.getUTCDate() + offset)
   return d.toISOString().slice(0, 10)
 }
-export function workingDays(start: string, end: string) {
+export function workingDays(start: string, end: string, holidays: string[] = []) {
   let days = 0
   const cursor = new Date(`${start}T12:00:00Z`)
   const finish = new Date(`${end}T12:00:00Z`)
@@ -22,7 +22,11 @@ export function workingDays(start: string, end: string) {
   )
     throw new DataFailure(422, 'INVALID_DATES', 'Choose a valid period of no more than one year.')
   while (cursor <= finish) {
-    if (![0, 6].includes(cursor.getUTCDay())) days++
+    if (
+      ![0, 6].includes(cursor.getUTCDay()) &&
+      !holidays.includes(cursor.toISOString().slice(0, 10))
+    )
+      days++
     cursor.setUTCDate(cursor.getUTCDate() + 1)
   }
   return days
@@ -38,6 +42,8 @@ export class WorkspaceDemoSource implements DataSource {
   private receipts = new Map<string, { signature: string; result: DataResponse }>()
   private read = new Set<string>()
   private sequence = 1000
+  private adjustments: RecordData[] = []
+  private deliveryQueue: Promise<void> = Promise.resolve()
   private preferences = { email: true, inApp: true, reminders: true, version: 1 }
   private history = Array.from({ length: 8 }, (_, i) => ({
     id: `history-${i}`,
@@ -58,6 +64,7 @@ export class WorkspaceDemoSource implements DataSource {
     this.read.clear()
     this.receipts.clear()
     this.rows.clear()
+    this.adjustments = []
     this.role = 'EMPLOYEE'
     this.preferences = { email: true, inApp: true, reminders: true, version: 1 }
   }
@@ -214,6 +221,15 @@ export class WorkspaceDemoSource implements DataSource {
       )
   }
   async send(request: DataRequest): Promise<DataResponse> {
+    if (request.method === 'GET') return this.deliver(request)
+    const next = this.deliveryQueue.then(() => this.deliver(request))
+    this.deliveryQueue = next.then(
+      () => {},
+      () => {},
+    )
+    return next
+  }
+  private async deliver(request: DataRequest): Promise<DataResponse> {
     this.ready ??= this.seed()
     await this.ready
     validateRequest(request)
@@ -261,6 +277,12 @@ export class WorkspaceDemoSource implements DataSource {
           items: RecordData[]
         }
       ).items
+      const year = Number(r.query?.year ?? new Date().getFullYear())
+      const employeeId = r.query?.employeeId ?? 'demo-employee'
+      if (employeeId !== 'demo-employee') this.requireAdmin()
+      const ownedItems = items.filter(
+        (x) => x.employeeId === employeeId && String(x.startDate).startsWith(String(year)),
+      )
       return ok({
         items: [
           ['Annual leave', 15],
@@ -269,32 +291,130 @@ export class WorkspaceDemoSource implements DataSource {
         ].map(([type, entitlement]) => ({
           type,
           available:
-            Number(entitlement) -
-            items
+            Number(entitlement) +
+            this.adjustments
+              .filter((x) => x.employeeId === employeeId && x.year === year && x.type === type)
+              .reduce((sum, x) => sum + Number(x.days), 0) -
+            ownedItems
               .filter((x) => x.type === type && ['PENDING', 'APPROVED'].includes(String(x.status)))
               .reduce((s, x) => s + Number(x.days || 0), 0),
-          pending: items
+          pending: ownedItems
             .filter((x) => x.type === type && x.status === 'PENDING')
             .reduce((s, x) => s + Number(x.days || 0), 0),
           unit: 'days',
-          year: new Date().getFullYear(),
+          year,
         })),
         total: 3,
       })
+    }
+    if (r.path === '/leave/balance-adjustments' && r.method === 'POST') {
+      this.requireAdmin()
+      const body = r.body ?? {}
+      const amount = Number(body.days)
+      if (
+        !this.rows.get('/employees')!.some((x) => x.id === body.employeeId) ||
+        !['Annual leave', 'Medical leave', 'Personal leave'].includes(String(body.type)) ||
+        !Number.isInteger(body.year) ||
+        !Number.isFinite(amount) ||
+        amount === 0 ||
+        !Number.isInteger(amount * 2) ||
+        String(body.reason ?? '').trim().length < 5
+      )
+        throw new DataFailure(
+          422,
+          'INVALID_ADJUSTMENT',
+          'Choose an employee, year, exact half-day amount and reason.',
+        )
+      const current = (
+        await this.dispatch({
+          method: 'GET',
+          path: '/leave/balances/me',
+          query: { employeeId: String(body.employeeId), year: String(body.year) },
+        })
+      ).data as { items: { type: string; available: number }[] }
+      if ((current.items.find((x) => x.type === body.type)?.available ?? 0) + amount < 0)
+        throw new DataFailure(
+          422,
+          'NEGATIVE_BALANCE',
+          'This adjustment would overdraw available leave.',
+        )
+      const row = { ...body, id: `adjustment-${++this.sequence}`, version: 1, status: 'POSTED' }
+      this.adjustments.push(row)
+      return ok(row, 201, 1)
+    }
+    if (r.method === 'POST' && /^\/requests\/[^/]+\/fulfill$/.test(r.path)) {
+      this.requireAdmin()
+      if (!r.body?.materialId)
+        throw new DataFailure(
+          422,
+          'MATERIAL_REQUIRED',
+          'Select the stock material before issuing equipment.',
+        )
+      const material = this.rows.get('/materials')!.find((x) => x.id === r.body!.materialId)
+      const quantity = Number(r.body.quantity)
+      const request = (
+        await this.base.send({ method: 'GET', path: r.path.replace('/fulfill', '') })
+      ).data as RecordData
+      if (request.type !== 'Equipment' || request.status !== 'APPROVED')
+        throw new DataFailure(
+          409,
+          'APPROVED_MATERIAL_REQUIRED',
+          'Only approved equipment requests can be issued.',
+        )
+      if (
+        !material ||
+        !Number.isInteger(quantity) ||
+        quantity < 1 ||
+        quantity > Number(material.quantity) ||
+        quantity > Number(request.quantity ?? 1) - Number(request.fulfilledQuantity ?? 0)
+      )
+        throw new DataFailure(
+          422,
+          'INSUFFICIENT_STOCK',
+          'Choose a valid material and no more than available stock or outstanding quantity.',
+        )
+      material.quantity = Number(material.quantity) - quantity
+      material.version = Number(material.version) + 1
+      try {
+        return await this.base.send(r)
+      } catch (e) {
+        material.quantity = Number(material.quantity) + quantity
+        material.version = Number(material.version) + 1
+        throw e
+      }
     }
     if (r.path === '/leave/requests' && r.method === 'POST') {
       const parsed = leaveForm.safeParse(r.body)
       if (!parsed.success)
         throw new DataFailure(422, 'VALIDATION_ERROR', parsed.error.issues[0]!.message)
-      const days = workingDays(parsed.data.startDate, parsed.data.endDate)
+      if (parsed.data.startDate.slice(0, 4) !== parsed.data.endDate.slice(0, 4))
+        throw new DataFailure(
+          422,
+          'CROSS_YEAR_POLICY_REQUIRED',
+          'Cross-year leave requires an approved settlement policy; use separately reviewed employee-year requests.',
+        )
+      const holidays = this.rows.get('/holidays')!.map((x) => String(x.date))
+      const fullDays = workingDays(parsed.data.startDate, parsed.data.endDate, holidays)
+      if (parsed.data.portion !== 'FULL_DAY' && parsed.data.startDate !== parsed.data.endDate)
+        throw new DataFailure(
+          422,
+          'SINGLE_HALF_DAY',
+          'A half-day request must use one working date.',
+        )
+      const days = parsed.data.portion === 'FULL_DAY' ? fullDays : fullDays ? 0.5 : 0
       if (!days)
         throw new DataFailure(
           422,
           'NO_WORKING_DAYS',
           'This demo calendar counts Monday–Friday only. Choose a working day.',
         )
-      const balances = (await this.dispatch({ method: 'GET', path: '/leave/balances/me' }))
-        .data as { items: { type: string; available: number }[] }
+      const balances = (
+        await this.dispatch({
+          method: 'GET',
+          path: '/leave/balances/me',
+          query: { year: parsed.data.startDate.slice(0, 4) },
+        })
+      ).data as { items: { type: string; available: number }[] }
       const balance = balances.items.find((x) => x.type === parsed.data.type)
       if (!balance || days > balance.available)
         throw new DataFailure(
@@ -312,7 +432,15 @@ export class WorkspaceDemoSource implements DataSource {
           (x) =>
             ['PENDING', 'APPROVED'].includes(String(x.status)) &&
             String(x.startDate) <= parsed.data.endDate &&
-            String(x.endDate) >= parsed.data.startDate,
+            String(x.endDate) >= parsed.data.startDate &&
+            !(
+              parsed.data.startDate === parsed.data.endDate &&
+              x.startDate === x.endDate &&
+              x.portion &&
+              x.portion !== 'FULL_DAY' &&
+              parsed.data.portion !== 'FULL_DAY' &&
+              x.portion !== parsed.data.portion
+            ),
         )
       )
         throw new DataFailure(409, 'LEAVE_OVERLAP', 'This period overlaps an existing request.')
@@ -326,7 +454,10 @@ export class WorkspaceDemoSource implements DataSource {
         },
       })
     }
-    if (r.path === '/requests' && r.method === 'POST') {
+    if (
+      (r.path === '/requests' && r.method === 'POST') ||
+      (/^\/requests\/[^/]+$/.test(r.path) && r.method === 'PATCH')
+    ) {
       const p = requestForm.safeParse(r.body)
       if (!p.success) throw new DataFailure(422, 'VALIDATION_ERROR', p.error.issues[0]!.message)
       return this.base.send({

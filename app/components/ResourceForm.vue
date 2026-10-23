@@ -40,6 +40,7 @@ watch(
     Object.keys(values).forEach((k) => delete values[k])
     Object.assign(values, {
       type: '',
+      portion: 'FULL_DAY',
       startDate: '',
       endDate: '',
       reason: '',
@@ -143,6 +144,21 @@ async function save() {
       }}
     </p>
     <form class="app-form" novalidate @submit.prevent="save">
+      <div v-if="kind === 'leave'" class="field">
+        <label for="form-portion">Day portion</label
+        ><PSelect
+          input-id="form-portion"
+          v-model="values.portion"
+          aria-label="Day portion"
+          :options="[
+            { label: 'Full day', value: 'FULL_DAY' },
+            { label: 'Morning half-day', value: 'MORNING' },
+            { label: 'Afternoon half-day', value: 'AFTERNOON' },
+          ]"
+          option-label="label"
+          option-value="value"
+        /><small>Half-day requests use a single working date.</small>
+      </div>
       <template v-if="kind === 'leave'"
         ><div class="field">
           <label for="form-type">Leave type</label

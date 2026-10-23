@@ -76,10 +76,16 @@ export class WorkspaceApi {
       (await this.source.send({ method: 'GET', path: '/attendance/today' })).data,
     )
   }
-  async balances() {
+  async balances(year?: number, employeeId?: string) {
     return decode(
       collection(Balance),
-      (await this.source.send({ method: 'GET', path: '/leave/balances/me' })).data,
+      (
+        await this.source.send({
+          method: 'GET',
+          path: '/leave/balances/me',
+          query: { ...(year ? { year: String(year) } : {}), ...(employeeId ? { employeeId } : {}) },
+        })
+      ).data,
     )
   }
   async notices() {
@@ -197,6 +203,19 @@ export class WorkspaceApi {
         this.clockAttempt = undefined
       throw e
     }
+  }
+  async adjustBalance(body: RecordData) {
+    return this.command('/leave/balance-adjustments', body)
+  }
+  async issueMaterial(body: RecordData) {
+    const request = await this.detail('requests', String(body.recordId))
+    if (body.expectedVersion !== undefined && request.row.version !== body.expectedVersion)
+      throw new DataFailure(
+        412,
+        'STALE_VERSION',
+        'Refresh and review the changed request before issuing materials.',
+      )
+    return this.command(`/requests/${request.row.id}/fulfill`, body, request.etag)
   }
   async readNotice(id?: string) {
     return this.command(

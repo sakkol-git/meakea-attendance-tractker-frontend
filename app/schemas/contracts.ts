@@ -41,6 +41,10 @@ export const Entity = z
     start: z.string().optional(),
     end: z.string().optional(),
     quantity: z.number().optional(),
+    fulfilledQuantity: z.number().optional(),
+    history: z
+      .array(z.object({ status: z.string(), at: z.string(), reason: z.string().optional() }))
+      .optional(),
   })
   .passthrough()
 export type EntityRow = z.infer<typeof Entity>

@@ -58,6 +58,7 @@ export const useSessionStore = defineStore('session', () => {
       initialized.value = true
       app.$queryClient.clear()
       app.$workspace.clear()
+      app.$business.clear()
     }
     if (error) throw error
   }
@@ -66,6 +67,7 @@ export const useSessionStore = defineStore('session', () => {
     profile.value = undefined
     app.$queryClient.clear()
     app.$workspace.clear()
+    app.$business.clear()
     initialized.value = true
   }
   return {

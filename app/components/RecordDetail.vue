@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useConfirm } from 'primevue/useconfirm'
-import { dateLabel, titleCase } from '~/utils/format'
+import { dateLabel, titleCase, tenantDay } from '~/utils/format'
 const props = defineProps<{ kind: 'leave' | 'request'; id: string }>()
 const api = useWorkspace()
 const session = useSessionStore()
@@ -10,6 +10,34 @@ const path = props.kind === 'leave' ? 'leaves' : 'requests'
 const result = useWorkspaceQuery(`detail-${path}-${props.id}`, () => api.detail(path, props.id))
 const row = computed(() => result.data.value?.row)
 const reasonDialog = ref(false)
+const reasonAction = ref<'reject' | 'cancel'>('reject')
+const fulfillmentDialog = ref(false)
+const materialId = ref('')
+const issueQuantity = ref(1)
+const issueReason = ref('')
+const materials = useWorkspaceQuery('fulfillment-materials', () =>
+  session.isAdmin ? api.list('materials') : Promise.resolve({ items: [], total: 0 }),
+)
+async function issue() {
+  if (!row.value || issueReason.value.trim().length < 5) {
+    feedback.error.value = 'Add an issue reason in at least five characters.'
+    return
+  }
+  const response = await feedback.run(
+    () =>
+      api.issueMaterial({
+        recordId: props.id,
+        materialId: materialId.value,
+        quantity: issueQuantity.value,
+        reason: issueReason.value.trim(),
+        expectedVersion: row.value!.version,
+      }),
+    'Material issue recorded',
+  )
+  if (response) fulfillmentDialog.value = false
+}
+
+const editDraft = ref(false)
 const reason = ref('')
 const reasonError = ref('')
 const isOwn = computed(() => row.value?.employeeId === session.profile?.employeeId)
@@ -23,6 +51,11 @@ async function perform(action: string, note?: string) {
   if (response) reasonDialog.value = false
 }
 function requestAction(action: string) {
+  if (action === 'cancel' && row.value?.status === 'APPROVED') {
+    reasonAction.value = 'cancel'
+    reasonDialog.value = true
+    return
+  }
   confirm.require({
     header: `${titleCase(action)} this request?`,
     message:
@@ -35,12 +68,16 @@ function requestAction(action: string) {
     accept: () => perform(action),
   })
 }
+function openReject() {
+  reasonAction.value = 'reject'
+  reasonDialog.value = true
+}
 function reject() {
   if (reason.value.trim().length < 5) {
     reasonError.value = 'Add a reason in at least five characters.'
     return
   }
-  perform('reject', reason.value.trim())
+  perform(reasonAction.value, reason.value.trim())
 }
 </script>
 <template>
@@ -105,6 +142,21 @@ function reject() {
             {{ feedback.error.value }}
           </p>
           <div class="detail-actions">
+            <NuxtLink
+              :to="{
+                path: '/workflows/BF-026',
+                query: { scope: kind === 'leave' ? 'leave' : 'request', record: id },
+              }"
+              class="text-link"
+              >Manage private evidence<AppIcon name="paperclip"
+            /></NuxtLink>
+            <PButton
+              v-if="kind === 'request' && row.status === 'DRAFT' && isOwn"
+              label="Edit draft"
+              outlined
+              icon="pi pi-pencil"
+              @click="editDraft = true"
+            />
             <PButton
               v-if="kind === 'request' && row.status === 'DRAFT' && isOwn"
               label="Submit for approval"
@@ -123,7 +175,7 @@ function reject() {
               severity="danger"
               outlined
               :disabled="feedback.busy.value"
-              @click="reasonDialog = true"
+              @click="openReject"
             /><PButton
               v-if="
                 session.isAdmin &&
@@ -133,9 +185,16 @@ function reject() {
               "
               label="Mark fulfilled"
               :loading="feedback.busy.value"
-              @click="requestAction('fulfill')"
+              @click="fulfillmentDialog = true"
             /><PButton
-              v-if="isOwn && ['DRAFT', 'PENDING'].includes(row.status || '')"
+              v-if="
+                isOwn &&
+                (['DRAFT', 'PENDING'].includes(row.status || '') ||
+                  (kind === 'leave' &&
+                    row.status === 'APPROVED' &&
+                    (row.startDate || '') >
+                      tenantDay(new Date().toISOString(), session.profile?.timeZone)))
+              "
               label="Cancel request"
               severity="secondary"
               outlined
@@ -147,6 +206,13 @@ function reject() {
         <aside class="panel detail-aside">
           <span class="record-icon leave"><AppIcon name="history" /></span>
           <h2>Where things stand</h2>
+          <div v-for="(event, index) in row.history ?? []" :key="index" class="activity-item">
+            <span class="activity-dot" />
+            <div>
+              <strong>{{ titleCase(event.status) }}</strong>
+              <p>{{ dateLabel(event.at, 'MMM d, h:mm a') }} {{ event.reason }}</p>
+            </div>
+          </div>
           <div class="activity-item">
             <span class="activity-dot" />
             <div>
@@ -171,8 +237,60 @@ function reject() {
     ></QueryState
   >
   <PDialog
+    v-model:visible="fulfillmentDialog"
+    modal
+    header="Record material fulfillment"
+    :style="{ width: '32rem' }"
+    ><form class="app-form" @submit.prevent="issue">
+      <p class="small-note">
+        Issued quantities reduce available stock. A partial issue keeps the request approved until
+        the full quantity is fulfilled.
+      </p>
+      <div class="field">
+        <label for="issue-material">Material</label
+        ><PSelect
+          input-id="issue-material"
+          v-model="materialId"
+          aria-label="Material"
+          :options="materials.data.value?.items ?? []"
+          option-label="name"
+          option-value="id"
+          filter
+        />
+      </div>
+      <div class="field">
+        <label for="issue-quantity">Quantity to issue</label
+        ><input
+          id="issue-quantity"
+          v-model.number="issueQuantity"
+          type="number"
+          min="1"
+          :max="(row?.quantity ?? 1) - (row?.fulfilledQuantity ?? 0)"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="issue-reason">Issue reason</label
+        ><PTextarea
+          id="issue-reason"
+          v-model="issueReason"
+          minlength="5"
+          maxlength="2000"
+          required
+        />
+      </div>
+      <p v-if="feedback.error.value" role="alert" class="form-error">{{ feedback.error.value }}</p>
+      <PButton label="Record issue" type="submit" :loading="feedback.busy.value" /></form
+  ></PDialog>
+  <ResourceForm
+    v-if="kind === 'request' && row"
+    v-model:visible="editDraft"
+    kind="request"
+    :initial="row"
+  />
+  <PDialog
     v-model:visible="reasonDialog"
-    header="Reject this request"
+    :header="reasonAction === 'reject' ? 'Reject this request' : 'Cancel future approved leave'"
     modal
     :style="{ width: '30rem' }"
     ><form class="app-form" @submit.prevent="reject">
@@ -193,7 +311,7 @@ function reject() {
           outlined
           @click="reasonDialog = false"
         /><PButton
-          label="Reject request"
+          :label="reasonAction === 'reject' ? 'Reject request' : 'Cancel approved leave'"
           type="submit"
           severity="danger"
           :loading="feedback.busy.value"
