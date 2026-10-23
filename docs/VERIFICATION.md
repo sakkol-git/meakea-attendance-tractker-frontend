@@ -1,0 +1,44 @@
+# Client verification
+
+Verified on 2026-10-24 in the local workspace, with Node 26.3.0 and installed Google Chrome. GitHub Actions is configured for Node 24; the hosted workflow itself has not been executed in this session.
+
+| Check | Actual result |
+| --- | --- |
+| `npm run format:check` | PASS |
+| `npm run typecheck` | PASS |
+| `npm run test:data` | PASS: 8 original data-source cases |
+| `npm run test:unit` | PASS: 18 workflow, command, auth, transport, formatting and architecture cases across 4 files |
+| `npm run build` | PASS: production Node server and client assets generated |
+| `npm run test:e2e` | PASS: 6 cases, 28.6 seconds including startup |
+| `git diff --check` | PASS |
+| `npm audit` | FAIL: 7 high-severity package findings in the node-forge/Nuxt tooling dependency chain; no compatible automated fix remains |
+
+`npm run check` combines the first five checks above. All six browser cases run against isolated production builds on ports 3100 and 3101, not the development server. The remote instance uses controlled HTTP responses to verify the client contract, not a running HR backend.
+
+## Browser evidence
+
+1. Employee check-in/out, refusal of offline writes, draft request submission, denied manager route and 390px mobile navigation.
+2. HR person creation, department creation, CSV download, preference update and desktop overview accessibility.
+3. Medical leave creation/approval, attendance issue creation/rejection with a reason, equipment approval/fulfillment and department editing/deletion.
+4. Axe WCAG A/AA scans across time off, requests, attendance, approvals, people, organization, reports, notifications, settings and profile; material quantity editing; no unhandled page errors.
+5. Remote-mode sign-in, CSRF and idempotency headers, bearer token forwarding, one token refresh, explicit 503 failure without demo fallback, memory-only tokens and logout.
+6. Missing-CSRF refusal before credentials are submitted.
+
+Desktop overview and mobile attendance screenshots were visually inspected. Re-running the browser suite regenerates `test-results/overview-desktop.png` and `test-results/attendance-mobile.png`. These artifacts are intentionally ignored by Git.
+
+## Corrections established by the tests
+
+- Browser fetch retains its required global receiver.
+- Late refresh cannot revive a signed-out session.
+- Refresh or business-service outages do not masquerade as confirmed session revocation.
+- Attendance retries retain the original timestamp, payload and idempotency key after an uncertain outcome.
+- Record updates reject stale versions and missing ETags before changing state.
+- Forms expose usable field labels; secondary text and badges meet the sampled contrast checks.
+- Large UI widgets load on demand. PrimeVue columns stay synchronous because the table inspects their vnode types.
+- Acceptance servers are independent of `.env` changes and development hot reloads.
+
+## Not verified and release blockers
+
+No real-backend transaction, cross-tenant isolation, secure refresh-cookie lifecycle, mail delivery, attachment scanning, payroll calculation, production deployment, operational recovery or load test was run. Those capabilities are not implemented by a web client. API schemas and policy/catalog assumptions remain provisional as described in [Integration](INTEGRATION.md).
+
+The audit failure remains visible as a separate failing CI job, rather than being suppressed. Compatible fixes were applied; the remaining automated suggestion is an incompatible Nuxt downgrade and was not applied. Upstream remediation and exposure review are required before release. Automated accessibility scans do not replace a complete manual keyboard and screen-reader assessment.

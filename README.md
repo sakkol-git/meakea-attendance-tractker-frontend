@@ -1,75 +1,32 @@
-# Nuxt Minimal Starter
+# HRFlow web client
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Nuxt 4 + TypeScript people workspace with a teal/cream interface, responsive navigation, attendance, leave, workplace requests, approvals, people, organization, notifications, preferences and reports. Uses conventional Nuxt folders and an isolated typed API boundary.
 
-## Setup
+## Start
 
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
+```sh
+npm ci
+cp .env.example .env
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Use Node 24 LTS (Node 26 is also supported). Open `http://localhost:3000`. Local mode uses clearly labeled synthetic data, in-memory changes and a demo role selector. No cloud account or backend is required to review the interface. Refresh resets demo changes.
 
-Build the application for production:
+## Verify
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+```sh
+npm run check
+npm run test:e2e
+npm audit
 ```
 
-Locally preview production build:
+`check` runs formatting, TypeScript, adapter/unit/architecture tests and a production build. Browser tests use installed Google Chrome on macOS; elsewhere install Chromium with `npx playwright install chromium`. CI installs its browser explicitly. Browser acceptance builds once and starts isolated local/remote instances on ports 3100/3101. Test artifacts appear in ignored `test-results/`.
 
-```bash
-# npm
-npm run preview
+## Read next
 
-# pnpm
-pnpm preview
+- [Architecture and feature recipe](docs/ARCHITECTURE.md)
+- [Remote integration, contracts and blockers](docs/INTEGRATION.md)
+- [Feature coverage](docs/FEATURE-COVERAGE.md)
+- [Verified results and release blockers](docs/VERIFICATION.md)
 
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+The backend does not yet provide the business APIs. Remote adapters are provisional and fail explicitly; this client must not be described as production-integrated until real-backend acceptance passes.
