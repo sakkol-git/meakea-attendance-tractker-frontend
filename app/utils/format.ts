@@ -14,6 +14,20 @@ export const titleCase = (value?: string) =>
     .toLowerCase()
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase())
+export const statusLabel = (status?: string) =>
+  (
+    ({
+      REVIEW_NEEDED: 'Review needed',
+      CONFIRMED: 'Confirmed',
+      PENDING: 'Pending approval',
+      APPROVED: 'Approved',
+      REJECTED: 'Rejected',
+      CANCELLED: 'Cancelled',
+      DRAFT: 'Draft',
+      FULFILLED: 'Fulfilled',
+      COMPLETED: 'Completed',
+    }) as Record<string, string>
+  )[status ?? ''] ?? titleCase(status)
 export function duration(start: string, end: string | null) {
   if (!end) return 'In progress'
   const minutes = Math.max(0, differenceInMinutes(parseISO(end), parseISO(start)))

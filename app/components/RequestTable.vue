@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EntityRow } from '~/types/workspace'
-import { dateLabel, titleCase, initials } from '~/utils/format'
+import { dateLabel, statusLabel, initials } from '~/utils/format'
 const props = defineProps<{
   rows: EntityRow[]
   kind: 'leave' | 'request' | 'correction'
@@ -39,8 +39,8 @@ const target = (row: EntityRow) =>
       />
     </div>
     <PSelect v-model="status" :options="statuses" aria-label="Filter status"
-      ><template #value>{{ status === 'All statuses' ? status : titleCase(status) }}</template
-      ><template #option="slotProps">{{ titleCase(slotProps.option) }}</template></PSelect
+      ><template #value>{{ status === 'All statuses' ? status : statusLabel(status) }}</template
+      ><template #option="slotProps">{{ statusLabel(slotProps.option) }}</template></PSelect
     ><span class="record-count">{{ filtered.length }} records</span>
   </div>
   <PDataTable

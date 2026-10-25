@@ -66,6 +66,14 @@
 
 .p-datatable {
   font-size: 13px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.p-datatable-table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .p-datatable-thead > tr > th {
@@ -101,6 +109,11 @@
 .p-toast .p-toast-message-success .p-toast-summary,
 .p-toast .p-toast-message-success .p-toast-detail {
   color: #164b37;
+}
+
+.p-toast {
+  width: 25rem;
+  max-width: calc(100vw - 32px) !important;
 }
 
 .p-button.p-button-danger:not(.p-button-outlined):not(.p-button-text) {

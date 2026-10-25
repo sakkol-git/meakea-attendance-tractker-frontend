@@ -20,7 +20,7 @@ npm run test:e2e
 npm audit
 ```
 
-`check` runs formatting, TypeScript, adapter/unit/architecture tests and a production build. Browser tests use installed Google Chrome on macOS; elsewhere install Chromium with `npx playwright install chromium`. CI installs its browser explicitly. Browser acceptance builds once and starts isolated local/remote instances on ports 3100/3101. Test artifacts appear in ignored `test-results/`.
+`check` runs formatting, TypeScript, adapter/unit/architecture tests and an explicitly marked demo production build. `npm run build` is reserved for a remote release and fails unless `NUXT_PUBLIC_DATA_SOURCE=remote` and a safe `/api/v1` base URL are configured. Browser tests use installed Google Chrome on macOS; elsewhere install Chromium with `npx playwright install chromium`. CI installs its browser explicitly. Browser acceptance builds once and starts isolated local/remote instances on ports 3100/3101. Test artifacts appear in ignored `test-results/`.
 
 ## Read next
 
@@ -28,6 +28,8 @@ npm audit
 - [Remote integration, contracts and blockers](docs/INTEGRATION.md)
 - [Feature coverage](docs/FEATURE-COVERAGE.md)
 - [Verified results and release blockers](docs/VERIFICATION.md)
+- [Manual client UAT](docs/CLIENT-UAT.md)
+- [Client quality gates](docs/CLIENT-QUALITY.md)
 
 The backend does not yet provide the business APIs. Remote adapters are provisional and fail explicitly; this client must not be described as production-integrated until real-backend acceptance passes.
 

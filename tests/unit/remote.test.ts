@@ -1,6 +1,14 @@
 import { expect, it } from 'vitest'
 import { RemoteDataSource } from '../../app/data/remote'
-import { commandKey } from '../../app/data/source'
+import { commandKey, DataFailure } from '../../app/data/source'
+import { failureMessage } from '../../app/utils/failure'
+
+it('adds a server trace reference to user-facing errors', () => {
+  expect(
+    failureMessage(new DataFailure(503, 'UNAVAILABLE', 'Service unavailable', 'trace-123')),
+  ).toBe('Service unavailable Reference: trace-123.')
+  expect(failureMessage(new Error('Try again later.'))).toBe('Try again later.')
+})
 it('calls browser fetch with the global receiver and forwards CSRF only on mutations', async () => {
   const headers: Headers[] = []
   const fetcher = function (this: unknown, _url: unknown, init?: RequestInit) {
@@ -28,7 +36,6 @@ it('calls browser fetch with the global receiver and forwards CSRF only on mutat
 })
 
 import { authenticatedSource } from '../../app/data/authenticated'
-import { DataFailure } from '../../app/data/source'
 import type { DataRequest, DataSource } from '../../app/data/source'
 it('does not sign out a valid session on a service outage after refresh, and keeps the original command', async () => {
   const requests: DataRequest[] = []

@@ -18,7 +18,7 @@ export default defineConfig({
   projects: [
     {
       name: 'demo',
-      testMatch: ['workspace.spec.ts', 'alignment.spec.ts'],
+      testMatch: ['workspace.spec.ts', 'alignment.spec.ts', 'responsive.spec.ts'],
       use: { baseURL: 'http://127.0.0.1:3100' },
     },
     {
@@ -30,7 +30,7 @@ export default defineConfig({
   reporter: [['list']],
   webServer: [
     {
-      command: 'npm run build && node tests/serve-app.mjs local',
+      command: 'npm run build:demo && node tests/serve-app.mjs local',
       url: 'http://127.0.0.1:3100',
       reuseExistingServer: false,
       timeout: 120000,

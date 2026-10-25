@@ -3,7 +3,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "node scripts/validate-build.mjs && nuxt build",
+    "build:demo": "node scripts/validate-build.mjs --demo && nuxt build",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "check:structure": "node scripts/check-structure.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -11,12 +14,13 @@
     "test:data": "node --test tests/data.test.ts",
     "typecheck": "nuxt typecheck",
     "test:unit": "vitest run",
-    "test": "npm run test:data && npm run test:unit",
+    "test:config": "node --test tests/build-config.test.mjs",
+    "test": "npm run test:data && npm run test:config && npm run test:unit",
     "test:e2e": "playwright test",
     "test:live-auth": "node tests/live-auth.mjs",
     "format": "prettier --write app tests nuxt.config.ts vitest.config.ts playwright.config.ts",
     "format:check": "prettier --check app tests nuxt.config.ts vitest.config.ts playwright.config.ts",
-    "check": "npm run format:check && npm run typecheck && npm test && npm run build"
+    "check": "npm run format:check && npm run check:structure && npm run typecheck && npm test && npm run build:demo && npm run check:bundle"
   },
   "dependencies": {
     "@fontsource-variable/kantumruy-pro": "5.3.0",

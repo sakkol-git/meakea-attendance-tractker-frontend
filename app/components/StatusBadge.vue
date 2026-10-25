@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { titleCase } from '~/utils/format'
+import { statusLabel } from '~/utils/format'
 const props = defineProps<{ status?: string }>()
 const severity = computed(
   () =>
@@ -16,4 +16,4 @@ const severity = computed(
     })[props.status || ''] || 'info',
 )
 </script>
-<template><PTag :value="titleCase(status)" :severity="severity" rounded /></template>
+<template><PTag :value="statusLabel(status)" :severity="severity" rounded /></template>

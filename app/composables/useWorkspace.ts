@@ -1,6 +1,7 @@
 import { useToast } from 'primevue/usetoast'
 import { useQuery } from '@tanstack/vue-query'
 import { DataFailure } from '../data/source'
+import { failureMessage } from '../utils/failure'
 import type { MaybeRefOrGetter } from 'vue'
 export const useWorkspace = () => useNuxtApp().$workspace
 export function useWorkspaceQuery<T>(key: MaybeRefOrGetter<string>, fetcher: () => Promise<T>) {
@@ -32,7 +33,7 @@ export function useFeedback() {
       await app.$queryClient.invalidateQueries({ queryKey: ['workspace'] })
       return result
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Something went wrong. Please try again.'
+      error.value = failureMessage(e)
       toast.add({
         severity: 'error',
         summary:

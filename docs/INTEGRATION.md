@@ -6,6 +6,8 @@ The UI is usable in explicit demo mode. Real HR transactions cannot be accepted 
 
 Run `npm ci`, copy `.env.example` to `.env`, then `npm run dev`. Default mode is local. The shell labels all data synthetic and lets you preview employee, manager, HR administrator and owner roles. Browser refresh resets the simulation. The shared canonical fixture in `app/data/demo-seed.json` is preserved; `app/data/demo.ts` adds UI-only sample history, balances and organization records.
 
+Use `npm run build:demo` when packaging an intentional demonstration. The normal `npm run build` command accepts only remote mode with an absolute HTTPS API URL ending in `/api/v1`; loopback HTTP remains available for local integration. This prevents an unlabeled release artifact from silently using synthetic data.
+
 For remote mode, set `NUXT_PUBLIC_DATA_SOURCE=remote` and `NUXT_PUBLIC_API_BASE_URL=https://your-host/api/v1`, then restart/rebuild. Public runtime config contains no secrets. Production hosting must deliberately select remote mode; default demo mode is not a production configuration. HTTPS is required except loopback development. No credentials, query strings or fragments are accepted in the base URL.
 
 ## Identity and transport
@@ -30,7 +32,7 @@ Every path below is relative to `/api/v1`. Route mappings live only in `app/api/
 | People            | List/create `/employees`; detail/PATCH by ID; POST `/{id}/terminate`                                                                                                |
 | Organization      | List/create/detail/PATCH/DELETE departments, positions, shifts, holidays, work-sites and materials                                                                  |
 | Notifications     | GET `/notifications`, `/notifications/preferences`; POST `/{id}/read`, `/read-all`; PUT preferences with ETag                                                       |
-| Reporting         | GET `/reports/dashboard`; POST `/reports/exports`, then GET `/reports/exports/{id}` until the job is complete; download from a trusted URL                                                   |
+| Reporting         | GET `/reports/dashboard`; POST `/reports/exports`, then GET `/reports/exports/{id}` until the job is complete; download from a trusted URL                          |
 | Approval coverage | GET/POST `/approvals/delegations`, DELETE `/approvals/delegations/{id}` with `If-Match`, and GET `/approvals/eligible-delegates`                                    |
 
 Lists expect `{ items, total }`. The employee directory and approval queues additionally require zero-based `page` and bounded `size` metadata in their responses. Web sends `page` and `size` (1–100); approval queues also send `search`, `status`, `sort` and `minAgeDays`. The demo applies filtering and sorting before pagination, and the approval screen offers Previous/Next controls. These query parameters and delegation routes remain pending provider contracts. Large directory/catalog browsing, date/holiday policy, approval routing and organization dependency checks still require real provider acceptance. Dropdown choices are provisional demo categories; they do not establish an approved company policy.

@@ -35,3 +35,22 @@ test('mobile-aligned approvals, delegation and accessible coverage view', async 
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
   expect(results.violations.map((violation) => violation.id)).toEqual([])
 })
+
+test('keyboard users can skip navigation and leave a dialog safely', async ({ page }) => {
+  await page.goto('/')
+  await page.keyboard.press('Tab')
+  const skipLink = page.getByRole('link', { name: 'Skip to content' })
+  await expect(skipLink).toBeFocused()
+  await expect(skipLink).toBeVisible()
+  await page.keyboard.press('Enter')
+  await expect(page.locator('#main-content')).toBeFocused()
+
+  await page.goto('/requests')
+  const trigger = page.getByRole('button', { name: 'New request' })
+  await trigger.focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  await expect(trigger).toBeFocused()
+})

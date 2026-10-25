@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { failureMessage } from '../utils/failure'
+
 defineProps<{
   pending?: boolean
   error?: unknown
@@ -17,9 +19,7 @@ defineEmits<{ retry: [] }>()
   <div v-else-if="error" class="empty-state error-state" role="alert">
     <span class="state-icon"><AppIcon name="exclamation-circle" /></span>
     <h2>We couldn’t load this</h2>
-    <p>
-      {{ error instanceof Error ? error.message : 'Please check your connection and try again.' }}
-    </p>
+    <p>{{ failureMessage(error) }}</p>
     <PButton label="Try again" icon="pi pi-refresh" outlined @click="$emit('retry')" />
   </div>
   <div v-else-if="empty" class="empty-state">

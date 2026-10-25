@@ -4,7 +4,7 @@ import { WorkspaceDemoSource, workingDays } from '../../app/data/demo'
 import { LocalDataSource } from '../../app/data/local'
 import { DataFailure } from '../../app/data/source'
 import type { DataRequest, DataSource } from '../../app/data/source'
-import { csvCell, safeDownloadUrl, tenantDay } from '../../app/utils/format'
+import { csvCell, safeDownloadUrl, statusLabel, tenantDay } from '../../app/utils/format'
 import { decode, Profile } from '../../app/schemas/contracts'
 
 function fixture() {
@@ -209,6 +209,12 @@ describe('remote command safety', () => {
   })
 })
 describe('safe formatting', () => {
+  it('uses the shared workflow status vocabulary', () => {
+    expect(statusLabel('PENDING')).toBe('Pending approval')
+    expect(statusLabel('REVIEW_NEEDED')).toBe('Review needed')
+    expect(statusLabel('CUSTOM_STATUS')).toBe('Custom Status')
+  })
+
   it('neutralizes CSV formulas and embedded quotes', () => {
     expect(csvCell('=1+1')).toBe('"\'=1+1"')
     expect(csvCell('a"b')).toBe('"a""b"')
