@@ -38,9 +38,9 @@ Mobile remains the primary interaction reference for shared workflows. Accepted 
 Final local verification on 25 October 2026:
 
 - Web `npm run check`: formatting, structure and bundle budgets, type checking, 8 data tests, 2 release-configuration tests, 87 unit tests and the explicitly marked demo production build passed.
-- Web `npm run test:e2e`: 9 browser scenarios passed across demo and remote-contract projects, including all 40 workflow routes, WCAG A/AA axe scans and overflow checks on 11 main routes at phone, tablet and desktop widths.
+- Web `npm run test:e2e`: 10 browser scenarios passed across demo and remote-contract projects, including all 40 workflow routes, keyboard focus restoration, WCAG A/AA axe scans and overflow checks on 11 main routes at phone, tablet and desktop widths.
 - Mobile `fvm flutter analyze`: passed with no issues.
-- Mobile `fvm flutter test`: 147 tests passed and one live-gateway test was skipped because credentials were not supplied. Coverage includes role workflows, release and URL configuration, source-growth limits, 200 percent text layouts, 14 light/dark golden references, tablet adaptation and support-reference formatting.
+- Mobile `fvm flutter test`: 148 tests passed and one live-gateway test was skipped because credentials were not supplied. Coverage includes role workflows, shared status vocabulary, release and URL configuration, source-growth limits, 200 percent text layouts, 14 light/dark golden references, tablet adaptation and support-reference formatting.
 - Shared contract validation: 158 operations validated and both client bundles match the canonical OpenAPI file.
 
 These checks prove client behavior against synthetic and contract fixtures. They cannot prove the live gateway, service authorization, tenant isolation, storage provider, mobile operating-system behavior, performance on target devices or representative-user acceptance.

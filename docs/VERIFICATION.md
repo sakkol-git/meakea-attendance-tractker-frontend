@@ -10,11 +10,11 @@ Verified on 2026-10-25 in the local workspace with installed Google Chrome. GitH
 | `npm run test:config`  | PASS: 2 release-configuration cases                                                                                         |
 | `npm run test:unit`    | PASS: 87 workflow, command, auth, transport, formatting and architecture cases across 16 files                              |
 | `npm run build:demo`   | PASS: explicitly marked demonstration Node server and client assets generated                                               |
-| `npm run test:e2e`     | PASS: 9 cases, 1.1 minutes including startup                                                                                |
+| `npm run test:e2e`     | PASS: 10 cases, 1.3 minutes including startup                                                                               |
 | `git diff --check`     | PASS                                                                                                                        |
 | `npm audit`            | FAIL: 7 high-severity package findings in the node-forge/Nuxt tooling dependency chain; no compatible automated fix remains |
 
-`npm run check` combines formatting, structure and bundle budgets, type checking, all 97 non-browser tests and the demo production build. All nine browser cases run against isolated production builds on ports 3100 and 3101, not the development server. The remote instance uses controlled HTTP responses to verify the client contract, not a running HR backend. A normal release build also has a negative configuration test: implicit local mode is refused, while remote mode requires a safe `/api/v1` URL.
+`npm run check` combines formatting, structure and bundle budgets, type checking, all 97 non-browser tests and the demo production build. All ten browser cases run against isolated production builds on ports 3100 and 3101, not the development server. The remote instance uses controlled HTTP responses to verify the client contract, not a running HR backend. A normal release build also has a negative configuration test: implicit local mode is refused, while remote mode requires a safe `/api/v1` URL.
 
 ## Browser evidence
 
@@ -27,6 +27,7 @@ Verified on 2026-10-25 in the local workspace with installed Google Chrome. GitH
 7. Eleven main workspace routes at 390 × 844, 820 × 1180 and 1440 × 1050, with document-overflow detection and bounded table/toast surfaces.
 8. Remote-mode sign-in, CSRF and idempotency headers, bearer token forwarding, one token refresh, explicit 503 failure without demo fallback, memory-only tokens and logout.
 9. Missing-CSRF refusal before credentials are submitted.
+10. Keyboard entry reaches the skip link first, moves focus to main content, closes a dialog with Escape and restores focus to its trigger.
 
 Desktop overview, mobile attendance and the advanced leave-ledger screen were visually inspected. The workflow suite also regenerates `test-results/workflows-desktop.png` and `test-results/leave-ledger-desktop.png`. Re-running the browser suite regenerates `test-results/overview-desktop.png` and `test-results/attendance-mobile.png`. These artifacts are intentionally ignored by Git.
 

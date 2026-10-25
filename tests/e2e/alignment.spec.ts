@@ -37,9 +37,22 @@ test('mobile-aligned approvals, delegation and accessible coverage view', async 
 })
 
 test('keyboard users can skip navigation and leave a dialog safely', async ({ page }) => {
-  await page.goto('/')
-  await page.keyboard.press('Tab')
+  const response = await page.goto('/')
+  expect(response?.headers()['content-security-policy']).toContain("frame-ancestors 'none'")
+  expect(response?.headers()['x-content-type-options']).toBe('nosniff')
+  expect(response?.headers()['referrer-policy']).toBe('strict-origin-when-cross-origin')
   const skipLink = page.getByRole('link', { name: 'Skip to content' })
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  let firstInteractive = ''
+  for (let attempt = 0; attempt < 4 && !firstInteractive; attempt++) {
+    await page.keyboard.press('Tab')
+    firstInteractive = await page.evaluate(() =>
+      ['BODY', 'HTML'].includes(document.activeElement?.tagName ?? '')
+        ? ''
+        : document.activeElement?.textContent?.trim() || '',
+    )
+  }
+  expect(firstInteractive).toBe('Skip to content')
   await expect(skipLink).toBeFocused()
   await expect(skipLink).toBeVisible()
   await page.keyboard.press('Enter')
