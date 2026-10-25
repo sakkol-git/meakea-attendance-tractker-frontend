@@ -73,8 +73,71 @@ describe('workflow integration against explicit demo adapter', () => {
       api.savePreferences({ email: true, inApp: true, reminders: true }, p.etag),
     ).rejects.toMatchObject({ status: 412 })
   })
+  it('creates, protects and cancels an approval delegation', async () => {
+    const { demo, api } = fixture()
+    await expect(api.delegations()).rejects.toMatchObject({ status: 403 })
+    demo.setRole('MANAGER')
+    const candidates = await api.eligibleDelegates()
+    expect(candidates.items.some((person) => person.id === 'demo-manager')).toBe(false)
+    const row = await api.createDelegation({
+      delegateId: 'demo-hr',
+      startsOn: '2026-10-25',
+      endsOn: '2026-10-31',
+      reason: 'Annual leave coverage',
+    })
+    await expect(
+      api.createDelegation({
+        delegateId: 'demo-owner',
+        startsOn: '2026-10-26',
+        endsOn: '2026-10-27',
+        reason: 'Overlapping coverage',
+      }),
+    ).rejects.toMatchObject({ status: 409 })
+    const cancelled = await api.cancelDelegation(row.id, row.version)
+    expect(cancelled.status).toBe('CANCELLED')
+  })
 })
 describe('remote command safety', () => {
+  it('polls asynchronous report exports and stops on a terminal failure', async () => {
+    const calls: DataRequest[] = []
+    let statusReads = 0
+    const api = new WorkspaceApi(
+      {
+        mode: 'remote',
+        async send(request) {
+          calls.push(request)
+          if (request.method === 'POST')
+            return {
+              status: 202,
+              data: { id: 'export-1', status: 'PENDING', version: 1 },
+            }
+          statusReads += 1
+          return {
+            status: 200,
+            data: {
+              id: 'export-1',
+              status: statusReads === 1 ? 'RUNNING' : 'FAILED',
+              version: statusReads + 1,
+            },
+          }
+        },
+      },
+      () => {},
+      undefined,
+      async () => {},
+    )
+
+    await expect(api.downloadLeaveReport('', 'https://hr.test')).rejects.toMatchObject({
+      code: 'EXPORT_FAILED',
+    })
+    expect(calls.map(({ method, path }) => `${method} ${path}`)).toEqual([
+      'POST /reports/exports',
+      'GET /reports/exports/export-1',
+      'GET /reports/exports/export-1',
+    ])
+    expect(calls[0]!.body).toEqual({ report: 'LEAVE', format: 'CSV' })
+  })
+
   it('preserves the original attendance timestamp and key after an uncertain outcome', async () => {
     const calls: DataRequest[] = []
     const api = new WorkspaceApi({
@@ -129,6 +192,18 @@ describe('remote command safety', () => {
     await expect(api.create('leaves', {})).rejects.toThrow('Offline')
     expect(sent).toBe(false)
   })
+  it('supports pagination parameters in list queries', async () => {
+    const { demo, api } = fixture()
+    demo.setRole('HR_ADMIN')
+    const full = await api.list('employees')
+    expect(full.items.length).toBeGreaterThanOrEqual(2)
+    const first = await api.list('employees', { page: 0, size: 1 })
+    const second = await api.list('employees', { page: 1, size: 1 })
+    expect(first.items).toEqual([full.items[0]])
+    expect(second.items).toEqual([full.items[1]])
+    expect(first.total).toBe(full.total)
+    expect(second.total).toBe(full.total)
+  })
   it('rejects invalid responses instead of substituting demo data', () => {
     expect(() => decode(Profile, {})).toThrow(DataFailure)
   })
@@ -142,6 +217,11 @@ describe('safe formatting', () => {
     expect(() => safeDownloadUrl('javascript:alert(1)', '', 'https://hr.test')).toThrow()
     expect(() => safeDownloadUrl('https://evil.test/export', '', 'https://hr.test')).toThrow()
     expect(safeDownloadUrl('/export', '', 'https://hr.test')).toBe('https://hr.test/export')
+    expect(
+      safeDownloadUrl('https://files.hr.test/export', '', 'https://hr.test', [
+        'https://files.hr.test',
+      ]),
+    ).toBe('https://files.hr.test/export')
   })
   it('uses the workspace date rather than UTC at midnight', () => {
     expect(tenantDay('2026-01-01T23:30:00Z', 'Asia/Phnom_Penh')).toBe('2026-01-02')

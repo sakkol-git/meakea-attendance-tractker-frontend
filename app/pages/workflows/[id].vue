@@ -91,7 +91,7 @@ async function upload() {
   if (!file.value) return
   const record = await feedback.run(
     () => app.$business.upload(uploadScope.value, ownerId.value, file.value!),
-    'Local file attached',
+    'File attached',
   )
   if (record) {
     expanded.value = record
@@ -270,7 +270,7 @@ onBeforeUnmount(() => clearInterval(timer))
               scanning and production retention remain server responsibilities.</small
             >
           </div>
-          <PButton label="Attach local file" type="submit" :loading="feedback.busy.value" />
+          <PButton label="Attach file" type="submit" :loading="feedback.busy.value" />
         </form>
         <p
           v-if="!actions.length && !formKind && flow.number !== 26 && flow.number !== 40"
@@ -377,7 +377,7 @@ onBeforeUnmount(() => clearInterval(timer))
     :visible="!!expanded"
     modal
     :header="expanded?.title"
-    :style="{ width: '42rem' }"
+    class="dialog-xl"
     @update:visible="expanded = undefined"
     ><template v-if="expanded"
       ><StatusBadge :status="expanded.status" />

@@ -1,9 +1,47 @@
 <script setup lang="ts">
 import { clockLabel, dateLabel, duration, tenantDay } from '~/utils/format'
 const api = useWorkspace()
+const app = useNuxtApp()
 const session = useSessionStore()
+const feedback = useFeedback()
 const history = useWorkspaceQuery('attendance', () => api.attendance())
 const corrections = useWorkspaceQuery('corrections', () => api.list('corrections'))
+const pendingInferred = useWorkspaceQuery('pending-inferred-attendance', () =>
+  session.mode === 'local'
+    ? app.$business.snapshot('BF-011')
+    : Promise.resolve({ items: [], references: [], note: '' }),
+)
+const inferredItem = computed(() =>
+  pendingInferred.data.value?.items.find((x) => x.status === 'PENDING'),
+)
+
+async function confirmInferred(recordId: string) {
+  const result = await feedback.run(
+    () => app.$business.execute('BF-011', 'confirm', { recordId }, crypto.randomUUID()),
+    'Attendance session confirmed',
+  )
+  if (result) {
+    await pendingInferred.refetch()
+    await history.refetch()
+  }
+}
+
+async function rejectInferred(recordId: string) {
+  const result = await feedback.run(
+    () =>
+      app.$business.execute(
+        'BF-011',
+        'reject',
+        { recordId, reason: 'Reported presence was declined by employee.' },
+        crypto.randomUUID(),
+      ),
+    'Proposed session declined',
+  )
+  if (result) {
+    await pendingInferred.refetch()
+  }
+}
+
 const from = ref('')
 const to = ref('')
 const visible = ref(false)
@@ -31,6 +69,43 @@ function clearDates() {
       icon="pi pi-clock"
       @click="navigateTo('/')"
   /></PageHeading>
+  <AttendanceGeoCard />
+  <section v-if="inferredItem" class="panel inferred-review-panel">
+    <div class="inferred-badge">
+      <AppIcon name="clock" />
+      <span>ACTION REQUIRED · WORKDAY CONFIRMATION (BF-011)</span>
+    </div>
+    <div class="inferred-body">
+      <div>
+        <h3>{{ inferredItem.title }} · {{ String(inferredItem.details?.workDate ?? '') }}</h3>
+        <p>
+          Passive telemetry detected presence from
+          <strong>{{ String(inferredItem.details?.clockIn ?? '') }}</strong> to
+          <strong>{{ String(inferredItem.details?.clockOut ?? '') }}</strong
+          >.
+        </p>
+        <small class="subtle"
+          >Source: {{ String(inferredItem.details?.source ?? 'INFERRED') }} (Wi-Fi &amp; BLE beacon
+          cluster)</small
+        >
+      </div>
+      <div class="inline-actions">
+        <PButton
+          label="Confirm workday"
+          icon="pi pi-check"
+          :loading="feedback.busy.value"
+          @click="confirmInferred(inferredItem.id)"
+        />
+        <PButton
+          label="Decline"
+          severity="secondary"
+          outlined
+          :disabled="feedback.busy.value"
+          @click="rejectInferred(inferredItem.id)"
+        />
+      </div>
+    </div>
+  </section>
   <div class="attendance-stats">
     <section class="panel">
       <span class="eyebrow">RECORDS IN VIEW</span><strong>{{ rows.length }}</strong
@@ -78,7 +153,6 @@ function clearDates() {
         :value="rows"
         :paginator="rows.length > 8"
         :rows="8"
-        table-style="min-width: 36rem"
         :pt="{
           tableContainer: { role: 'region', 'aria-label': 'Attendance sessions', tabindex: 0 },
         }"

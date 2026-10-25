@@ -13,6 +13,7 @@
     "test:unit": "vitest run",
     "test": "npm run test:data && npm run test:unit",
     "test:e2e": "playwright test",
+    "test:live-auth": "node tests/live-auth.mjs",
     "format": "prettier --write app tests nuxt.config.ts vitest.config.ts playwright.config.ts",
     "format:check": "prettier --check app tests nuxt.config.ts vitest.config.ts playwright.config.ts",
     "check": "npm run format:check && npm run typecheck && npm test && npm run build"

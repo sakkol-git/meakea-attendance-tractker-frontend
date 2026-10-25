@@ -1,6 +1,8 @@
 import fixture from './demo-seed.json' with { type: 'json' }
 import { DataFailure, validateRequest } from './source.ts'
+import { pageRows } from './page.ts'
 import type { DataRequest, DataResponse, DataSource, RecordData } from './source.ts'
+import { applyListQuery } from '../utils/approval.ts'
 
 type Role = 'EMPLOYEE' | 'MANAGER' | 'HR_ADMIN' | 'OWNER'
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value))
@@ -47,12 +49,6 @@ export class LocalDataSource implements DataSource {
   }
   async send(request: DataRequest): Promise<DataResponse> {
     validateRequest(request)
-    if (Object.keys(request.query ?? {}).length)
-      throw new DataFailure(
-        501,
-        'DEMO_NOT_IMPLEMENTED',
-        'Local query filters are not implemented yet.',
-      )
     const scope = `${this.actor}:${request.method}:${request.path}:${request.idempotencyKey}`
     const fingerprint = canonical({
       body: request.body ?? null,
@@ -82,10 +78,29 @@ export class LocalDataSource implements DataSource {
     })
     if (r.method === 'GET' && r.path === '/auth/me')
       return ok({ ...this.state.profile, roles: [this.actor] })
+    if (r.method === 'POST' && r.path === '/auth/forgot-password')
+      return ok({ message: 'If an account exists with this email, instructions have been sent.' })
+    if (r.method === 'POST' && r.path === '/auth/reset-password')
+      return ok({ message: 'Password has been reset successfully.' })
+    if (r.method === 'POST' && r.path === '/auth/setup')
+      return ok({
+        message:
+          'Workspace created. Follow the owner invitation supplied by your administrator, then sign in with your company workspace.',
+      })
+    if (r.method === 'POST' && r.path === '/auth/change-password')
+      return ok({ message: 'Password has been changed successfully.' })
+    if (r.method === 'PATCH' && r.path === '/auth/profile') {
+      const body = (r.body ?? {}) as Record<string, unknown>
+      const profile = this.state.profile as Record<string, unknown>
+      if (typeof body.name === 'string' && body.name.trim()) profile.name = body.name.trim()
+      if (typeof body.timeZone === 'string' && body.timeZone.trim())
+        profile.timeZone = body.timeZone.trim()
+      return ok({ ...this.state.profile, roles: [this.actor] })
+    }
     if (r.method === 'GET' && r.path === '/employees') {
       if (this.actor === 'EMPLOYEE')
         throw new DataFailure(403, 'FORBIDDEN', 'Management access is required.')
-      return ok({ items: this.state.employees, total: this.state.employees.length })
+      return ok(pageRows(this.state.employees, r.query))
     }
     if (r.method === 'GET' && r.path === '/notifications')
       return ok({ items: this.notifications, total: this.notifications.length })
@@ -135,10 +150,24 @@ export class LocalDataSource implements DataSource {
       if (r.method === 'GET' && [resource.listPath, `${resource.path}/pending`].includes(r.path)) {
         if (r.path.endsWith('/pending') && this.actor === 'EMPLOYEE')
           throw new DataFailure(403, 'FORBIDDEN', 'Management access is required.')
-        const items = r.path.endsWith('/pending')
-          ? rows.filter((row) => row.status === 'PENDING')
+        let items = r.path.endsWith('/pending')
+          ? rows.filter((row) => row.status === (r.query?.status ?? 'PENDING'))
           : rows
-        return ok({ items, total: items.length })
+        const result = applyListQuery(items as ({ id: string } & RecordData)[], {
+          page: Math.max(0, Number(r.query?.page ?? 0)),
+          size: Number(r.query?.size ?? (items.length || 1)),
+          search: r.query?.search,
+          status: r.query?.status,
+          sort:
+            r.query?.sort === 'newest'
+              ? 'newest'
+              : r.query?.sort === 'oldest'
+                ? 'oldest'
+                : undefined,
+          minAgeDays: Number(r.query?.minAgeDays ?? 0),
+          now: this.now(),
+        })
+        return ok(result)
       }
       if (r.method === 'POST' && r.path === resource.path) {
         if (!r.body || Object.keys(r.body).length === 0)
@@ -217,6 +246,18 @@ export class LocalDataSource implements DataSource {
         status: String(row.status),
         at: this.now().toISOString(),
         reason: String(r.body?.reason ?? ''),
+        ...(action === 'fulfill'
+          ? {
+              materialId: r.body?.materialId,
+              materialName: r.body?.materialName,
+              quantity: r.body?.quantity,
+              requestedQuantity: r.body?.requestedQuantity,
+              issuedBefore: r.body?.issuedBefore,
+              remainingAfter: r.body?.remainingAfter,
+              stockBefore: r.body?.stockBefore,
+              stockAfter: r.body?.stockAfter,
+            }
+          : {}),
       })
       row.history = history
       row.version = Number(row.version) + 1

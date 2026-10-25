@@ -1,31 +1,38 @@
 <script setup lang="ts">
 import type { EntityRow, Resource } from '~/types/workspace'
 import { useConfirm } from 'primevue/useconfirm'
+import { filterRecords } from '~/utils/filter'
 definePageMeta({ roles: ['HR_ADMIN', 'OWNER'] })
 const api = useWorkspace()
 const confirm = useConfirm()
 const feedback = useFeedback()
-const tab = ref<Resource>('departments')
+type OrgTab = Resource | 'orgChart'
+
+const tab = ref<OrgTab>('departments')
 const editing = ref<EntityRow>()
 const visible = ref(false)
+const bulkImport = ref(false)
 const search = ref('')
-const categories: { label: string; value: Resource; icon: string }[] = [
+const categories: { label: string; value: OrgTab; icon: string }[] = [
   { label: 'Departments', value: 'departments', icon: 'sitemap' },
   { label: 'Positions', value: 'positions', icon: 'id-card' },
+  { label: 'Org chart', value: 'orgChart', icon: 'users' },
   { label: 'Shifts', value: 'shifts', icon: 'clock' },
   { label: 'Holidays', value: 'holidays', icon: 'sun' },
   { label: 'Work sites', value: 'workSites', icon: 'map-marker' },
   { label: 'Materials', value: 'materials', icon: 'box' },
 ]
 const queries = Object.fromEntries(
-  categories.map((x) => [x.value, useWorkspaceQuery(x.value, () => api.list(x.value))]),
+  categories
+    .filter((x) => x.value !== 'orgChart')
+    .map((x) => [x.value, useWorkspaceQuery(x.value, () => api.list(x.value as Resource))]),
 )
-const result = computed(() => queries[tab.value]!)
-const rows = computed(
-  () =>
-    result.value.data.value?.items.filter((x) =>
-      `${x.name} ${x.description || ''}`.toLowerCase().includes(search.value.toLowerCase()),
-    ) || [],
+const activeResource = computed<Resource>(() =>
+  tab.value === 'orgChart' ? 'departments' : (tab.value as Resource),
+)
+const result = computed(() => queries[activeResource.value]!)
+const rows = computed(() =>
+  filterRecords(result.value.data.value?.items || [], ['name', 'description'], search.value),
 )
 function open(row?: EntityRow) {
   editing.value = row
@@ -41,7 +48,7 @@ function remove(row: EntityRow) {
     acceptProps: { severity: 'danger' },
     accept: () =>
       feedback.run(
-        () => api.change(tab.value, row.id, '', row.version, undefined, 'DELETE'),
+        () => api.change(tab.value as Resource, row.id, '', row.version, undefined, 'DELETE'),
         'Record deleted',
       ),
   })
@@ -56,8 +63,15 @@ watch(tab, () => {
     title="Organization"
     description="The foundations of a well-connected workplace."
     eyebrow="MAKE YOURSELF AT HOME"
-    ><PButton label="Add a record" icon="pi pi-plus" @click="open()"
-  /></PageHeading>
+  >
+    <div v-if="tab !== 'orgChart'" class="heading-actions">
+      <NuxtLink v-if="tab === 'shifts'" to="/workflows/BF-005">
+        <PButton label="Assign shift" icon="pi pi-user-plus" outlined />
+      </NuxtLink>
+      <PButton label="Bulk import" icon="pi pi-upload" outlined @click="bulkImport = true" />
+      <PButton label="Add a record" icon="pi pi-plus" @click="open()" />
+    </div>
+  </PageHeading>
   <div class="segmented-tabs wrap" role="group" aria-label="Organization category">
     <button
       v-for="item in categories"
@@ -69,14 +83,19 @@ watch(tab, () => {
       <AppIcon :name="item.icon" />{{ item.label }}
     </button>
   </div>
-  <section class="panel no-padding">
+  <section v-if="tab === 'orgChart'" class="panel">
+    <OrgChart />
+  </section>
+  <section v-else class="panel no-padding">
     <div class="table-toolbar">
       <h2>{{ categories.find((x) => x.value === tab)?.label }}</h2>
-      <PInputText
-        v-model="search"
-        aria-label="Search organization records"
-        placeholder="Search records…"
-      />
+      <div class="search-field">
+        <AppIcon name="search" /><PInputText
+          v-model="search"
+          aria-label="Search organization records"
+          placeholder="Search records…"
+        />
+      </div>
     </div>
     <QueryState
       :pending="result.isPending.value"
@@ -86,7 +105,7 @@ watch(tab, () => {
       message="Create the first record in this category."
       @retry="result.refetch()"
       ><div class="table-region" role="region" aria-label="Organization records" tabindex="0">
-        <PDataTable :value="rows" paginator :rows="10" data-key="id" table-style="min-width: 38rem"
+        <PDataTable :value="rows" paginator :rows="10" data-key="id" class="table-org"
           ><PColumn field="name" header="Name" sortable /><PColumn
             field="description"
             header="Description"
@@ -122,8 +141,15 @@ watch(tab, () => {
   <ResourceForm
     v-model:visible="visible"
     kind="master"
-    :path="tab"
+    :path="activeResource"
     :initial="editing"
     :heading="`${editing ? 'Edit' : 'Add'} ${categories.find((x) => x.value === tab)?.label.toLowerCase()}`"
+  />
+  <BulkImportDialog
+    v-if="tab !== 'orgChart'"
+    v-model:visible="bulkImport"
+    :resource="tab as Resource"
+    :title="`Bulk import ${categories.find((x) => x.value === tab)?.label.toLowerCase()}`"
+    @imported="() => result?.refetch()"
   />
 </template>

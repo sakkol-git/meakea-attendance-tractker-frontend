@@ -1,0 +1,37 @@
+import { expect, test } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+
+test('mobile-aligned approvals, delegation and accessible coverage view', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'Manager', exact: true }).click()
+  await expect(page.getByRole('combobox', { name: 'Demo role' })).toContainText('Manager')
+  await page.getByRole('link', { name: 'Approvals', exact: false }).first().click()
+
+  await expect(page.getByRole('textbox', { name: 'Search approvals' })).toBeVisible()
+  await expect(page.getByRole('combobox', { name: 'Filter waiting age' })).toBeVisible()
+  await expect(page.getByRole('combobox', { name: 'Sort approvals' })).toContainText('Oldest first')
+  await page.screenshot({ path: 'test-results/aligned-approvals.png', fullPage: true })
+
+  await page.getByRole('link', { name: 'Manage delegation' }).click()
+  await page.getByRole('button', { name: 'New delegation' }).click()
+  await page.getByRole('combobox', { name: 'Reviewer', exact: true }).click()
+  await page.getByRole('option', { name: 'Kim Sreyneang' }).click()
+  await page.getByLabel('Start date · Required', { exact: true }).fill('2030-02-01')
+  await page.getByLabel('End date · Required', { exact: true }).fill('2030-02-07')
+  await page.getByLabel('Reason · Required', { exact: true }).fill('Annual leave review coverage')
+  await page.getByRole('button', { name: 'Create delegation' }).click()
+  await expect(page.getByRole('cell', { name: 'Kim Sreyneang' })).toBeVisible()
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel delegation' }).click()
+  await expect(page.getByText('Cancelled', { exact: true })).toBeVisible()
+
+  await page.goto('/leave')
+  await page.getByRole('button', { name: 'Team calendar' }).click()
+  await page.getByRole('button', { name: 'Accessible list' }).click()
+  await expect(page.getByText(/of \d+ off, coverage/).first()).toBeVisible()
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+  expect(results.violations.map((violation) => violation.id)).toEqual([])
+})

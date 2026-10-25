@@ -50,6 +50,12 @@ function deactivate() {
           <StatusBadge :status="row.status" />
         </div>
         <dl class="detail-list">
+          <div v-if="row.employeeNo">
+            <dt>Employee ID</dt>
+            <dd>
+              <span class="text-mono">{{ row.employeeNo }}</span>
+            </dd>
+          </div>
           <div>
             <dt>Email</dt>
             <dd>{{ row.email }}</dd>
@@ -62,19 +68,29 @@ function deactivate() {
             <dt>Department</dt>
             <dd>{{ row.department }}</dd>
           </div>
+          <div v-if="row.hireDate">
+            <dt>Hire date</dt>
+            <dd>{{ row.hireDate }}</dd>
+          </div>
           <div>
             <dt>Record revision</dt>
             <dd>{{ row.version }}</dd>
           </div>
         </dl>
-        <PButton
-          v-if="session.isAdmin && row.status !== 'INACTIVE' && id !== session.profile?.employeeId"
-          label="Deactivate person"
-          severity="danger"
-          outlined
-          :loading="feedback.busy.value"
-          @click="deactivate"
-        />
+        <div v-if="session.isAdmin" class="inline-actions profile-actions">
+          <NuxtLink :to="{ path: '/workflows/BF-005', query: { employee: id } }">
+            <PButton label="Assign shift" icon="pi pi-clock" outlined size="small" />
+          </NuxtLink>
+          <PButton
+            v-if="row.status !== 'INACTIVE' && id !== session.profile?.employeeId"
+            label="Deactivate person"
+            severity="danger"
+            outlined
+            size="small"
+            :loading="feedback.busy.value"
+            @click="deactivate"
+          />
+        </div>
       </section>
       <ResourceForm v-model:visible="edit" kind="employee" :initial="row" /></template
   ></QueryState>

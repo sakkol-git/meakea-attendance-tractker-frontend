@@ -1,7 +1,9 @@
+const publicRoutes = ['/login', '/forgot-password', '/reset-password', '/setup']
+
 export default defineNuxtRouteMiddleware(async (to) => {
   const session = useSessionStore()
   await session.initialize()
-  if (to.path === '/login') return
+  if (publicRoutes.includes(to.path)) return
   if (!session.profile)
     return navigateTo({
       path: '/login',

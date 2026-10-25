@@ -7,6 +7,8 @@ import { WorkspaceDemoSource } from '../data/demo'
 import { WorkspaceApi } from '../api/workspace'
 import { SessionService } from '../api/auth'
 
+import { RemoteBusinessAdapter } from '../data/remote-business'
+
 export default defineNuxtPlugin({
   name: 'workspace-data',
   setup() {
@@ -38,7 +40,7 @@ export default defineNuxtPlugin({
           'A secure session cookie is missing. Reload the sign-in page or contact your workspace administrator.',
         )
     }
-    const sessionService = new SessionService(client, source, guard)
+    const sessionService = new SessionService(client, source, guard, csrf)
     const authenticated = authenticatedSource(
       source,
       () => sessionService.refresh(),
@@ -53,11 +55,27 @@ export default defineNuxtPlugin({
       guard,
       demo ? () => demo.exportCsv() : undefined,
     )
+    const allowedFileOrigins = String(config.public.fileOrigins)
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean)
+    if (config.public.apiBaseUrl) {
+      try {
+        allowedFileOrigins.push(new URL(config.public.apiBaseUrl).origin)
+      } catch {
+        /* ClientData reports the invalid base URL with the configured contract error. */
+      }
+    }
+    allowedFileOrigins.push(window.location.origin)
+    const remoteBusiness =
+      source.mode === 'remote'
+        ? new RemoteBusinessAdapter(authenticated, guard, undefined, { allowedFileOrigins })
+        : undefined
     return {
       provide: {
         clientData: client,
         workspace,
-        business: new BusinessApi(workspace, guard),
+        business: new BusinessApi(workspace, guard, remoteBusiness),
         sessionService,
         demoSource: demo,
       },

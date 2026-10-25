@@ -1,0 +1,468 @@
+/* ==========================================================================
+   Consolidated Responsive Breakpoints & Accessibility
+   ========================================================================== */
+
+@media (min-width: 1600px) {
+  .page-content {
+    padding-top: 42px;
+  }
+  .overview-grid,
+  .home-lower-grid {
+    grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr);
+  }
+  .attendance-hero {
+    min-height: 290px;
+  }
+  .hero-copy {
+    padding-top: 33px;
+  }
+  .hero-copy h2 {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 1190px) {
+  .topbar {
+    padding: 0 24px;
+  }
+  .page-content {
+    padding: 26px 24px;
+  }
+  .quick-search {
+    display: none;
+  }
+  .hero-copy {
+    padding: 24px 20px;
+  }
+  .attendance-hero {
+    grid-template-columns: 1fr 125px;
+  }
+  .hero-clock {
+    padding-right: 15px;
+  }
+  .hero-clock strong {
+    font-size: 21px;
+  }
+  .hero-copy h2 {
+    font-size: 23px;
+  }
+  .hero-bottom {
+    padding-inline: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .quick-action {
+    gap: 10px;
+    padding: 16px 13px;
+  }
+  .quick-action small {
+    font-size: 9px;
+  }
+  .quick-action > .pi {
+    display: none;
+  }
+  .hero-bottom > span {
+    font-size: 8px;
+  }
+  .activity-grid {
+    gap: 16px;
+  }
+  .demo-strip {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .workflow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1023px) {
+  .sidebar {
+    display: none;
+  }
+  .workspace-main {
+    margin-left: 0;
+    width: 100%;
+  }
+  .mobile-menu {
+    display: inline-flex;
+  }
+  .topbar {
+    height: 64px;
+  }
+  .breadcrumb {
+    gap: 8px;
+  }
+  .overview-grid,
+  .home-lower-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(230px, 1fr);
+  }
+  .hero-copy h2 {
+    font-size: 25px;
+  }
+  .quick-action strong {
+    font-size: 12px;
+  }
+  .login-story {
+    padding: 35px;
+  }
+  .login-story h1 {
+    font-size: 38px;
+  }
+
+  .topbar .mobile-menu {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 720px) {
+  h1 {
+    font-size: 25px;
+  }
+  .page-content {
+    padding: 24px 16px;
+  }
+  .topbar {
+    padding: 0 12px;
+  }
+  .breadcrumb-company,
+  .breadcrumb > .pi,
+  .account-name,
+  .account-link > .pi,
+  .topbar-divider {
+    display: none;
+  }
+  .topbar-actions {
+    gap: 5px;
+  }
+  .account-link {
+    padding: 4px;
+  }
+  .avatar {
+    width: 33px;
+    height: 33px;
+    font-size: 11px;
+  }
+  .demo-strip {
+    padding: 7px 16px;
+    gap: 6px;
+  }
+  .demo-description {
+    display: none;
+  }
+  .role-switch {
+    font-size: 9px;
+    gap: 5px;
+  }
+  .role-switch .p-select {
+    min-width: 115px;
+    font-size: 9px;
+  }
+  .page-heading {
+    align-items: flex-start;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .page-heading p {
+    font-size: 11px;
+    max-width: 320px;
+    line-height: 1.8;
+  }
+  .heading-actions {
+    width: 100%;
+  }
+  .heading-actions .p-button {
+    min-height: 40px;
+    font-size: 11px;
+  }
+  .overview-grid,
+  .home-lower-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .attendance-hero {
+    min-height: 275px;
+    grid-template-columns: 1fr 115px;
+  }
+  .hero-copy {
+    padding: 24px 18px 22px;
+  }
+  .hero-copy h2 {
+    font-size: 23px;
+    max-width: 210px;
+  }
+  .hero-copy p {
+    font-size: 10px;
+  }
+  .hero-clock {
+    padding-right: 13px;
+  }
+  .hero-clock strong {
+    font-size: 19px;
+  }
+  .clock-halo {
+    width: 51px;
+    height: 51px;
+  }
+  .clock-halo > .pi {
+    font-size: 23px;
+  }
+  .clock-action {
+    gap: 13px;
+    flex-wrap: wrap;
+  }
+  .clock-action a {
+    font-size: 9px;
+  }
+  .hero-bottom {
+    padding: 13px 18px;
+    gap: 12px;
+  }
+  .hero-bottom > span {
+    font-size: 8px;
+  }
+  .hero-bottom strong {
+    font-size: 9px;
+  }
+  .leave-summary .section-heading {
+    margin-bottom: 14px;
+  }
+  .leave-summary .balance-number {
+    font-size: 40px;
+  }
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 18px 0;
+  }
+  .quick-action {
+    padding: 14px 18px;
+  }
+  .quick-action small {
+    font-size: 11px;
+  }
+  .quick-action > .pi {
+    display: block;
+  }
+  .quick-action .record-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .activity-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .activity-item {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eff3ed;
+  }
+  .activity-item:last-child {
+    border: 0;
+  }
+  .activity-item p {
+    font-size: 11px;
+  }
+  .app-footer {
+    padding: 20px 16px;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .panel {
+    padding: 20px;
+  }
+  .section-heading.padded {
+    padding: 20px 20px 0;
+  }
+  .table-toolbar {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+  .table-toolbar .search-field,
+  .table-toolbar .p-inputtext {
+    width: 100%;
+    max-width: none;
+  }
+  .balance-cards,
+  .metric-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .balance-card .balance-number {
+    font-size: 35px;
+    margin-top: 7px;
+  }
+  .balance-card > .record-icon {
+    top: 20px;
+    right: 20px;
+  }
+  .balance-card p {
+    margin-top: 4px;
+  }
+  .table-filter-row {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .segmented-tabs button {
+    padding: 9px 12px;
+    font-size: 11px;
+  }
+  .segmented-tabs.wrap {
+    gap: 4px;
+  }
+  .form-grid {
+    gap: 12px;
+  }
+  .detail-list > div {
+    grid-template-columns: 100px 1fr;
+    font-size: 11px;
+    gap: 10px;
+  }
+  .issue-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .notice-row {
+    gap: 12px;
+  }
+  .notice-row h3 {
+    font-size: 12px;
+  }
+  .notice-row p {
+    font-size: 11px;
+  }
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+  .login-story {
+    min-height: 260px;
+    padding: 28px;
+  }
+  .login-story h1 {
+    font-size: 32px;
+    margin: 22px 0 12px;
+  }
+  .login-story .eyebrow,
+  .login-story .login-art,
+  .login-story > small {
+    display: none;
+  }
+  .login-story p {
+    font-size: 11px;
+  }
+  .login-form {
+    padding: 32px 24px;
+  }
+  .login-box h2 {
+    font-size: 24px;
+  }
+  .login-story .brand {
+    font-size: 23px;
+  }
+  .login-story .brand-mark {
+    width: 32px;
+    height: 32px;
+    font-size: 23px;
+  }
+  .preference-row {
+    gap: 16px;
+  }
+  .bar-chart {
+    gap: 17px;
+    padding-inline: 0;
+  }
+  .filter-bar {
+    align-items: flex-start;
+  }
+  .filter-bar input {
+    width: 100%;
+  }
+  .info-banner {
+    font-size: 11px;
+    align-items: flex-start;
+  }
+  .metric-card > .date-metric {
+    font-size: 23px;
+  }
+
+  .page-actions {
+    width: 100%;
+  }
+  .attendance-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .attendance-stats strong {
+    font-size: 24px;
+  }
+  .attendance-stats .stat-label {
+    font-size: 19px;
+  }
+  .date-filters {
+    gap: 10px;
+  }
+  .date-filters .field {
+    flex: 1;
+    min-width: 120px;
+  }
+  .date-filters input {
+    max-width: none;
+  }
+  .record-count {
+    display: none;
+  }
+
+  .workflow-grid,
+  .workflow-filter {
+    grid-template-columns: 1fr;
+  }
+  .workflow-record {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .workflow-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .workflow-card h2 {
+    font-size: 16px;
+  }
+}
+
+/* Keep essential and supporting text readable after feature-level cascade rules. */
+.demo-description,
+.eyebrow,
+.page-eyebrow,
+.small-note,
+.quick-action small,
+.table-title small,
+.calendar-event small,
+.date-tile span,
+.gentle-note p,
+.profile-panel .gentle-note p,
+.activity-item small,
+.app-footer,
+.subtle,
+.record-count,
+.attendance-stats small,
+.notice-row small,
+.preference-row label span,
+.chart-legend,
+.bar-column > small,
+.detail-list dt,
+.workflow-reference code,
+.workflow-record code {
+  color: var(--text-secondary) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

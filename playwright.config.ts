@@ -16,7 +16,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'demo', testMatch: 'workspace.spec.ts', use: { baseURL: 'http://127.0.0.1:3100' } },
+    {
+      name: 'demo',
+      testMatch: ['workspace.spec.ts', 'alignment.spec.ts'],
+      use: { baseURL: 'http://127.0.0.1:3100' },
+    },
     {
       name: 'remote-contract',
       testMatch: 'remote.spec.ts',

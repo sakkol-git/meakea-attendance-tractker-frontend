@@ -105,10 +105,15 @@ async function demo() {
               required
             />
           </div>
+          <div class="field-actions">
+            <NuxtLink to="/forgot-password" class="text-link"> Forgot password? </NuxtLink>
+          </div>
           <PButton type="submit" label="Sign in" :loading="busy" />
           <p class="small-note">
-            Need access or a password reset? Contact your workspace administrator. Self-service
-            recovery will be enabled when your identity service supports it.
+            Need an account or self-service help? You can
+            <NuxtLink to="/forgot-password" class="text-link">reset your password</NuxtLink>,
+            <NuxtLink to="/setup" class="text-link">set up a workspace</NuxtLink>, or contact your
+            workspace administrator.
           </p>
         </form>
         <p v-if="error" role="alert" class="form-error">{{ error }}</p>

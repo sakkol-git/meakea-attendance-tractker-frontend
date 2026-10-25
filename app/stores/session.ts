@@ -70,6 +70,31 @@ export const useSessionStore = defineStore('session', () => {
     app.$business.clear()
     initialized.value = true
   }
+  async function forgotPassword(email: string) {
+    return app.$sessionService.forgotPassword(email)
+  }
+  async function resetPassword(body: { token: string; newPassword: string }) {
+    return app.$sessionService.resetPassword(body)
+  }
+  async function changePassword(body: { currentPassword: string; newPassword: string }) {
+    return app.$sessionService.changePassword(body)
+  }
+  async function updateProfile(body: { name?: string; timeZone?: string }) {
+    const updated = await app.$sessionService.updateProfile(body)
+    profile.value = updated
+    return updated
+  }
+  async function setupWorkspace(body: {
+    name: string
+    slug: string
+    ownerName: string
+    ownerEmail: string
+    bootstrapCode?: string
+    timezone?: string
+    locale?: string
+  }) {
+    return app.$sessionService.setupWorkspace(body)
+  }
   return {
     expire,
     profile,
@@ -83,5 +108,10 @@ export const useSessionStore = defineStore('session', () => {
     signIn,
     enterDemo,
     signOut,
+    setupWorkspace,
+    forgotPassword,
+    resetPassword,
+    changePassword,
+    updateProfile,
   }
 })

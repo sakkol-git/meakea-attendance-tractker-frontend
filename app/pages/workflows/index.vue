@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { workflows } from '~/features/workflows/catalog'
+import { filterRecords } from '~/utils/filter'
 const session = useSessionStore()
 const search = ref('')
 const group = ref('All areas')
 const groups = ['All areas', ...new Set(workflows.map((x) => x.group))]
-const rows = computed(() =>
-  workflows.filter(
-    (x) =>
-      (group.value === 'All areas' || x.group === group.value) &&
-      `${x.id} ${x.title} ${x.purpose}`.toLowerCase().includes(search.value.toLowerCase()),
-  ),
-)
+const rows = computed(() => {
+  const byGroup =
+    group.value === 'All areas' ? workflows : workflows.filter((x) => x.group === group.value)
+  return filterRecords(byGroup, ['id', 'title', 'purpose'], search.value)
+})
 const allowed = (roles: string[]) => session.roles.some((x) => roles.includes(x))
 </script>
 <template>

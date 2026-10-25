@@ -6,6 +6,14 @@ export type {
   AttendanceRow,
   NoticeRow,
   PreferenceValues,
+  EmployeeRecord,
+  DepartmentRecord,
+  PositionRecord,
+  WorkSiteRecord,
+  LeaveRecord,
+  ShiftRecord,
+  HolidayRecord,
+  DocumentRecord,
 } from '../schemas/contracts'
 export type Resource =
   | 'leaves'

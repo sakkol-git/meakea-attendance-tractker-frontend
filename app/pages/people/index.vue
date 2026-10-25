@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { initials } from '~/utils/format'
+import { filterRecords } from '~/utils/filter'
 definePageMeta({ roles: ['MANAGER', 'HR_ADMIN', 'OWNER'] })
 const api = useWorkspace()
 const session = useSessionStore()
 const search = ref('')
 const add = ref(false)
+const bulkImport = ref(false)
 const result = useWorkspaceQuery('people', () => api.list('employees'))
 const rows = computed(() =>
-  (result.data.value?.items || []).filter((x) =>
-    [x.name, x.department, x.position, x.email]
-      .join(' ')
-      .toLowerCase()
-      .includes(search.value.toLowerCase()),
+  filterRecords(
+    result.data.value?.items || [],
+    ['name', 'department', 'position', 'email', 'employeeNo'],
+    search.value,
   ),
 )
 </script>
@@ -20,8 +21,12 @@ const rows = computed(() =>
     title="People"
     description="Meet the people who make your workspace work."
     eyebrow="BETTER TOGETHER"
-    ><PButton v-if="session.isAdmin" label="Add a person" icon="pi pi-plus" @click="add = true"
-  /></PageHeading>
+  >
+    <div v-if="session.isAdmin" class="heading-actions">
+      <PButton label="Bulk import" icon="pi pi-upload" outlined @click="bulkImport = true" />
+      <PButton label="Add a person" icon="pi pi-plus" @click="add = true" />
+    </div>
+  </PageHeading>
   <section class="panel no-padding">
     <div class="table-toolbar">
       <h2>
@@ -42,7 +47,7 @@ const rows = computed(() =>
       title="Your people belong here"
       @retry="result.refetch()"
       ><div class="table-region" role="region" aria-label="People directory" tabindex="0">
-        <PDataTable :value="rows" paginator :rows="10" data-key="id" table-style="min-width: 42rem"
+        <PDataTable :value="rows" paginator :rows="10" data-key="id" class="table-people"
           ><PColumn header="Person"
             ><template #body="{ data }"
               ><NuxtLink :to="`/people/${data.id}`" class="person-cell"
@@ -53,6 +58,10 @@ const rows = computed(() =>
                 ></NuxtLink
               ></template
             ></PColumn
+          ><PColumn field="employeeNo" header="Employee ID"
+            ><template #body="{ data }">
+              <span class="text-mono">{{ data.employeeNo || '—' }}</span>
+            </template></PColumn
           ><PColumn field="department" header="Department" sortable /><PColumn
             field="position"
             header="Position"
@@ -74,5 +83,11 @@ const rows = computed(() =>
     v-model:visible="add"
     kind="employee"
     @saved="(row) => navigateTo(`/people/${row.id}`)"
+  />
+  <BulkImportDialog
+    v-model:visible="bulkImport"
+    resource="employees"
+    title="Bulk import people"
+    @imported="() => result.refetch()"
   />
 </template>

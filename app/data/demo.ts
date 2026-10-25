@@ -3,6 +3,12 @@ import { DataFailure, validateRequest, commandKey } from '../data/source.ts'
 import type { DataRequest, DataResponse, DataSource, RecordData } from '../data/source.ts'
 import { correctionForm, employeeForm, leaveForm, requestForm } from '../schemas/forms.ts'
 import { toCsv } from '../utils/format.ts'
+import { DemoDelegations } from '../features/approvals/data/demo-delegation.ts'
+import { pageRows } from './page.ts'
+import {
+  withPolicyExceptions,
+  withReviewContext,
+} from '../features/approvals/data/demo-review-context.ts'
 
 const clone = <T>(value: T): T => structuredClone(value)
 const isoDay = (offset: number) => {
@@ -43,6 +49,7 @@ export class WorkspaceDemoSource implements DataSource {
   private read = new Set<string>()
   private sequence = 1000
   private adjustments: RecordData[] = []
+  private approvals = new DemoDelegations()
   private deliveryQueue: Promise<void> = Promise.resolve()
   private preferences = { email: true, inApp: true, reminders: true, version: 1 }
   private history = Array.from({ length: 8 }, (_, i) => ({
@@ -56,6 +63,7 @@ export class WorkspaceDemoSource implements DataSource {
   }
   setRole(role: string) {
     this.role = role
+    this.approvals.setRole(role)
     this.base.setDemoRole(role as 'EMPLOYEE')
   }
   reset() {
@@ -65,7 +73,9 @@ export class WorkspaceDemoSource implements DataSource {
     this.receipts.clear()
     this.rows.clear()
     this.adjustments = []
+    this.approvals.reset()
     this.role = 'EMPLOYEE'
+    this.approvals.setRole('EMPLOYEE')
     this.preferences = { email: true, inApp: true, reminders: true, version: 1 }
   }
   private async seed() {
@@ -264,6 +274,24 @@ export class WorkspaceDemoSource implements DataSource {
         position: 'Software engineer',
         timeZone: 'Asia/Phnom_Penh',
       })
+    const approvalResponse = this.approvals.handle(r)
+    if (approvalResponse) return approvalResponse
+    if (
+      r.method === 'GET' &&
+      this.role !== 'EMPLOYEE' &&
+      (/^\/leave\/requests\/[^/]+$/.test(r.path) || /^\/requests\/[^/]+$/.test(r.path))
+    ) {
+      const response = await this.base.send(r)
+      return withReviewContext(r.path, response, this.rows.get('/materials')?.[0])
+    }
+    if (
+      r.method === 'GET' &&
+      this.role !== 'EMPLOYEE' &&
+      ['/leave/requests/pending', '/requests/pending', '/attendance/corrections'].includes(r.path)
+    ) {
+      const response = await this.base.send(r)
+      return withPolicyExceptions(r.path, response)
+    }
     if (r.path === '/attendance/me' && r.method === 'GET') {
       const response = (await this.base.send(r)).data as { items: RecordData[] }
       return ok({
@@ -376,7 +404,19 @@ export class WorkspaceDemoSource implements DataSource {
       material.quantity = Number(material.quantity) - quantity
       material.version = Number(material.version) + 1
       try {
-        return await this.base.send(r)
+        return await this.base.send({
+          ...r,
+          body: {
+            ...r.body,
+            materialName: String(material.name ?? material.id),
+            requestedQuantity: Number(request.quantity ?? 1),
+            issuedBefore: Number(request.fulfilledQuantity ?? 0),
+            remainingAfter:
+              Number(request.quantity ?? 1) - Number(request.fulfilledQuantity ?? 0) - quantity,
+            stockBefore: Number(material.quantity) + quantity,
+            stockAfter: Number(material.quantity),
+          },
+        })
       } catch (e) {
         material.quantity = Number(material.quantity) + quantity
         material.version = Number(material.version) + 1
@@ -530,7 +570,9 @@ export class WorkspaceDemoSource implements DataSource {
       if (r.path !== path && !r.path.startsWith(path + '/')) continue
       if (path === '/employees') this.requireManager()
       else if (r.method !== 'GET') this.requireAdmin()
-      if (r.method === 'GET' && r.path === path) return ok({ items: rows, total: rows.length })
+      if (r.method === 'GET' && r.path === path) {
+        return ok(pageRows(rows, r.query))
+      }
       if (r.method === 'POST' && r.path === path) {
         this.requireAdmin()
         if (path === '/employees') {

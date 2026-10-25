@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Design Tokens & CSS Variables
+   ========================================================================== */
+:root {
+  /* Typography */
+  font-family: 'Kantumruy Pro Variable', 'Kantumruy Pro', sans-serif;
+  font-synthesis: none;
+
+  /* Primary Brand Palette */
+  --teal: #006151;
+  --teal-hover: #005447;
+  --teal-active: #00463b;
+  --teal-light: #e8f4f0;
+  --teal-subtle: #c0e8dd;
+  --teal-border: #cceae2;
+
+  /* Neutral Surfaces & Canvas */
+  --canvas: #f5f7f8;
+  --surface: #ffffff;
+  --surface-subtle: #eef2f3;
+  --surface-muted: #eef2f3;
+
+  /* Text & Contrast (WCAG AA Compliant) */
+  --muted: #526560;
+  --text-primary: #172b29;
+  --text-secondary: #526560;
+  --text-tertiary: #71817c;
+  --text-muted: #859389;
+  --text-inverse: #ffffff;
+
+  /* Borders & Dividers */
+  --border: #d9e2df;
+  --border-strong: #71857f;
+  --border-subtle: #d9e2df;
+
+  /* Functional Status Palette */
+  --status-success: #17613f;
+  --status-success-bg: #eaf6ef;
+  --status-success-text: #17613f;
+  --status-warning: #805400;
+  --status-warning-bg: #fff4d6;
+  --status-warning-text: #805400;
+  --status-danger: #a12b2b;
+  --status-danger-bg: #fceded;
+  --status-danger-text: #a12b2b;
+  --status-info: #245a91;
+  --status-info-bg: #eaf2fc;
+  --status-info-text: #245a91;
+  --status-peach: #b28c59;
+  --status-peach-bg: #fbf9f6;
+  --status-peach-text: #7c5a2b;
+
+  /* Radius Scale */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* PrimeVue Theme Overrides */
+  --p-font-family: 'Kantumruy Pro Variable', sans-serif;
+  --p-primary-color: #006151;
+  --p-primary-hover-color: #005447;
+  --p-form-field-border-color: #71857f;
+  --p-form-field-focus-border-color: #006151;
+  --p-border-radius-md: 10px;
+}

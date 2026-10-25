@@ -32,12 +32,24 @@ export function csvCell(value: unknown) {
 }
 export const toCsv = (rows: unknown[][]) =>
   '\uFEFF' + rows.map((row) => row.map(csvCell).join(',')).join('\r\n')
-export function safeDownloadUrl(url: string, apiBase: string, origin: string) {
+export function safeDownloadUrl(
+  url: string,
+  apiBase: string,
+  origin: string,
+  allowedOrigins: string[] = [],
+) {
   const parsed = new URL(url, origin)
-  if (
-    !['https:', 'http:'].includes(parsed.protocol) ||
-    ![new URL(apiBase || origin).origin, origin].includes(parsed.origin)
-  )
+  const trusted = new Set([new URL(apiBase || origin).origin, origin])
+  for (const value of allowedOrigins) {
+    try {
+      const candidate = new URL(value)
+      if (candidate.protocol === 'https:' && !candidate.username && !candidate.password)
+        trusted.add(candidate.origin)
+    } catch {
+      /* Invalid deployment values are ignored and cannot expand trust. */
+    }
+  }
+  if (!['https:', 'http:'].includes(parsed.protocol) || !trusted.has(parsed.origin))
     throw new Error('The server returned an untrusted download URL.')
   return parsed.href
 }

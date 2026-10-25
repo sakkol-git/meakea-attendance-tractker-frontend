@@ -1,8 +1,9 @@
 import { useToast } from 'primevue/usetoast'
 import { useQuery } from '@tanstack/vue-query'
 import { DataFailure } from '../data/source'
+import type { MaybeRefOrGetter } from 'vue'
 export const useWorkspace = () => useNuxtApp().$workspace
-export function useWorkspaceQuery<T>(key: string, fetcher: () => Promise<T>) {
+export function useWorkspaceQuery<T>(key: MaybeRefOrGetter<string>, fetcher: () => Promise<T>) {
   const session = useSessionStore()
   return useQuery({
     queryKey: computed(() => [
@@ -10,7 +11,7 @@ export function useWorkspaceQuery<T>(key: string, fetcher: () => Promise<T>) {
       session.profile?.tenantId,
       session.profile?.employeeId,
       session.roles.join(','),
-      key,
+      toValue(key),
     ]),
     queryFn: fetcher,
     enabled: computed(() => !!session.profile),

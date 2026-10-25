@@ -12,6 +12,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - run: python3 contracts/check-bundle.py
       - run: npm ci
       - run: npm run check
       - run: npx playwright install --with-deps chromium

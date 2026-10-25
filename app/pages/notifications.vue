@@ -19,14 +19,21 @@ function safeRoute(to?: string) {
     title="Your updates"
     description="The things that matter, all in one place."
     eyebrow="STAY IN THE LOOP"
-    ><PButton
-      label="Mark all read"
-      icon="pi pi-check"
-      outlined
-      :loading="feedback.busy.value"
-      :disabled="!result.data.value?.items.some((x) => !x.read)"
-      @click="mark()"
-  /></PageHeading>
+  >
+    <div class="heading-actions">
+      <NuxtLink to="/settings">
+        <PButton label="Preferences" icon="pi pi-cog" outlined />
+      </NuxtLink>
+      <PButton
+        label="Mark all read"
+        icon="pi pi-check"
+        outlined
+        :loading="feedback.busy.value"
+        :disabled="!result.data.value?.items.some((x) => !x.read)"
+        @click="mark()"
+      />
+    </div>
+  </PageHeading>
   <section class="panel">
     <div class="section-heading">
       <h2>Workspace notifications</h2>

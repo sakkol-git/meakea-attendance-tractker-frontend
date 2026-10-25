@@ -1,0 +1,115 @@
+/* ==========================================================================
+   PrimeVue UI Component Overrides
+   ========================================================================== */
+.p-button {
+  min-height: 44px;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.p-button-label {
+  font-weight: 600;
+}
+
+.p-button.p-button-text {
+  padding-inline: 10px;
+}
+
+.p-select {
+  min-height: 44px;
+  align-items: center;
+}
+
+.p-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.p-tag-success {
+  background: #e3f4eb;
+  color: #256447;
+}
+
+.p-tag-warn {
+  background: #fff2dc;
+  color: #875512;
+}
+
+.p-tag-info {
+  background: #e7effb;
+  color: #315d96;
+}
+
+.p-tag-danger {
+  background: #fce9e7;
+  color: #a5372d;
+}
+
+.p-tag-secondary {
+  background: #eef1f1;
+  color: #526560;
+}
+
+.p-dialog {
+  max-width: calc(100vw - 24px);
+}
+
+.p-dialog-content {
+  padding-top: 4px;
+}
+
+.p-dialog-title {
+  font-size: 20px;
+}
+
+.p-datatable {
+  font-size: 13px;
+}
+
+.p-datatable-thead > tr > th {
+  background: #f9fbfa;
+  color: #64746f;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 13px 20px;
+  font-weight: 600;
+  border-color: var(--border);
+}
+
+.p-datatable-tbody > tr > td {
+  padding: 18px 20px;
+  border-color: var(--border);
+}
+
+.p-datatable-tbody > tr:hover {
+  background: #fafcfb;
+}
+
+.p-paginator {
+  border-top: 1px solid var(--border);
+  padding: 12px;
+}
+
+.p-paginator button {
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.p-toast .p-toast-message-success .p-toast-summary,
+.p-toast .p-toast-message-success .p-toast-detail {
+  color: #164b37;
+}
+
+.p-button.p-button-danger:not(.p-button-outlined):not(.p-button-text) {
+  background: #a52b25;
+  border-color: #a52b25;
+  color: #fff;
+}
+
+.p-button.p-button-danger:not(.p-button-outlined):not(.p-button-text):hover {
+  background: #84221e;
+  border-color: #84221e;
+}

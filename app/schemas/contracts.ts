@@ -3,7 +3,7 @@ import { DataFailure } from '../data/source.ts'
 export const Roles = z.enum(['EMPLOYEE', 'MANAGER', 'HR_ADMIN', 'OWNER'])
 export type Role = z.infer<typeof Roles>
 export const Profile = z.object({
-  userId: z.string(),
+  userId: z.string().optional(),
   employeeId: z.string(),
   tenantId: z.string(),
   name: z.string(),
@@ -12,7 +12,7 @@ export const Profile = z.object({
   email: z.string().optional(),
   department: z.string().optional(),
   position: z.string().optional(),
-  timeZone: z.string().default('UTC'),
+  timeZone: z.string().min(1),
 })
 export type UserProfile = z.infer<typeof Profile>
 export const Entity = z
@@ -43,7 +43,23 @@ export const Entity = z
     quantity: z.number().optional(),
     fulfilledQuantity: z.number().optional(),
     history: z
-      .array(z.object({ status: z.string(), at: z.string(), reason: z.string().optional() }))
+      .array(
+        z
+          .object({
+            status: z.string(),
+            at: z.string(),
+            reason: z.string().optional(),
+            materialId: z.string().optional(),
+            materialName: z.string().optional(),
+            quantity: z.number().optional(),
+            requestedQuantity: z.number().optional(),
+            issuedBefore: z.number().optional(),
+            remainingAfter: z.number().optional(),
+            stockBefore: z.number().optional(),
+            stockAfter: z.number().optional(),
+          })
+          .passthrough(),
+      )
       .optional(),
   })
   .passthrough()
@@ -87,12 +103,30 @@ export const Report = z.object({
 })
 export const ExportJob = z.object({
   id: z.string(),
-  status: z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']),
+  status: z.enum(['QUEUED', 'PENDING', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED']),
   downloadUrl: z.string().optional(),
   version: z.number().int(),
 })
+export const ApprovalDelegation = z.object({
+  id: z.string(),
+  delegateId: z.string(),
+  delegateName: z.string(),
+  startsOn: z.string(),
+  endsOn: z.string(),
+  reason: z.string(),
+  status: z.enum(['ACTIVE', 'CANCELLED']),
+  version: z.number().int().positive(),
+})
+export const EligibleDelegate = z.object({ id: z.string(), name: z.string() })
+export type ApprovalDelegation = z.infer<typeof ApprovalDelegation>
+export type EligibleDelegate = z.infer<typeof EligibleDelegate>
 export const collection = <T extends z.ZodType>(schema: T) =>
   z.object({ items: z.array(schema), total: z.number().int().nonnegative() })
+export const pagedCollection = <T extends z.ZodType>(schema: T) =>
+  collection(schema).extend({
+    page: z.number().int().nonnegative(),
+    size: z.number().int().min(1).max(100),
+  })
 export function decode<T extends z.ZodType>(schema: T, value: unknown): z.infer<T> {
   const parsed = schema.safeParse(value)
   if (!parsed.success)
@@ -103,3 +137,106 @@ export function decode<T extends z.ZodType>(schema: T, value: unknown): z.infer<
     )
   return parsed.data
 }
+
+export const EmployeeRecord = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+    employeeNo: z.string().optional(),
+    hireDate: z.string().optional(),
+    department: z.string().optional(),
+    position: z.string().optional(),
+    manager: z.string().optional(),
+    status: z.string().optional(),
+    version: z.number().int().positive(),
+  })
+  .passthrough()
+export type EmployeeRecord = z.infer<typeof EmployeeRecord>
+
+export const DepartmentRecord = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    code: z.string().optional(),
+    manager: z.string().optional(),
+    description: z.string().optional(),
+    version: z.number().int().positive(),
+  })
+  .passthrough()
+export type DepartmentRecord = z.infer<typeof DepartmentRecord>
+
+export const PositionRecord = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    department: z.string().optional(),
+    description: z.string().optional(),
+    version: z.number().int().positive(),
+  })
+  .passthrough()
+export type PositionRecord = z.infer<typeof PositionRecord>
+
+export const WorkSiteRecord = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    latitude: z.number(),
+    longitude: z.number(),
+    radiusMeters: z.number().positive(),
+    version: z.number().int().positive(),
+  })
+  .passthrough()
+export type WorkSiteRecord = z.infer<typeof WorkSiteRecord>
+
+export const LeaveRecord = z
+  .object({
+    id: z.string(),
+    employeeId: z.string().optional(),
+    employeeName: z.string().optional(),
+    type: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    days: z.number(),
+    portion: z.enum(['FULL_DAY', 'MORNING', 'AFTERNOON']).optional(),
+    reason: z.string().optional(),
+    status: z.string(),
+    version: z.number().int().positive(),
+    createdAt: z.string().optional(),
+  })
+  .passthrough()
+export type LeaveRecord = z.infer<typeof LeaveRecord>
+
+export const ShiftRecord = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    start: z.string(),
+    end: z.string(),
+    version: z.number().int().positive(),
+  })
+  .passthrough()
+export type ShiftRecord = z.infer<typeof ShiftRecord>
+
+export const HolidayRecord = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    date: z.string(),
+    version: z.number().int().positive(),
+  })
+  .passthrough()
+export type HolidayRecord = z.infer<typeof HolidayRecord>
+
+export const DocumentRecord = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    size: z.number().int().nonnegative(),
+    mimeType: z.string(),
+    uploadedAt: z.string(),
+    url: z.string().optional(),
+    version: z.number().int().positive().optional(),
+  })
+  .passthrough()
+export type DocumentRecord = z.infer<typeof DocumentRecord>

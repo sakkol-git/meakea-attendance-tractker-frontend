@@ -129,7 +129,7 @@ test('time off, correction review, request fulfillment and organization edit/del
   await page
     .getByLabel('Issue reason', { exact: true })
     .fill('Issued the approved external monitor.')
-  await page.getByRole('button', { name: 'Record issue', exact: true }).click()
+  await page.getByRole('button', { name: 'Record material issue', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Mark fulfilled' })).toHaveCount(0)
   await page.getByRole('link', { name: 'Organization', exact: true }).click()
   await page.getByRole('button', { name: 'Edit Operations', exact: true }).click()
@@ -277,7 +277,7 @@ test('all 40 business workflow screens resolve and advanced HR journeys change s
     mimeType: 'application/pdf',
     buffer: Buffer.from('%PDF-1.7\nSynthetic test evidence'),
   })
-  await page.getByRole('button', { name: 'Attach local file', exact: true }).click()
+  await page.getByRole('button', { name: 'Attach file', exact: true }).click()
   await expect(page.getByRole('dialog').locator('.p-tag')).toHaveText('Local Ready')
   await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.getByRole('dialog')).not.toBeVisible()

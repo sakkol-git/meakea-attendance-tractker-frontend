@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EntityRow } from '~/types/workspace'
-import { dateLabel, titleCase } from '~/utils/format'
+import { dateLabel, titleCase, initials } from '~/utils/format'
 const props = defineProps<{
   rows: EntityRow[]
   kind: 'leave' | 'request' | 'correction'
@@ -31,12 +31,14 @@ const target = (row: EntityRow) =>
 </script>
 <template>
   <div v-if="!compact" class="table-toolbar">
-    <span class="search-field"
-      ><AppIcon name="search" /><PInputText
+    <div class="search-field">
+      <AppIcon name="search" /><PInputText
         v-model="query"
         :placeholder="kind === 'leave' ? 'Search time off…' : 'Search requests…'"
-        aria-label="Search records" /></span
-    ><PSelect v-model="status" :options="statuses" aria-label="Filter status"
+        aria-label="Search records"
+      />
+    </div>
+    <PSelect v-model="status" :options="statuses" aria-label="Filter status"
       ><template #value>{{ status === 'All statuses' ? status : titleCase(status) }}</template
       ><template #option="slotProps">{{ titleCase(slotProps.option) }}</template></PSelect
     ><span class="record-count">{{ filtered.length }} records</span>
@@ -46,7 +48,6 @@ const target = (row: EntityRow) =>
     :paginator="!compact && filtered.length > 8"
     :rows="8"
     data-key="id"
-    table-style="min-width: 36rem"
     class="workspace-table"
     :row-hover="true"
     :pt="{ tableContainer: { role: 'region', 'aria-label': 'Requests table', tabindex: 0 } }"
@@ -73,13 +74,7 @@ const target = (row: EntityRow) =>
     <PColumn v-if="!compact" header="Requested by"
       ><template #body="{ data }"
         ><span class="person-cell"
-          ><span class="avatar avatar-small">{{
-            (data.employeeName || 'SD')
-              .split(' ')
-              .map((x: string) => x[0])
-              .slice(0, 2)
-              .join('')
-          }}</span
+          ><span class="avatar avatar-small">{{ initials(data.employeeName || 'You') }}</span
           >{{ data.employeeName || 'You' }}</span
         ></template
       ></PColumn

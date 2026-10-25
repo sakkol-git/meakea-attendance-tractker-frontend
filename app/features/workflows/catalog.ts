@@ -37,7 +37,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Organization',
     purpose: 'Establish the company boundary for subsequent HR work.',
     source: 'docs/business-flow/IDENTITY.md',
-    route: null,
+    route: '/setup',
     roles: ['OWNER'],
   },
   {
@@ -57,7 +57,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Organization',
     purpose: 'Supply working windows used for lateness, leave days and cutoff.',
     source: 'docs/business-flow/IDENTITY.md',
-    route: null,
+    route: '/organization',
     roles: ['EMPLOYEE', 'MANAGER', 'HR_ADMIN', 'OWNER'],
   },
   {
@@ -97,7 +97,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Attendance',
     purpose: 'Persist aggregate device presence evidence for review/inference.',
     source: 'docs/business-flow/ATTENDANCE.md',
-    route: null,
+    route: '/attendance',
     roles: ['EMPLOYEE', 'MANAGER', 'HR_ADMIN', 'OWNER'],
   },
   {
@@ -117,7 +117,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Attendance',
     purpose: 'Let employees correct inferred presence and supply model labels.',
     source: 'docs/business-flow/ATTENDANCE.md',
-    route: null,
+    route: '/attendance',
     roles: ['EMPLOYEE', 'MANAGER', 'HR_ADMIN', 'OWNER'],
   },
   {
@@ -187,7 +187,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Time off',
     purpose: 'Explain entitlement/availability and record authorized adjustments.',
     source: 'docs/business-flow/LEAVE.md',
-    route: null,
+    route: '/leave',
     roles: ['EMPLOYEE', 'MANAGER', 'HR_ADMIN', 'OWNER'],
   },
   {
@@ -267,7 +267,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Requests',
     purpose: 'Attach private evidence without exposing files across users/tenants.',
     source: 'docs/business-flow/REQUEST.md',
-    route: null,
+    route: '/requests',
     roles: ['EMPLOYEE', 'MANAGER', 'HR_ADMIN', 'OWNER'],
   },
   {
@@ -317,7 +317,7 @@ export const workflows: WorkflowDefinition[] = [
     group: 'Reporting',
     purpose: 'Recover a reporting projection when retained events are insufficient.',
     source: 'docs/business-flow/REPORTING.md',
-    route: null,
+    route: '/reports',
     roles: ['OWNER'],
   },
   {

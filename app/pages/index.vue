@@ -18,12 +18,33 @@ onMounted(() => {
   timer = setInterval(() => (now.value = new Date()), 1000)
 })
 onBeforeUnmount(() => clearInterval(timer))
+import type { GeolocationCoordinates } from '~/utils/geofence'
+
+const currentLocation = ref<GeolocationCoordinates>()
+
 async function clock() {
   await feedback.run(
-    () => api.clock(open.value),
+    () => api.clock(open.value, currentLocation.value),
     open.value ? 'Clock-out recorded' : 'Clock-in recorded',
   )
 }
+const pendingLeave = useWorkspaceQuery('pending-leave-home', () =>
+  session.isManager ? api.list('pendingLeaves') : Promise.resolve({ items: [], total: 0 }),
+)
+const pendingRequests = useWorkspaceQuery('pending-requests-home', () =>
+  session.isManager ? api.list('pendingRequests') : Promise.resolve({ items: [], total: 0 }),
+)
+const pendingCorrections = useWorkspaceQuery('pending-corrections-home', () =>
+  session.isManager ? api.list('corrections') : Promise.resolve({ items: [], total: 0 }),
+)
+const totalPendingApprovals = computed(() => {
+  if (!session.isManager) return 0
+  const lCount = pendingLeave.data.value?.total ?? 0
+  const rCount = pendingRequests.data.value?.total ?? 0
+  const cCount =
+    pendingCorrections.data.value?.items.filter((x) => x.status === 'PENDING').length ?? 0
+  return lCount + rCount + cCount
+})
 </script>
 <template>
   <PageHeading
@@ -32,6 +53,31 @@ async function clock() {
     :eyebrow="dateLabel(now.toISOString(), 'EEEE, MMMM d, yyyy')"
     ><PButton label="Request time off" icon="pi pi-plus" outlined @click="showLeave = true"
   /></PageHeading>
+  <section
+    v-if="session.isManager && totalPendingApprovals > 0"
+    class="panel manager-review-banner"
+  >
+    <div class="manager-review-content">
+      <span class="record-icon peach"><AppIcon name="check-square" /></span>
+      <div>
+        <h3>
+          {{ totalPendingApprovals }} team
+          {{ totalPendingApprovals === 1 ? 'item requires' : 'items require' }} your decision
+        </h3>
+        <p>
+          {{ pendingLeave.data.value?.total ?? 0 }} time off ·
+          {{ pendingRequests.data.value?.total ?? 0 }} requests ·
+          {{
+            pendingCorrections.data.value?.items.filter((x) => x.status === 'PENDING').length ?? 0
+          }}
+          attendance issues
+        </p>
+      </div>
+    </div>
+    <NuxtLink to="/approvals">
+      <PButton label="Review approvals" icon="pi pi-arrow-right" icon-pos="right" size="small" />
+    </NuxtLink>
+  </section>
   <div class="overview-grid">
     <section class="attendance-hero">
       <div class="hero-copy">
@@ -54,6 +100,7 @@ async function clock() {
                 : 'Settle in, take a breath, and start your workday.'
           }}
         </p>
+        <AttendanceGeoCard @update:location="(loc) => (currentLocation = loc)" />
         <div class="clock-action">
           <PButton
             :label="open ? 'Clock out' : 'Clock in'"

@@ -11,16 +11,26 @@ export class SessionService {
   private guard: () => void
   private epoch = 0
   private refreshFlight?: Promise<void>
-  constructor(client: ClientData, source: DataSource, guard: () => void = () => {}) {
+  constructor(
+    client: ClientData,
+    source: DataSource,
+    guard: () => void = () => {},
+    private csrf?: () => string | undefined,
+  ) {
     this.client = client
     this.source = source
     this.guard = guard
+  }
+  private async prepareMutation() {
+    if (this.source.mode === 'remote' && this.csrf && !this.csrf())
+      await this.source.send({ method: 'GET', path: '/auth/csrf' })
+    this.guard()
   }
   async me() {
     return decode(Profile, (await this.source.send({ method: 'GET', path: '/auth/me' })).data)
   }
   async login(body: RecordData) {
-    this.guard()
+    await this.prepareMutation()
     const epoch = ++this.epoch
     const r = await this.source.send({
       method: 'POST',
@@ -42,7 +52,7 @@ export class SessionService {
     if (this.refreshFlight) return this.refreshFlight
     const epoch = this.epoch
     this.refreshFlight = (async () => {
-      this.guard()
+      await this.prepareMutation()
       const r = await this.source.send({
         method: 'POST',
         path: '/auth/refresh',
@@ -71,7 +81,7 @@ export class SessionService {
     this.epoch++
     try {
       if (this.source.mode === 'remote') {
-        this.guard()
+        await this.prepareMutation()
         await this.source.send({
           method: 'POST',
           path: '/auth/logout',
@@ -81,5 +91,59 @@ export class SessionService {
     } finally {
       this.client.clearSession()
     }
+  }
+  async setupWorkspace(body: {
+    name: string
+    slug: string
+    ownerName: string
+    ownerEmail: string
+    bootstrapCode?: string
+    timezone?: string
+    locale?: string
+  }) {
+    await this.prepareMutation()
+    return this.source.send({
+      method: 'POST',
+      path: '/auth/setup',
+      body,
+      idempotencyKey: commandKey(),
+    })
+  }
+  async forgotPassword(email: string) {
+    await this.prepareMutation()
+    return this.source.send({
+      method: 'POST',
+      path: '/auth/forgot-password',
+      body: { email },
+      idempotencyKey: commandKey(),
+    })
+  }
+  async resetPassword(body: { token: string; newPassword: string }) {
+    await this.prepareMutation()
+    return this.source.send({
+      method: 'POST',
+      path: '/auth/reset-password',
+      body,
+      idempotencyKey: commandKey(),
+    })
+  }
+  async changePassword(body: { currentPassword: string; newPassword: string }) {
+    await this.prepareMutation()
+    return this.source.send({
+      method: 'POST',
+      path: '/auth/change-password',
+      body,
+      idempotencyKey: commandKey(),
+    })
+  }
+  async updateProfile(body: { name?: string; timeZone?: string }) {
+    await this.prepareMutation()
+    const r = await this.source.send({
+      method: 'PATCH',
+      path: '/auth/profile',
+      body,
+      idempotencyKey: commandKey(),
+    })
+    return decode(Profile, r.data)
   }
 }

@@ -4,6 +4,7 @@ import type { Role } from '~/types/workspace'
 const session = useSessionStore()
 const route = useRoute()
 const api = useWorkspace()
+const realtime = useRealtimeNotifications()
 const notices = useWorkspaceQuery('notifications', () => api.notices())
 const unread = computed(() => notices.data.value?.items.filter((x) => !x.read).length ?? 0)
 const drawer = ref(false)
@@ -68,10 +69,12 @@ onMounted(() => {
   connectivity()
   window.addEventListener('online', connectivity)
   window.addEventListener('offline', connectivity)
+  realtime.connect()
 })
 onBeforeUnmount(() => {
   window.removeEventListener('online', connectivity)
   window.removeEventListener('offline', connectivity)
+  realtime.disconnect()
 })
 </script>
 <template>
@@ -81,8 +84,7 @@ onBeforeUnmount(() => {
       v-model:visible="drawer"
       modal
       header="Workspace navigation"
-      class="nav-dialog"
-      :style="{ width: '20rem' }"
+      class="nav-dialog dialog-sm"
       dismissable-mask
       ><nav aria-label="Mobile navigation">
         <NuxtLink
@@ -167,7 +169,12 @@ onBeforeUnmount(() => {
             </div>
           </div>
           <NuxtLink to="/notifications" class="notification-link" aria-label="Open notifications"
-            ><AppIcon name="bell" /><span v-if="unread" class="notification-dot" /></NuxtLink
+            ><AppIcon name="bell" /><span v-if="unread" class="notification-dot" /><span
+              class="realtime-status-dot"
+              :class="{ live: realtime.connected.value }"
+              :title="
+                realtime.connected.value ? 'Real-time sync active' : 'Connecting for updates'
+              " /></NuxtLink
           ><span class="topbar-divider" /><NuxtLink to="/profile" class="account-link"
             ><span class="avatar">{{ initials(session.profile?.name || 'User') }}</span
             ><span class="account-name"
@@ -201,8 +208,13 @@ onBeforeUnmount(() => {
       <footer class="app-footer">
         <span>HRFlow · A better way to work together.</span
         ><span
-          >{{ session.mode === 'local' ? 'Sample workspace' : 'Connected to your workspace'
-          }}<i class="connection-dot"
+          >{{
+            session.mode === 'local'
+              ? 'Sample workspace'
+              : realtime.connected.value
+                ? 'Live connected'
+                : 'Connecting to workspace'
+          }}<i class="connection-dot" :class="{ 'is-live': realtime.connected.value }"
         /></span>
       </footer>
     </div>

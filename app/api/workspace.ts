@@ -7,9 +7,12 @@ import {
   Attendance,
   Balance,
   collection,
+  pagedCollection,
   decode,
   Entity,
   ExportJob,
+  ApprovalDelegation,
+  EligibleDelegate,
   Notice,
   Preferences,
   Profile,
@@ -28,6 +31,8 @@ export class WorkspaceApi {
     source: DataSource,
     mutationGuard: () => void = () => {},
     private demoExport?: () => Promise<string>,
+    private wait: (milliseconds: number) => Promise<void> = (milliseconds) =>
+      new Promise((resolve) => setTimeout(resolve, milliseconds)),
   ) {
     this.source = source
     this.guard = mutationGuard
@@ -51,10 +56,41 @@ export class WorkspaceApi {
     }
     return paths[resource]
   }
-  async list(resource: Resource) {
+  async list(
+    resource: Resource,
+    options?: {
+      page?: number
+      size?: number
+      search?: string
+      status?: string
+      sort?: 'oldest' | 'newest'
+      minAgeDays?: number
+    },
+  ) {
+    if (
+      (options?.page !== undefined && (!Number.isInteger(options.page) || options.page < 0)) ||
+      (options?.size !== undefined &&
+        (!Number.isInteger(options.size) || options.size < 1 || options.size > 100))
+    )
+      throw new DataFailure(400, 'INVALID_PAGINATION', 'Use page 0 or higher and size 1–100.')
     const path = this.path(resource)
-    const r = await this.source.send({ method: 'GET', path })
-    return decode(collection(Entity), r.data)
+    const query = options
+      ? {
+          ...(options.page !== undefined ? { page: String(options.page) } : {}),
+          ...(options.size !== undefined ? { size: String(options.size) } : {}),
+          ...(options.search?.trim() ? { search: options.search.trim() } : {}),
+          ...(options.status ? { status: options.status } : {}),
+          ...(options.sort ? { sort: options.sort } : {}),
+          ...(options.minAgeDays ? { minAgeDays: String(options.minAgeDays) } : {}),
+        }
+      : undefined
+    const r = await this.source.send({ method: 'GET', path, query })
+    return decode(
+      ['employees', 'pendingLeaves', 'pendingRequests', 'corrections'].includes(resource)
+        ? pagedCollection(Entity)
+        : collection(Entity),
+      r.data,
+    )
   }
   async detail(resource: Resource, id: string) {
     const path = `${this.path(resource)}/${encodeURIComponent(id)}`
@@ -102,6 +138,34 @@ export class WorkspaceApi {
     return decode(
       Report,
       (await this.source.send({ method: 'GET', path: '/reports/dashboard' })).data,
+    )
+  }
+  async delegations() {
+    const response = await this.source.send({ method: 'GET', path: '/approvals/delegations' })
+    return decode(collection(ApprovalDelegation), response.data)
+  }
+  async eligibleDelegates(search = '') {
+    const response = await this.source.send({
+      method: 'GET',
+      path: '/approvals/eligible-delegates',
+      query: { ...(search.trim() ? { search: search.trim() } : {}), page: '0', size: '25' },
+    })
+    return decode(collection(EligibleDelegate), response.data)
+  }
+  async createDelegation(body: RecordData) {
+    return decode(ApprovalDelegation, (await this.command('/approvals/delegations', body)).data)
+  }
+  async cancelDelegation(id: string, version: number) {
+    return decode(
+      ApprovalDelegation,
+      (
+        await this.command(
+          `/approvals/delegations/${encodeURIComponent(id)}`,
+          undefined,
+          `"${version}"`,
+          'DELETE',
+        )
+      ).data,
     )
   }
   private async command(
@@ -159,10 +223,24 @@ export class WorkspaceApi {
   async exportReport(body: RecordData) {
     return decode(ExportJob, (await this.command('/reports/exports', body)).data)
   }
+  async exportStatus(id: string) {
+    return decode(
+      ExportJob,
+      (
+        await this.source.send({
+          method: 'GET',
+          path: `/reports/exports/${encodeURIComponent(id)}`,
+        })
+      ).data,
+    )
+  }
   async update(resource: Resource, id: string, version: number, body: RecordData) {
     return decode(Entity, (await this.change(resource, id, '', version, body, 'PATCH')).data)
   }
-  async clock(open?: { id: string; version: number }) {
+  async clock(
+    open?: { id: string; version: number },
+    location?: { latitude: number; longitude: number; accuracyMeters?: number },
+  ) {
     this.guard()
     if (!this.clockAttempt || this.clockAttempt.sessionId !== open?.id) {
       let device: string | null = null
@@ -184,6 +262,13 @@ export class WorkspaceApi {
         body: {
           deviceId: device,
           occurredAt: new Date().toISOString(),
+          ...(location
+            ? {
+                latitude: location.latitude,
+                longitude: location.longitude,
+                accuracyMeters: location.accuracyMeters,
+              }
+            : {}),
           ...(open ? { sessionId: open.id } : { source: 'TAP' }),
         },
         etag: open ? `"${open.version}"` : undefined,
@@ -230,9 +315,20 @@ export class WorkspaceApi {
       (await this.command('/notifications/preferences', body, etag, 'PUT')).data,
     )
   }
-  async downloadLeaveReport(apiBase: string, origin: string) {
-    const job = await this.exportReport({ type: 'LEAVE', format: 'CSV' })
-    if (job.status !== 'COMPLETED') return job
+  async downloadLeaveReport(apiBase: string, origin: string, allowedOrigins: string[] = []) {
+    let job = await this.exportReport({ report: 'LEAVE', format: 'CSV' })
+    for (
+      let attempt = 0;
+      attempt < 10 && ['QUEUED', 'PENDING', 'RUNNING'].includes(job.status);
+      attempt += 1
+    ) {
+      await this.wait(2_000)
+      job = await this.exportStatus(job.id)
+    }
+    if (['FAILED', 'CANCELLED'].includes(job.status))
+      throw new DataFailure(0, 'EXPORT_FAILED', 'The export failed. Start a new export.')
+    if (job.status !== 'COMPLETED')
+      throw new DataFailure(0, 'EXPORT_PENDING', 'The export is not complete. Check again later.')
     if (this.demoExport) {
       const blob = new Blob([await this.demoExport()], { type: 'text/csv;charset=utf-8' })
       const url = URL.createObjectURL(blob)
@@ -242,7 +338,7 @@ export class WorkspaceApi {
       a.click()
       setTimeout(() => URL.revokeObjectURL(url), 1000)
     } else if (job.downloadUrl)
-      window.location.assign(safeDownloadUrl(job.downloadUrl, apiBase, origin))
+      window.location.assign(safeDownloadUrl(job.downloadUrl, apiBase, origin, allowedOrigins))
     else
       throw new Error('The export completed without a download link. Contact your administrator.')
     return job

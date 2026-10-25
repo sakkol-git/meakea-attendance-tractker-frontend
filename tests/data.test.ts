@@ -110,7 +110,7 @@ test('general requests progress through draft, submission, approval and fulfillm
   }
 })
 
-test('mode is explicit; instances isolated; unsupported operations fail rather than fake success', async () => {
+test('mode is explicit; instances isolated; list queries work and unsupported operations fail', async () => {
   assert.equal(new ClientData().source.mode, 'local')
   assert.throws(() => new ClientData('typo'), failure(0, 'INVALID_MODE'))
   assert.throws(() => new ClientData('remote'), failure(0, 'INVALID_BASE_URL'))
@@ -123,10 +123,12 @@ test('mode is explicit; instances isolated; unsupported operations fail rather t
     source.send({ method: 'GET', path: '/reports/dashboard' }),
     failure(501, 'DEMO_NOT_IMPLEMENTED'),
   )
-  await assert.rejects(
-    source.send({ method: 'GET', path: '/requests/me', query: { status: 'PENDING' } }),
-    failure(501, 'DEMO_NOT_IMPLEMENTED'),
-  )
+  const filtered = await source.send({
+    method: 'GET',
+    path: '/requests/me',
+    query: { status: 'PENDING', page: '0', size: '25' },
+  })
+  assert.equal((filtered.data as RecordData).total, 0)
   assert.equal(
     ((await new LocalDataSource().send({ method: 'GET', path: '/requests/me' })).data as RecordData)
       .total,
