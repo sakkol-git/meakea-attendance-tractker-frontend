@@ -49,7 +49,10 @@ describe('workflow integration against explicit demo adapter', () => {
   })
   it('rejects overlapping leave and tracks notification read state', async () => {
     const { api } = fixture()
-    const first = (await api.list('myLeaves')).items[0]!
+    const first = (await api.list('myLeaves')).items.find((request) => {
+      const day = new Date(`${request.startDate}T12:00:00Z`).getUTCDay()
+      return day !== 0 && day !== 6
+    })!
     await expect(
       api.create('leaves', {
         type: 'Annual leave',

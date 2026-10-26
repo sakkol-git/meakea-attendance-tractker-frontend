@@ -337,6 +337,12 @@
   outline: none;
 }
 
+/* Keep consecutive page regions on the same vertical rhythm. Feature grids
+   own their internal gaps, while top-level regions never visually collide. */
+.page-content > :is(section, div):not(.page-heading) + :is(section, div) {
+  margin-top: var(--space-6);
+}
+
 .page-heading {
   display: flex;
   justify-content: space-between;
@@ -357,10 +363,6 @@
 .login-story .brand-mark {
   background: #eff3de;
   color: #005648;
-}
-
-.page-content > section.panel + section.panel {
-  margin-top: 24px;
 }
 
 /* Secondary text must retain WCAG AA contrast on the light surfaces. */

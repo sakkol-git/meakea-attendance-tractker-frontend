@@ -160,7 +160,7 @@ const actions: Record<number, WorkflowAction[]> = {
       label: 'Record entitlement adjustment',
       fields: [
         employee,
-        select('type', 'Leave type', ['Annual leave', 'Medical leave', 'Personal leave']),
+        select('type', 'Leave type', ['Annual leave', 'Sick leave', 'Personal leave']),
         year,
         number('days', 'Adjustment in days', -365, 365, 0.5),
         reason,

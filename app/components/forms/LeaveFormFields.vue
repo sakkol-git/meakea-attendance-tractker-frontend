@@ -22,28 +22,11 @@ const workingDaysBreakdown = computed(() =>
 
 <template>
   <div class="field">
-    <label for="form-portion">Day portion</label>
-    <PSelect
-      input-id="form-portion"
-      v-model="values.portion"
-      aria-label="Day portion"
-      :options="[
-        { label: 'Full day', value: 'FULL_DAY' },
-        { label: 'Morning half-day', value: 'MORNING' },
-        { label: 'Afternoon half-day', value: 'AFTERNOON' },
-      ]"
-      option-label="label"
-      option-value="value"
-    />
-    <small>Half-day requests use a single working date.</small>
-  </div>
-
-  <div class="field">
     <label for="form-type">Leave type</label>
     <PSelect
       input-id="form-type"
       v-model="values.type"
-      :options="['Annual leave', 'Medical leave', 'Personal leave']"
+      :options="['Annual leave', 'Sick leave', 'Personal leave']"
       aria-label="Leave type"
       placeholder="Select a leave type"
       :invalid="!!errors.type"
@@ -78,6 +61,23 @@ const workingDaysBreakdown = computed(() =>
     </div>
   </div>
 
+  <div class="field">
+    <label for="form-portion">Day portion</label>
+    <PSelect
+      input-id="form-portion"
+      v-model="values.portion"
+      aria-label="Day portion"
+      :options="[
+        { label: 'Full day', value: 'FULL_DAY' },
+        { label: 'Morning only', value: 'MORNING' },
+        { label: 'Afternoon only', value: 'AFTERNOON' },
+      ]"
+      option-label="label"
+      option-value="value"
+    />
+    <small>Half-day requests must use one working date.</small>
+  </div>
+
   <div v-if="workingDaysBreakdown?.valid" class="gentle-note form-note" role="status">
     <AppIcon name="clock" />
     <div>
@@ -96,11 +96,12 @@ const workingDaysBreakdown = computed(() =>
   </div>
 
   <div class="field">
-    <label for="form-reason">A little context</label>
+    <label for="form-reason">Reason</label>
     <PTextarea
       id="form-reason"
       v-model="values.reason"
       rows="3"
+      placeholder="Add enough detail for your reviewer."
       :aria-invalid="!!errors.reason"
       aria-describedby="error-reason"
     />

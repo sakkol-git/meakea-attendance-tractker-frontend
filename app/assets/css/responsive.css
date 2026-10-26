@@ -76,6 +76,10 @@
   .workflow-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .balance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1023px) {
@@ -173,6 +177,28 @@
   }
   .heading-actions {
     width: 100%;
+  }
+
+  .manager-review-banner,
+  .profile-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .manager-review-banner > a,
+  .manager-review-banner > a .p-button,
+  .profile-actions,
+  .profile-actions .p-button {
+    width: 100%;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .balance-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
   }
   .heading-actions .p-button {
     min-height: var(--control-height);

@@ -19,12 +19,59 @@ export const leaveForm = z
     message: 'End date must be on or after the start date.',
     path: ['endDate'],
   })
-export const requestForm = z.object({
-  title: z.string().trim().min(3, 'Use at least three characters.').max(160),
-  type: z.string().min(1, 'Choose a request type.'),
-  reason: z.string().trim().min(5, 'Tell your approver what you need.').max(2000),
-  quantity: z.number().int().min(1).max(100).default(1),
-})
+export const requestForm = z
+  .object({
+    title: z.string().trim().min(3, 'Use at least three characters.').max(160),
+    type: z.enum([
+      'GENERAL',
+      'MATERIAL',
+      'REMOTE_WORK',
+      'LATE_ARRIVAL',
+      'EARLY_LEAVE',
+      'General',
+      'Equipment',
+      'Remote work',
+    ]),
+    reason: z.string().trim().min(5, 'Tell your approver what you need.').max(2000),
+    quantity: z.number().int().min(1).max(100).nullable().default(1),
+    materialId: z.string().nullable().optional(),
+    items: z
+      .array(
+        z.object({
+          materialId: z.string().min(1),
+          quantity: z.number().int().min(1).max(100),
+        }),
+      )
+      .optional(),
+    startDate: z.string().nullable().optional(),
+    endDate: z.string().nullable().optional(),
+    fromTime: z.string().nullable().optional(),
+    toTime: z.string().nullable().optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.type === 'MATERIAL' && !value.materialId && !value.items?.length)
+      context.addIssue({ code: 'custom', path: ['materialId'], message: 'Choose a material.' })
+    if (['REMOTE_WORK', 'LATE_ARRIVAL', 'EARLY_LEAVE'].includes(value.type)) {
+      if (!value.startDate)
+        context.addIssue({ code: 'custom', path: ['startDate'], message: 'Choose a start date.' })
+      if (!value.endDate)
+        context.addIssue({ code: 'custom', path: ['endDate'], message: 'Choose an end date.' })
+      if (value.startDate && value.endDate && value.endDate < value.startDate)
+        context.addIssue({
+          code: 'custom',
+          path: ['endDate'],
+          message: 'End date must follow start date.',
+        })
+    }
+    if (['LATE_ARRIVAL', 'EARLY_LEAVE'].includes(value.type)) {
+      if (!value.fromTime || !value.toTime || value.toTime <= value.fromTime)
+        context.addIssue({
+          code: 'custom',
+          path: ['toTime'],
+          message: 'End time must follow start time.',
+        })
+    }
+  })
 export const correctionForm = z.object({
   date: calendarDate('Choose the affected date.'),
   reason: z.string().trim().min(10, 'Explain the issue in at least ten characters.').max(2000),

@@ -16,6 +16,15 @@ const fulfillmentDialog = ref(false)
 const editDraft = ref(false)
 const decisionSaved = ref(false)
 const isOwn = computed(() => row.value?.employeeId === session.profile?.employeeId)
+const requestTypeLabels: Record<string, string> = {
+  GENERAL: 'General',
+  MATERIAL: 'Material or equipment',
+  REMOTE_WORK: 'Remote work',
+  LATE_ARRIVAL: 'Late arrival',
+  EARLY_LEAVE: 'Early leave',
+}
+const requestTypeLabel = (value: unknown) =>
+  requestTypeLabels[String(value)] || String(value || 'General')
 
 async function perform(action: string, note?: string) {
   if (!row.value) return
@@ -36,7 +45,7 @@ function decisionSummary(action: string) {
   const request = row.value.title || row.value.type || 'request'
   const effect =
     props.kind === 'leave'
-      ? `${dateLabel(row.value.startDate)} to ${dateLabel(row.value.endDate)} · ${row.value.days ?? 'calculated'} days`
+      ? `${dateLabel(row.value.startDate ?? undefined)} to ${dateLabel(row.value.endDate ?? undefined)} · ${row.value.days ?? 'calculated'} days`
       : `${row.value.quantity ?? 1} requested`
   return `${employee} · ${request} · ${effect}. ${titleCase(action)} will record this decision and continue the workflow.`
 }
@@ -92,12 +101,15 @@ function openReject() {
             </div>
             <div>
               <dt>Type</dt>
-              <dd>{{ row.type || 'General' }}</dd>
+              <dd>{{ requestTypeLabel(row.type) }}</dd>
             </div>
             <template v-if="kind === 'leave'"
               ><div>
                 <dt>Dates</dt>
-                <dd>{{ dateLabel(row.startDate) }} – {{ dateLabel(row.endDate) }}</dd>
+                <dd>
+                  {{ dateLabel(row.startDate ?? undefined) }} –
+                  {{ dateLabel(row.endDate ?? undefined) }}
+                </dd>
               </div>
               <div>
                 <dt>Requested time</dt>
@@ -168,7 +180,7 @@ function openReject() {
                 session.isAdmin &&
                 kind === 'request' &&
                 row.status === 'APPROVED' &&
-                row.type === 'Equipment'
+                ['Equipment', 'MATERIAL'].includes(String(row.type))
               "
               label="Mark fulfilled"
               :loading="feedback.busy.value"

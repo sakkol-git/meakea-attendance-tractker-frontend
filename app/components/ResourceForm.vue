@@ -58,6 +58,9 @@ watch(
       reason: '',
       title: '',
       quantity: 1,
+      materialId: '',
+      fromTime: '08:30',
+      toTime: '17:30',
       date: '',
       name: '',
       email: '',
@@ -132,7 +135,35 @@ async function save() {
     master: props.path || 'departments',
   }
 
-  const body = JSON.parse(JSON.stringify(parsed.data)) as RecordData
+  let body = JSON.parse(JSON.stringify(parsed.data)) as RecordData
+  if (props.kind === 'leave') {
+    const leaveTypeIds: Record<string, string> = {
+      'Annual leave': 'annual',
+      'Sick leave': 'sick',
+      'Personal leave': 'personal',
+    }
+    body.leaveTypeId = leaveTypeIds[String(body.type)] || null
+  }
+  if (props.kind === 'request') {
+    const type = String(body.type)
+    const materialId = String(body.materialId || '')
+    const reason = String(body.reason || '')
+    const quantity = Number(body.quantity || 1)
+    body = {
+      title: String(body.title || ''),
+      type,
+      reason,
+      description: reason,
+      quantity: type === 'MATERIAL' ? quantity : null,
+      items: type === 'MATERIAL' && materialId ? [{ materialId, quantity }] : [],
+      ...(['REMOTE_WORK', 'LATE_ARRIVAL', 'EARLY_LEAVE'].includes(type)
+        ? { startDate: String(body.startDate || ''), endDate: String(body.endDate || '') }
+        : { startDate: null, endDate: null }),
+      ...(['LATE_ARRIVAL', 'EARLY_LEAVE'].includes(type)
+        ? { fromTime: String(body.fromTime || ''), toTime: String(body.toTime || '') }
+        : { fromTime: null, toTime: null }),
+    }
+  }
 
   const result = await feedback.run(
     async () =>

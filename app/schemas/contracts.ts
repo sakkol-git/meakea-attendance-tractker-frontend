@@ -30,8 +30,8 @@ export const Entity = z
     position: z.string().optional(),
     email: z.string().optional(),
     type: z.string().optional(),
-    startDate: z.string().optional(),
-    endDate: z.string().optional(),
+    startDate: z.string().nullable().optional(),
+    endDate: z.string().nullable().optional(),
     date: z.string().optional(),
     days: z.number().optional(),
     createdAt: z.string().optional(),
@@ -40,7 +40,7 @@ export const Entity = z
     manager: z.string().optional(),
     start: z.string().optional(),
     end: z.string().optional(),
-    quantity: z.number().optional(),
+    quantity: z.number().nullable().optional(),
     fulfilledQuantity: z.number().optional(),
     history: z
       .array(

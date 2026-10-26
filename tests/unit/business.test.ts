@@ -134,7 +134,7 @@ describe('advanced HR workflows', () => {
   it('supports half days, draft editing, history and future approved cancellation', async () => {
     const { core, demo } = fixture('EMPLOYEE')
     const leave = await core.create('leaves', {
-      type: 'Medical leave',
+      type: 'Sick leave',
       portion: 'MORNING',
       startDate: '2030-02-04',
       endDate: '2030-02-04',

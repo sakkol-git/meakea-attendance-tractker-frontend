@@ -21,16 +21,15 @@ export function withReviewContext(
             nextReviewer: 'Manager',
           }
         : {
-            materials:
-              row.type === 'Equipment'
-                ? [
-                    {
-                      name: material?.name ?? 'Requested material',
-                      requested: Number(row.quantity ?? 1),
-                      stockAvailable: Number(material?.quantity ?? 0),
-                    },
-                  ]
-                : [],
+            materials: ['Equipment', 'MATERIAL'].includes(String(row.type))
+              ? [
+                  {
+                    name: material?.name ?? 'Requested material',
+                    requested: Number(row.quantity ?? 1),
+                    stockAvailable: Number(material?.quantity ?? 0),
+                  },
+                ]
+              : [],
             steps: row.history ?? [],
             nextReviewer: 'Manager',
           },

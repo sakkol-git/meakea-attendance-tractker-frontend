@@ -314,7 +314,7 @@ export class WorkspaceDemoSource implements DataSource {
       return ok({
         items: [
           ['Annual leave', 15],
-          ['Medical leave', 10],
+          ['Sick leave', 10],
           ['Personal leave', 5],
         ].map(([type, entitlement]) => ({
           type,
@@ -341,7 +341,7 @@ export class WorkspaceDemoSource implements DataSource {
       const amount = Number(body.days)
       if (
         !this.rows.get('/employees')!.some((x) => x.id === body.employeeId) ||
-        !['Annual leave', 'Medical leave', 'Personal leave'].includes(String(body.type)) ||
+        !['Annual leave', 'Sick leave', 'Personal leave'].includes(String(body.type)) ||
         !Number.isInteger(body.year) ||
         !Number.isFinite(amount) ||
         amount === 0 ||
@@ -383,7 +383,7 @@ export class WorkspaceDemoSource implements DataSource {
       const request = (
         await this.base.send({ method: 'GET', path: r.path.replace('/fulfill', '') })
       ).data as RecordData
-      if (request.type !== 'Equipment' || request.status !== 'APPROVED')
+      if (!/^(Equipment|MATERIAL)$/.test(String(request.type)) || request.status !== 'APPROVED')
         throw new DataFailure(
           409,
           'APPROVED_MATERIAL_REQUIRED',
