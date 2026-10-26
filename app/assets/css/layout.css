@@ -226,7 +226,7 @@
   border: 0 !important;
   padding: 8px 2px !important;
   font-size: 12px;
-  min-height: 40px;
+  min-height: var(--control-height);
   width: 150px;
 }
 
@@ -247,7 +247,7 @@
   top: 45px;
   min-width: 240px;
   background: white;
-  box-shadow: 0 10px 30px #173e2920;
+  box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
   border-radius: 9px;
   padding: 8px;
@@ -287,6 +287,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-height: var(--control-height);
 }
 
 .account-link > .pi {
@@ -328,8 +329,8 @@
 }
 
 .page-content {
-  padding: 32px;
-  max-width: 1344px;
+  padding: var(--space-8);
+  max-width: calc(var(--content-max) + 2 * var(--space-8));
   width: 100%;
   margin: 0 auto;
   flex: 1;
@@ -340,13 +341,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 18px;
-  margin-bottom: 26px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
 .page-heading p {
   font-size: 12px;
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 .login-story .brand {

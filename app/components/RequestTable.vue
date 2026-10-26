@@ -71,7 +71,7 @@ const target = (row: EntityRow) =>
         ></template
       ></PColumn
     >
-    <PColumn v-if="!compact" header="Requested by"
+    <PColumn v-if="!compact" header="Requested by" class="mobile-hidden"
       ><template #body="{ data }"
         ><span class="person-cell"
           ><span class="avatar avatar-small">{{ initials(data.employeeName || 'You') }}</span
@@ -79,15 +79,15 @@ const target = (row: EntityRow) =>
         ></template
       ></PColumn
     >
-    <PColumn v-if="kind === 'leave'" header="Duration"
+    <PColumn v-if="kind === 'leave'" header="Duration" class="mobile-hidden"
       ><template #body="{ data }"
         >{{ data.days ?? '—' }} {{ data.days === 1 ? 'day' : 'days' }}</template
       ></PColumn
     >
-    <PColumn header="Status"
+    <PColumn header="Status" class="mobile-status"
       ><template #body="{ data }"><StatusBadge :status="data.status" /></template
     ></PColumn>
-    <PColumn header="Details" class="table-action"
+    <PColumn header="Details" class="table-action mobile-hidden"
       ><template #body="{ data }"
         ><NuxtLink
           :to="target(data)"

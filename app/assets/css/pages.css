@@ -2,7 +2,7 @@
    Screen-Specific Layouts & Page Workflows
    ========================================================================== */
 .attendance-hero {
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   color: #fff;
   position: relative;
   overflow: hidden;
@@ -159,12 +159,12 @@
   gap: 13px;
   background: white;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 17px 18px;
   min-width: 0;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 
 .quick-action:hover {

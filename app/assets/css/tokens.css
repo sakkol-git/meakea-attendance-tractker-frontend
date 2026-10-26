@@ -50,12 +50,38 @@
   --status-peach-bg: #fbf9f6;
   --status-peach-text: #7c5a2b;
 
+  /* Spacing: shared 4 px grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Typography */
+  --font-size-caption: 12px;
+  --font-size-body: 14px;
+  --font-size-body-lg: 16px;
+  --font-size-title: 20px;
+  --line-height-body: 1.6;
+
   /* Radius Scale */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* Elevation, controls, content and motion */
+  --shadow-sm: 0 1px 4px rgb(23 43 41 / 8%);
+  --shadow-md: 0 10px 30px rgb(23 62 41 / 12%);
+  --control-height: 44px;
+  --control-height-lg: 48px;
+  --content-max: 1280px;
+  --motion-fast: 150ms;
+  --motion-standard: 220ms;
 
   /* PrimeVue Theme Overrides */
   --p-font-family: 'Kantumruy Pro Variable', sans-serif;

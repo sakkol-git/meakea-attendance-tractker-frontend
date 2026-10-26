@@ -7,8 +7,10 @@
 
 body {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--text-primary);
+  background: var(--canvas);
 }
 
 a {
@@ -74,25 +76,25 @@ small {
 
 input:not([type='checkbox']),
 textarea {
-  border: 1px solid #d6e0dc;
-  border-radius: 8px;
-  background: white;
-  padding: 11px 13px;
-  color: #172b29;
-  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  min-height: var(--control-height);
   width: 100%;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #71817c;
+  color: var(--text-tertiary);
 }
 
 :focus-visible {
-  outline: 3px solid #249984;
+  outline: 3px solid var(--teal-subtle);
   outline-offset: 3px;
 }
 
 ::selection {
-  background: #c0e8dd;
+  background: var(--teal-subtle);
 }

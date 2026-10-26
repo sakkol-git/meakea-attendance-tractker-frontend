@@ -175,7 +175,7 @@
     width: 100%;
   }
   .heading-actions .p-button {
-    min-height: 40px;
+    min-height: var(--control-height);
     font-size: 11px;
   }
   .overview-grid,
@@ -272,10 +272,61 @@
     gap: 6px;
   }
   .panel {
-    padding: 20px;
+    padding: var(--space-4);
+  }
+  .geo-card-main {
+    align-items: flex-start;
+    padding: var(--space-4);
+  }
+  .geo-card-lead {
+    align-items: flex-start;
+  }
+  .geo-card-actions {
+    margin-top: -4px;
+  }
+  .geo-coords-bar {
+    padding: var(--space-3) var(--space-4);
+  }
+  .workspace-table .mobile-hidden {
+    display: none;
+  }
+  .workspace-table .p-datatable-thead > tr > th,
+  .workspace-table .p-datatable-tbody > tr > td {
+    padding-inline: var(--space-3);
+  }
+  .workspace-table .p-datatable-table {
+    width: 100%;
+    min-width: 100%;
+    table-layout: fixed;
+  }
+  .workspace-table .p-datatable-thead > tr > th:first-child {
+    width: 58%;
+  }
+  .workspace-table .mobile-status {
+    width: 42%;
+  }
+  .workspace-table .mobile-waiting {
+    width: 24%;
+  }
+  .workspace-table .mobile-waiting + .mobile-status {
+    width: 34%;
+  }
+  .workspace-table .table-title,
+  .workspace-table .table-title > span:last-child {
+    min-width: 0;
+  }
+  .workspace-table .table-title strong,
+  .workspace-table .table-title small {
+    overflow-wrap: anywhere;
+  }
+  .workspace-table .status-badge {
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.3;
   }
   .section-heading.padded {
-    padding: 20px 20px 0;
+    padding: var(--space-4) var(--space-4) 0;
   }
   .table-toolbar {
     padding: 16px;

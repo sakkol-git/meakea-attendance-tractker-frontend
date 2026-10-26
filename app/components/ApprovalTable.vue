@@ -42,7 +42,7 @@ const target = (row: EntityRow, index: number) => {
         </NuxtLink>
       </template>
     </PColumn>
-    <PColumn header="Requested by">
+    <PColumn header="Requested by" class="mobile-hidden">
       <template #body="{ data }">
         <span class="person-cell">
           <span class="avatar avatar-small">{{ initials(data.employeeName || 'Employee') }}</span>
@@ -50,12 +50,12 @@ const target = (row: EntityRow, index: number) => {
         </span>
       </template>
     </PColumn>
-    <PColumn header="Waiting">
+    <PColumn header="Waiting" class="mobile-waiting">
       <template #body="{ data }">
         <span class="status-badge">{{ approvalAgeDays(data) }} days</span>
       </template>
     </PColumn>
-    <PColumn header="Policy">
+    <PColumn header="Policy" class="mobile-hidden">
       <template #body="{ data }">
         <span v-if="approvalExceptions(data).length" class="status-badge status-warning">
           {{ approvalExceptions(data).join(', ') }}
@@ -63,10 +63,10 @@ const target = (row: EntityRow, index: number) => {
         <span v-else class="subtle">No exception</span>
       </template>
     </PColumn>
-    <PColumn header="Status">
+    <PColumn header="Status" class="mobile-status">
       <template #body="{ data }"><StatusBadge :status="data.status" /></template>
     </PColumn>
-    <PColumn header="Details" class="table-action">
+    <PColumn header="Details" class="table-action mobile-hidden">
       <template #body="{ data, index }">
         <NuxtLink
           :to="target(data, index)"

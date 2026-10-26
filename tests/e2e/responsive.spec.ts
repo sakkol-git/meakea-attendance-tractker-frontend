@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 const routes = [
   '/',
+  '/workflows',
   '/attendance',
   '/leave',
   '/requests',
@@ -17,10 +18,11 @@ const routes = [
 const viewports = [
   { name: 'phone', width: 390, height: 844 },
   { name: 'tablet', width: 820, height: 1180 },
+  { name: 'laptop', width: 1280, height: 800 },
   { name: 'desktop', width: 1440, height: 1050 },
 ]
 
-test('main workflows fit phone, tablet and desktop viewports', async ({ page }) => {
+test('main workflows fit phone, tablet, laptop and desktop viewports', async ({ page }) => {
   test.setTimeout(120_000)
   await page.goto('/')
   await page.getByRole('combobox', { name: 'Demo role' }).click()
@@ -43,6 +45,32 @@ test('main workflows fit phone, tablet and desktop viewports', async ({ page }) 
       }
       await expect(page.locator('main')).toBeVisible()
       await expect(page.locator('.loading-stack')).toHaveCount(0)
+      await expect(page.locator('.page-heading h1')).toHaveCount(1)
+      const design = await page.evaluate(() => ({
+        fontFamily: getComputedStyle(document.body).fontFamily,
+        panelRadii: [...document.querySelectorAll<HTMLElement>('.panel')]
+          .filter((element) => element.offsetParent !== null)
+          .map((element) => getComputedStyle(element).borderRadius),
+        smallTargets: [
+          ...document.querySelectorAll<HTMLElement>(
+            '.p-button, .p-select, .p-toggleswitch, input:not([type="hidden"]):not(.p-toggleswitch-input), textarea, a.view-link, a.notification-link, a.account-link, a.text-link',
+          ),
+        ]
+          .filter((element) => element.offsetParent !== null)
+          .filter((element) => element.getBoundingClientRect().height < 43.5)
+          .slice(0, 8)
+          .map((element) => ({
+            tag: element.tagName.toLowerCase(),
+            className: element.className.toString(),
+            height: Math.round(element.getBoundingClientRect().height),
+          })),
+      }))
+      expect(design.fontFamily).toContain('Kantumruy Pro')
+      expect(
+        design.panelRadii.every((radius) => radius === '16px'),
+        `${viewport.name} panel radius on ${path}: ${design.panelRadii.join(', ')}`,
+      ).toBe(true)
+      expect(design.smallTargets, `${viewport.name} touch targets on ${path}`).toEqual([])
       const overflow = await page.evaluate(() => {
         const contained = (element: HTMLElement) => {
           for (
@@ -79,6 +107,51 @@ test('main workflows fit phone, tablet and desktop viewports', async ({ page }) 
         }
       })
       expect(overflow, `${viewport.name} overflow on ${path}`).toEqual({ fits: true, elements: [] })
+    }
+  }
+})
+
+test('request dialog remains usable on a small phone', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 })
+  await page.goto('/requests')
+  await page.getByRole('button', { name: 'New request' }).click()
+
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  const bounds = await dialog.boundingBox()
+  expect(bounds).not.toBeNull()
+  expect(bounds!.x).toBeGreaterThanOrEqual(0)
+  expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320)
+  expect(bounds!.y).toBeGreaterThanOrEqual(0)
+  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(568)
+
+  await expect(dialog.getByRole('button', { name: /save draft/i })).toBeVisible()
+  await expect(dialog.getByRole('button', { name: /cancel/i })).toBeVisible()
+})
+
+test('authentication and onboarding pages share responsive foundations', async ({ page }) => {
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport)
+    for (const path of ['/login', '/forgot-password', '/reset-password', '/setup']) {
+      await page.goto(path)
+      await expect(page.locator('.login-shell')).toBeVisible()
+      const audit = await page.evaluate(() => ({
+        fits: document.documentElement.scrollWidth <= window.innerWidth + 1,
+        fontFamily: getComputedStyle(document.body).fontFamily,
+        smallTargets: [...document.querySelectorAll<HTMLElement>('.p-button, input, a.text-link')]
+          .filter((element) => element.offsetParent !== null)
+          .filter((element) => element.getBoundingClientRect().height < 43.5)
+          .map((element) => ({
+            className: element.className.toString(),
+            height: Math.round(element.getBoundingClientRect().height),
+          })),
+      }))
+      expect(audit.fits, `${path} at ${viewport.width}px`).toBe(true)
+      expect(audit.fontFamily).toContain('Kantumruy Pro')
+      expect(audit.smallTargets, `${path} touch targets at ${viewport.width}px`).toEqual([])
     }
   }
 })
