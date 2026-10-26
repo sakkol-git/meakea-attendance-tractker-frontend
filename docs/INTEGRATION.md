@@ -10,6 +10,8 @@ Use `npm run build:demo` when packaging an intentional demonstration. The normal
 
 For remote mode, set `NUXT_PUBLIC_DATA_SOURCE=remote` and `NUXT_PUBLIC_API_BASE_URL=https://your-host/api/v1`, then restart/rebuild. Public runtime config contains no secrets. Production hosting must deliberately select remote mode; default demo mode is not a production configuration. HTTPS is required except loopback development. No credentials, query strings or fragments are accepted in the base URL.
 
+The separate backend checkout's `infra/selfhost/compose.yaml` builds this repository's `Dockerfile` in remote mode and serves the generated static bundle behind Caddy. It requires this checkout at `web/` under the backend root. Its loopback edge binding is a private candidate only; the Acer deployment and external restore gate are still unverified. Build variables are baked into the bundle and must match the reviewed browser origin before creating a release image.
+
 ## Identity and transport
 
 - `GET /auth/me` returns the profile defined by `Profile` in `app/schemas/contracts.ts`, including trusted tenant/employee references, roles and time zone.

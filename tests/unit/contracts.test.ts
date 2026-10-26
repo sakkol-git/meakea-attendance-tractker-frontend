@@ -9,6 +9,7 @@ import {
   ShiftRecord,
   HolidayRecord,
   DocumentRecord,
+  AuditEntry,
 } from '../../app/schemas/contracts'
 import { DataFailure } from '../../app/data/source'
 
@@ -112,5 +113,16 @@ describe('Domain typed Zod contracts', () => {
       uploadedAt: '2026-10-25T00:00:00Z',
     })
     expect(doc.size).toBe(1024)
+  })
+  it('validates audit records and rejects malformed timestamps', () => {
+    const row = decode(AuditEntry, {
+      id: 'audit-1',
+      at: '2026-10-26T01:02:03Z',
+      actor: 'HR Admin',
+      action: 'REQUEST_APPROVED',
+      entityId: 'request-1',
+    })
+    expect(row.action).toBe('REQUEST_APPROVED')
+    expect(() => decode(AuditEntry, { ...row, at: 'not-a-time' })).toThrow(DataFailure)
   })
 })

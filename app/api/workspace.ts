@@ -3,6 +3,9 @@ import type { Resource } from '../types/workspace'
 import { z } from 'zod'
 import type { DataRequest, DataSource, RecordData } from '../data/source.ts'
 import { commandKey, DataFailure } from '../data/source.ts'
+import { fetchAuditLogs } from '../features/audit/data/audit.ts'
+import type { AuditOptions } from '../features/audit/data/audit.ts'
+import { resourcePath } from './resource-paths.ts'
 import {
   Attendance,
   Balance,
@@ -38,23 +41,7 @@ export class WorkspaceApi {
     this.guard = mutationGuard
   }
   private path(resource: Resource) {
-    const paths: Record<Resource, string> = {
-      leaves: '/leave/requests',
-      myLeaves: '/leave/requests/me',
-      pendingLeaves: '/leave/requests/pending',
-      requests: '/requests',
-      myRequests: '/requests/me',
-      pendingRequests: this.source.mode === 'local' ? '/requests/pending' : '/requests/inbox',
-      corrections: '/attendance/corrections',
-      employees: '/employees',
-      departments: '/departments',
-      positions: '/positions',
-      shifts: '/shifts',
-      holidays: '/holidays',
-      workSites: '/work-sites',
-      materials: '/materials',
-    }
-    return paths[resource]
+    return resourcePath(this.source.mode, resource)
   }
   async list(
     resource: Resource,
@@ -139,6 +126,9 @@ export class WorkspaceApi {
       Report,
       (await this.source.send({ method: 'GET', path: '/reports/dashboard' })).data,
     )
+  }
+  async auditLogs(options: AuditOptions) {
+    return fetchAuditLogs(this.source, options)
   }
   async delegations() {
     const response = await this.source.send({ method: 'GET', path: '/approvals/delegations' })

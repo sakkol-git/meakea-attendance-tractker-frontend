@@ -107,6 +107,18 @@ export const ExportJob = z.object({
   downloadUrl: z.string().optional(),
   version: z.number().int(),
 })
+export const AuditEntry = z.object({
+  id: z.string().min(1),
+  at: z.string().datetime(),
+  actor: z.string().min(1),
+  action: z.string().min(1),
+  entityId: z.string().min(1),
+  reason: z.string().optional(),
+  changes: z
+    .record(z.string(), z.object({ before: z.unknown().optional(), after: z.unknown().optional() }))
+    .optional(),
+})
+export type AuditEntry = z.infer<typeof AuditEntry>
 export const ApprovalDelegation = z.object({
   id: z.string(),
   delegateId: z.string(),

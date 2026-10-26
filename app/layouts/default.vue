@@ -29,6 +29,7 @@ const navigation = computed(() => [
       ]
     : []),
   ...(session.isAdmin ? [{ label: 'Organization', icon: 'sitemap', to: '/organization' }] : []),
+  ...(session.isAdmin ? [{ label: 'Audit', icon: 'history', to: '/audit' }] : []),
   ...(session.isManager ? [{ label: 'Reports', icon: 'chart-bar', to: '/reports' }] : []),
 ])
 const searchResults = computed(() =>

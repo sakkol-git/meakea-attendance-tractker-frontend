@@ -75,6 +75,10 @@ test('admin directory, organization, reporting, preferences and accessibility', 
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Export leave CSV' }).click()
   expect((await download).suggestedFilename()).toBe('hrflow-demo-leave.csv')
+  await page.getByRole('link', { name: 'Audit', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Audit activity' })).toBeVisible()
+  await page.getByLabel('Action').fill('approved')
+  await expect(page.getByRole('cell', { name: 'Request Approved' })).toBeVisible()
   await page.getByRole('link', { name: 'Settings', exact: true }).click()
   await page.getByRole('switch', { name: 'Helpful reminders' }).click()
   await page.getByRole('button', { name: 'Save preferences' }).click()
@@ -159,6 +163,7 @@ test('all main screens remain accessible and material quantity can be edited', a
     '/approvals',
     '/people',
     '/organization',
+    '/audit',
     '/reports',
     '/notifications',
     '/settings',

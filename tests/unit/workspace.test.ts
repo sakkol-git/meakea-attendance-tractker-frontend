@@ -99,6 +99,16 @@ describe('workflow integration against explicit demo adapter', () => {
     const cancelled = await api.cancelDelegation(row.id, row.version)
     expect(cancelled.status).toBe('CANCELLED')
   })
+  it('protects, filters and pages audit activity', async () => {
+    const { demo, api } = fixture()
+    await expect(api.auditLogs({ page: 0, size: 25 })).rejects.toMatchObject({ status: 403 })
+    demo.setRole('HR_ADMIN')
+    const result = await api.auditLogs({ page: 0, size: 1, action: 'approved' })
+    expect(result.page).toBe(0)
+    expect(result.size).toBe(1)
+    expect(result.total).toBe(1)
+    expect(result.items[0]?.action).toBe('REQUEST_APPROVED')
+  })
 })
 describe('remote command safety', () => {
   it('polls asynchronous report exports and stops on a terminal failure', async () => {

@@ -9,6 +9,7 @@ const routes = [
   '/approvals',
   '/people',
   '/organization',
+  '/audit',
   '/reports',
   '/notifications',
   '/settings',

@@ -9,6 +9,10 @@ import {
   withPolicyExceptions,
   withReviewContext,
 } from '../features/approvals/data/demo-review-context.ts'
+import { demoAuditRows } from '../features/audit/data/audit.ts'
+import { workingDays } from '../features/leave/data/demo-calendar.ts'
+
+export { workingDays } from '../features/leave/data/demo-calendar.ts'
 
 const clone = <T>(value: T): T => structuredClone(value)
 const isoDay = (offset: number) => {
@@ -16,28 +20,6 @@ const isoDay = (offset: number) => {
   d.setUTCDate(d.getUTCDate() + offset)
   return d.toISOString().slice(0, 10)
 }
-export function workingDays(start: string, end: string, holidays: string[] = []) {
-  let days = 0
-  const cursor = new Date(`${start}T12:00:00Z`)
-  const finish = new Date(`${end}T12:00:00Z`)
-  if (
-    !Number.isFinite(+cursor) ||
-    !Number.isFinite(+finish) ||
-    finish < cursor ||
-    (+finish - +cursor) / 86400000 > 366
-  )
-    throw new DataFailure(422, 'INVALID_DATES', 'Choose a valid period of no more than one year.')
-  while (cursor <= finish) {
-    if (
-      ![0, 6].includes(cursor.getUTCDay()) &&
-      !holidays.includes(cursor.toISOString().slice(0, 10))
-    )
-      days++
-    cursor.setUTCDate(cursor.getUTCDate() + 1)
-  }
-  return days
-}
-
 /** Explicit UI simulation layered over the existing shared data source, never a remote fallback. */
 export class WorkspaceDemoSource implements DataSource {
   readonly mode = 'local' as const
@@ -650,6 +632,10 @@ export class WorkspaceDemoSource implements DataSource {
         pendingApprovals: leave + requests,
         dataAsOf: new Date().toISOString(),
       })
+    }
+    if (r.path === '/audit-logs' && r.method === 'GET') {
+      this.requireAdmin()
+      return ok(pageRows(demoAuditRows(r.query), r.query))
     }
     if (r.path === '/reports/exports' && r.method === 'POST') {
       this.requireManager()

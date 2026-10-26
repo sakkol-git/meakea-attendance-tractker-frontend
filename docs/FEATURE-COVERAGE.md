@@ -15,8 +15,9 @@ Status describes the web client only. “Demo exercised” is not proof that an 
 | Organization       | Departments, positions, shifts, holidays, sites and materials list/create/edit/delete                                | Dependency-safe deletion and full policy/catalog relationships require server contracts                  |
 | Notifications      | Read/unread filter, mark read/all, internal-route safety                                                             | No push/WebSocket channel; no claim of email delivery                                                    |
 | Preferences        | ETag-protected notification channel changes                                                                          | The demo critical-channel rule is illustrative                                                           |
-| Profile            | Read-only trusted session profile                                                                                    | Password change, recovery, invitations and profile edits require identity/employee contracts             |
+| Profile            | Trusted session profile, canonical name/time-zone update and password change                                         | Recovery and invitations remain pending; server owns identity validation and session revocation          |
 | Reports            | Metric cards, accessible attendance bars with exact-value table, leave summary, CSV export                           | Demo export is synchronous; real background polling and remote CSV sanitization need reporting service   |
+| Audit              | Admin-only, paged activity screen with actor/action/target/date filters and exact timestamps                         | Synthetic demo only until the pending audit provider contract and tenant authorization are accepted      |
 | Shared states      | Loading skeletons, error/retry, empty states, validation, unsaved-form discard, confirmation, stale-version feedback | Retry is deliberate; a network timeout is never presented as confirmed success                           |
 
 ## Verification
