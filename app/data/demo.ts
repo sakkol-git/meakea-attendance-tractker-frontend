@@ -5,6 +5,7 @@ import { correctionForm, employeeForm, leaveForm, requestForm } from '../schemas
 import { toCsv } from '../utils/format.ts'
 import { DemoDelegations } from '../features/approvals/data/demo-delegation.ts'
 import { pageRows } from './page.ts'
+import { catalogName, seedEmployees } from './demo-people.ts'
 import {
   withPolicyExceptions,
   withReviewContext,
@@ -62,26 +63,7 @@ export class WorkspaceDemoSource implements DataSource {
   }
   private async seed() {
     const original = (await this.base.send({ method: 'GET', path: '/auth/me' })).data as RecordData
-    this.rows.set('/employees', [
-      {
-        id: String(original.employeeId),
-        name: String(original.name),
-        email: 'dara@example.test',
-        department: 'Engineering',
-        position: 'Software engineer',
-        status: 'ACTIVE',
-        version: 1,
-      },
-      {
-        id: 'demo-manager',
-        name: 'Chan Sopheak',
-        email: 'sopheak@example.test',
-        department: 'Engineering',
-        position: 'Engineering manager',
-        status: 'ACTIVE',
-        version: 1,
-      },
-    ])
+    this.rows.set('/employees', seedEmployees(original))
     const master: Record<string, RecordData[]> = {
       '/departments': [
         {
@@ -107,6 +89,12 @@ export class WorkspaceDemoSource implements DataSource {
           name: 'Standard workday',
           start: '09:00',
           end: '17:00',
+          startTime: '09:00',
+          endTime: '17:00',
+          graceMinutes: 10,
+          workingDays: 31,
+          siteId: 'office',
+          timezone: 'Asia/Phnom_Penh',
           description: 'Monday–Friday · Demo policy',
           version: 1,
         },
@@ -122,7 +110,16 @@ export class WorkspaceDemoSource implements DataSource {
         { id: 'company-day', name: 'Company day', date: isoDay(25), version: 1 },
       ],
       '/work-sites': [
-        { id: 'office', name: 'Phnom Penh office', description: 'Main workspace', version: 1 },
+        {
+          id: 'office',
+          name: 'Phnom Penh office',
+          latitude: 11.56,
+          longitude: 104.92,
+          radiusM: 100,
+          timezone: 'Asia/Phnom_Penh',
+          description: 'Main workspace',
+          version: 1,
+        },
       ],
       '/materials': [
         {
@@ -569,7 +566,13 @@ export class WorkspaceDemoSource implements DataSource {
           ...r.body,
           id: `workspace-${++this.sequence}`,
           version: 1,
-          ...(path === '/employees' ? { status: 'ACTIVE' } : {}),
+          ...(path === '/employees'
+            ? {
+                status: 'ACTIVE',
+                department: catalogName(this.rows.get('/departments'), r.body?.departmentId),
+                position: catalogName(this.rows.get('/positions'), r.body?.positionId),
+              }
+            : {}),
         }
         rows.push(row)
         return ok(row, 201, 1)
@@ -588,6 +591,10 @@ export class WorkspaceDemoSource implements DataSource {
             throw new DataFailure(409, 'DUPLICATE_EMAIL', 'An employee already uses this email.')
         }
         Object.assign(row, r.body, { id, version: Number(row.version) + 1 })
+        if (path === '/employees') {
+          row.department = catalogName(this.rows.get('/departments'), row.departmentId)
+          row.position = catalogName(this.rows.get('/positions'), row.positionId)
+        }
         return ok(row, 200, Number(row.version))
       }
       if (r.method === 'POST' && action === 'terminate' && path === '/employees') {
@@ -634,7 +641,8 @@ export class WorkspaceDemoSource implements DataSource {
       })
     }
     if (r.path === '/audit-logs' && r.method === 'GET') {
-      this.requireAdmin()
+      if (this.role !== 'OWNER')
+        throw new DataFailure(403, 'FORBIDDEN', 'Owner access is required.')
       return ok(pageRows(demoAuditRows(r.query), r.query))
     }
     if (r.path === '/reports/exports' && r.method === 'POST') {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const api = useWorkspace()
 const session = useSessionStore()
+const appearance = useAppearanceStore()
 const feedback = useFeedback()
 const result = useWorkspaceQuery('preferences', () => api.preferences())
 const values = reactive({ email: true, inApp: true, reminders: true })
@@ -36,7 +37,7 @@ const options = [
   {
     key: 'inApp' as const,
     title: 'In-app notifications',
-    detail: 'Keep your updates close while you work.',
+    detail: 'Optional workspace updates. Required approval updates remain in your inbox.',
   },
   {
     key: 'reminders' as const,
@@ -53,6 +54,25 @@ const options = [
   />
   <div class="detail-grid">
     <section class="panel">
+      <div class="field appearance-preference">
+        <label for="appearance">Appearance</label>
+        <PSelect
+          input-id="appearance"
+          aria-label="Appearance"
+          v-model="appearance.preference"
+          :options="[
+            { label: 'Use device setting', value: 'system' },
+            { label: 'Light', value: 'light' },
+            { label: 'Dark', value: 'dark' },
+          ]"
+          option-label="label"
+          option-value="value"
+          aria-describedby="appearance-help"
+        />
+        <small id="appearance-help"
+          >Applies to this browser. Notification preferences are saved separately.</small
+        >
+      </div>
       <div class="section-heading">
         <div>
           <h2>Keep me in the loop</h2>
@@ -90,6 +110,7 @@ const options = [
     </section>
     <aside class="panel">
       <h2>About your workspace</h2>
+      <NuxtLink to="/help" class="text-link">Help and getting started</NuxtLink>
       <dl class="detail-list">
         <div>
           <dt>Language</dt>

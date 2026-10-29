@@ -27,7 +27,7 @@ test('main workflows fit phone, tablet, laptop and desktop viewports', async ({ 
   test.setTimeout(120_000)
   await page.goto('/')
   await page.getByRole('combobox', { name: 'Demo role' }).click()
-  await page.getByRole('option', { name: 'HR administrator', exact: true }).click()
+  await page.getByRole('option', { name: 'Owner', exact: true }).click()
   await expect(page.locator('.p-select-overlay')).toHaveCount(0)
 
   for (const viewport of viewports) {
@@ -128,6 +128,29 @@ test('request dialog remains usable on a small phone', async ({ page }) => {
 
   await expect(dialog.getByRole('button', { name: /save draft/i })).toBeVisible()
   await expect(dialog.getByRole('button', { name: /cancel/i })).toBeVisible()
+})
+
+test('attendance cards keep dates, times and status readable on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 })
+  await page.goto('/attendance')
+  const first = page.locator('.attendance-session-card').first()
+  await expect(first).toBeVisible()
+  await expect(first.getByText('Completed', { exact: true })).toBeVisible()
+  await expect(first.getByText('Clock in', { exact: true })).toBeVisible()
+  await expect(first.getByText('Clock out', { exact: true })).toBeVisible()
+  await expect(page.locator('.attendance-session-table')).not.toBeVisible()
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await page.screenshot({ path: 'test-results/attendance-cards-phone.png', fullPage: true })
+})
+
+test('task menus keep technical processes out of normal navigation', async ({ page }) => {
+  await page.goto('/workflows')
+  await expect(page.getByRole('heading', { name: 'Tasks', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Refresh token rotation/ })).not.toBeVisible()
+  await expect(page.getByRole('link', { name: /My schedule/ })).toBeVisible()
+  await expect(
+    page.getByRole('navigation', { name: 'Main navigation' }).getByText('Workflows'),
+  ).toHaveCount(0)
 })
 
 test('authentication and onboarding pages share responsive foundations', async ({ page }) => {

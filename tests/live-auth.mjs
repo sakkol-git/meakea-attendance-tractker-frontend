@@ -14,7 +14,7 @@ try {
   await page.goto(`${url}/login`)
   await page.getByLabel('Workspace', { exact: true }).fill('demo')
   await page.getByLabel('Work email').fill('owner@example.test')
-  await page.getByLabel('Password').fill(password)
+  await page.getByLabel('Password', { exact: true }).fill(password)
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
   await expect(page).toHaveURL(`${url}/`)
   await expect(page.locator('h1').first()).toContainText('Local')

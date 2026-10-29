@@ -1,4 +1,9 @@
+import {
+  canReviewRequests as reviewRequests,
+  canFulfillRequests as fulfillRequests,
+} from '../features/requests/permissions'
 import { defineStore } from 'pinia'
+import { useListViewsStore } from './list-views'
 import type { Role, UserProfile } from '../schemas/contracts'
 
 export const useSessionStore = defineStore('session', () => {
@@ -13,6 +18,8 @@ export const useSessionStore = defineStore('session', () => {
     roles.value.some((x) => ['MANAGER', 'HR_ADMIN', 'OWNER'].includes(x)),
   )
   const isAdmin = computed(() => roles.value.some((x) => ['HR_ADMIN', 'OWNER'].includes(x)))
+  const canReviewRequests = computed(() => reviewRequests(mode.value, roles.value))
+  const canFulfillRequests = computed(() => fulfillRequests(mode.value, roles.value))
   async function initialize() {
     if (initialized.value) return
     if (flight) return flight
@@ -34,6 +41,7 @@ export const useSessionStore = defineStore('session', () => {
   }
   async function signIn(body: Record<string, string>) {
     profile.value = await app.$sessionService.login(body)
+    useListViewsStore().$reset()
     initialized.value = true
     initializationError.value = ''
     app.$queryClient.clear()
@@ -42,6 +50,7 @@ export const useSessionStore = defineStore('session', () => {
     if (!app.$demoSource) throw new Error('Demo mode is not enabled.')
     app.$demoSource.setRole(role)
     profile.value = await app.$sessionService.me()
+    useListViewsStore().$reset()
     initialized.value = true
     initializationError.value = ''
     app.$queryClient.clear()
@@ -55,6 +64,7 @@ export const useSessionStore = defineStore('session', () => {
       error = e
     } finally {
       profile.value = undefined
+      useListViewsStore().$reset()
       initialized.value = true
       app.$queryClient.clear()
       app.$workspace.clear()
@@ -63,6 +73,7 @@ export const useSessionStore = defineStore('session', () => {
     if (error) throw error
   }
   function expire() {
+    useListViewsStore().$reset()
     app.$clientData.clearSession()
     profile.value = undefined
     app.$queryClient.clear()
@@ -104,6 +115,8 @@ export const useSessionStore = defineStore('session', () => {
     roles,
     isManager,
     isAdmin,
+    canReviewRequests,
+    canFulfillRequests,
     initialize,
     signIn,
     enterDemo,

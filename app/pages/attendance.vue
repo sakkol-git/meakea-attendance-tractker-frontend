@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { clockLabel, dateLabel, duration, tenantDay } from '~/utils/format'
+import { dateLabel, tenantDay } from '~/utils/format'
 const api = useWorkspace()
 const app = useNuxtApp()
 const session = useSessionStore()
@@ -62,24 +62,27 @@ function clearDates() {
 <template>
   <PageHeading
     title="Attendance"
-    description="Every workday has a story. Here’s yours, clearly recorded."
+    description="Review recorded sessions and request a correction when something is missing or incorrect."
     eyebrow="YOUR WORKDAY HISTORY"
-    ><PButton label="Report an issue" icon="pi pi-flag" outlined @click="visible = true" /><PButton
+    ><PButton
+      label="Request correction"
+      icon="pi pi-flag"
+      outlined
+      @click="visible = true" /><PButton
       label="Today’s clock"
       icon="pi pi-clock"
       @click="navigateTo('/')"
   /></PageHeading>
-  <AttendanceGeoCard />
   <section v-if="inferredItem" class="panel inferred-review-panel">
     <div class="inferred-badge">
       <AppIcon name="clock" />
-      <span>ACTION REQUIRED · WORKDAY CONFIRMATION (BF-011)</span>
+      <span>Review proposed attendance</span>
     </div>
     <div class="inferred-body">
       <div>
         <h3>{{ inferredItem.title }} · {{ String(inferredItem.details?.workDate ?? '') }}</h3>
         <p>
-          Passive telemetry detected presence from
+          Proposed attendance from
           <strong>{{ String(inferredItem.details?.clockIn ?? '') }}</strong> to
           <strong>{{ String(inferredItem.details?.clockOut ?? '') }}</strong
           >.
@@ -106,24 +109,30 @@ function clearDates() {
       </div>
     </div>
   </section>
-  <div class="attendance-stats">
-    <section class="panel">
-      <span class="eyebrow">RECORDS IN VIEW</span><strong>{{ rows.length }}</strong
-      ><small>Recorded sessions</small>
-    </section>
-    <section class="panel">
-      <span class="eyebrow">CURRENT SESSION</span
-      ><strong class="stat-label">{{
-        rows.some((x) => !x.clockOut) ? 'Clocked in' : 'No open session'
-      }}</strong
-      ><small>Based on your latest records</small>
-    </section>
-    <section class="panel">
-      <span class="eyebrow">YOUR TIMEZONE</span
-      ><strong class="stat-label">{{ session.profile?.timeZone.replaceAll('_', ' ') }}</strong
-      ><small>Displayed in your workspace timezone</small>
-    </section>
-  </div>
+  <section class="panel attendance-summary" aria-label="Attendance summary">
+    <dl>
+      <div>
+        <dt>Sessions in view</dt>
+        <dd>{{ history.isPending.value || history.error.value ? 'Unavailable' : rows.length }}</dd>
+      </div>
+      <div>
+        <dt>Current session</dt>
+        <dd>
+          {{
+            history.isPending.value || history.error.value
+              ? 'Unavailable'
+              : history.data.value?.items.some((x) => !x.clockOut)
+                ? 'Clocked in'
+                : 'No open session'
+          }}
+        </dd>
+      </div>
+      <div>
+        <dt>Time zone</dt>
+        <dd>{{ session.profile?.timeZone.replaceAll('_', ' ') }}</dd>
+      </div>
+    </dl>
+  </section>
   <section class="panel no-padding">
     <div class="section-heading padded">
       <div>
@@ -149,40 +158,14 @@ function clearDates() {
       title="No recorded sessions"
       message="Try a different date range, or clock in from your overview."
       @retry="history.refetch()"
-      ><PDataTable
-        :value="rows"
-        :paginator="rows.length > 8"
-        :rows="8"
-        :pt="{
-          tableContainer: { role: 'region', 'aria-label': 'Attendance sessions', tabindex: 0 },
-        }"
-        ><PColumn header="Date"
-          ><template #body="{ data }"
-            ><strong>{{ tenantDay(data.clockIn, session.profile?.timeZone) }}</strong></template
-          ></PColumn
-        ><PColumn header="Clock in"
-          ><template #body="{ data }">{{
-            clockLabel(data.clockIn, session.profile?.timeZone)
-          }}</template></PColumn
-        ><PColumn header="Clock out"
-          ><template #body="{ data }">{{
-            clockLabel(data.clockOut, session.profile?.timeZone)
-          }}</template></PColumn
-        ><PColumn header="Duration"
-          ><template #body="{ data }">{{
-            duration(data.clockIn, data.clockOut)
-          }}</template></PColumn
-        ><PColumn header="Recorded state"
-          ><template #body="{ data }"
-            ><StatusBadge
-              :status="data.clockOut ? 'COMPLETED' : 'ACTIVE'" /></template></PColumn></PDataTable
-    ></QueryState>
+      ><AttendanceSessions :rows="rows" :time-zone="session.profile?.timeZone"
+    /></QueryState>
   </section>
   <section class="panel">
     <div class="section-heading">
       <div>
-        <h2>Attendance issues</h2>
-        <p>Follow the issues you’ve sent for review</p>
+        <h2>Attendance corrections</h2>
+        <p>Follow the corrections you’ve sent for review</p>
       </div>
     </div>
     <QueryState

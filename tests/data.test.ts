@@ -168,6 +168,56 @@ test('remote preserves wire headers, URL encoding, etag, empty bodies, and curre
   assert.equal((await source.send(request)).data, null)
 })
 
+test('remote employee master uses the compatible v2 route', async () => {
+  const source = new RemoteDataSource(
+    'https://example.test/api/v1',
+    () => 'token',
+    async (input) => {
+      assert.equal(new URL(String(input)).pathname, '/api/v2/employees')
+      return new Response('{"items":[],"page":0,"size":20,"total":0}', { status: 200 })
+    },
+  )
+  assert.deepEqual((await source.send({ method: 'GET', path: '/employees' })).data, {
+    items: [],
+    page: 0,
+    size: 20,
+    total: 0,
+  })
+})
+
+test('remote site and shift masters use v2 routes', async () => {
+  const paths: string[] = []
+  const source = new RemoteDataSource(
+    'https://example.test/api/v1',
+    () => 'token',
+    async (input) => {
+      paths.push(new URL(String(input)).pathname)
+      return new Response('{"items":[],"page":0,"size":0,"total":0}', { status: 200 })
+    },
+  )
+  await source.send({ method: 'GET', path: '/work-sites' })
+  await source.send({ method: 'GET', path: '/shifts' })
+  await source.send({
+    method: 'PATCH',
+    path: '/shifts/00000000-0000-4000-8000-000000000001',
+    body: {},
+  })
+  await source.send({ method: 'GET', path: '/holidays' })
+  await source.send({
+    method: 'GET',
+    path: '/employees/00000000-0000-4000-8000-000000000001/shifts',
+  })
+  await source.send({ method: 'GET', path: '/shift-assignments' })
+  assert.deepEqual(paths, [
+    '/api/v2/work-sites',
+    '/api/v2/shifts',
+    '/api/v2/shifts/00000000-0000-4000-8000-000000000001',
+    '/api/v2/holidays',
+    '/api/v2/employees/00000000-0000-4000-8000-000000000001/shifts',
+    '/api/v2/shift-assignments',
+  ])
+})
+
 test('remote problem and transport errors never return local success or retry mutations', async () => {
   let calls = 0
   const source = new RemoteDataSource(

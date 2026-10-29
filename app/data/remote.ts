@@ -43,14 +43,27 @@ export class RemoteDataSource implements DataSource {
   async send(request: DataRequest): Promise<DataResponse> {
     validateRequest(request)
     const url = new URL(this.base.toString())
-    url.pathname = url.pathname.replace(/\/$/, '') + request.path
+    const v2Master =
+      /^\/(?:employees(?:\/[^/]+(?:\/shifts)?)?|(?:work-sites|shifts|holidays)(?:\/[^/]+)?|shift-assignments(?:\/[^/]+\/close)?)$/.test(
+        request.path,
+      )
+    const root = url.pathname.replace(/\/$/, '')
+    url.pathname = (v2Master ? root.replace(/\/api\/v1$/, '/api/v2') : root) + request.path
     for (const [key, value] of Object.entries(request.query ?? {})) url.searchParams.set(key, value)
-    const headers: Record<string, string> = { Accept: 'application/json, application/problem+json' }
+    const headers: Record<string, string> = {
+      Accept:
+        request.responseType === 'bytes'
+          ? 'application/pdf, image/png, image/jpeg, application/problem+json'
+          : request.responseType === 'csv'
+            ? 'text/csv, application/problem+json'
+            : 'application/json, application/problem+json',
+    }
     const token = this.token()
     if (token) headers.Authorization = `Bearer ${token}`
     const csrf = this.csrf()
     if (request.method !== 'GET' && csrf) headers['X-XSRF-TOKEN'] = csrf
     if (request.body !== undefined) headers['Content-Type'] = 'application/json'
+    if (request.bytes) headers['Content-Type'] = request.contentType!
     if (request.idempotencyKey) headers['Idempotency-Key'] = request.idempotencyKey
     if (request.ifMatch) headers['If-Match'] = request.ifMatch
     const controller = new AbortController()
@@ -59,13 +72,43 @@ export class RemoteDataSource implements DataSource {
       const response = await this.fetcher(url, {
         method: request.method,
         headers,
-        body: request.body === undefined ? undefined : JSON.stringify(request.body),
+        body: request.bytes
+          ? new Uint8Array(request.bytes).buffer
+          : request.body === undefined
+            ? undefined
+            : JSON.stringify(request.body),
         signal: controller.signal,
         credentials: 'include',
         redirect: 'error',
         cache: 'no-store',
       })
+      if (response.ok && request.responseType === 'bytes') {
+        const type = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()
+        if (!['application/pdf', 'image/png', 'image/jpeg'].includes(type ?? ''))
+          throw new DataFailure(
+            response.status,
+            'INVALID_RESPONSE',
+            'The API did not return a supported private file.',
+          )
+        const bytes = new Uint8Array(await response.arrayBuffer())
+        if (bytes.length === 0 || bytes.length > 10 * 1024 * 1024)
+          throw new DataFailure(
+            response.status,
+            'INVALID_RESPONSE',
+            'The private file exceeds the supported size.',
+          )
+        return { status: response.status, data: Array.from(bytes) }
+      }
       const text = response.status === 204 ? '' : await response.text()
+      if (response.ok && request.responseType === 'csv') {
+        if (!/^text\/csv(?:;|$)/i.test(response.headers.get('content-type') ?? ''))
+          throw new DataFailure(
+            response.status,
+            'INVALID_RESPONSE',
+            'The API did not return a CSV file.',
+          )
+        return { status: response.status, data: text }
+      }
       let data = null
       try {
         data = text ? JSON.parse(text) : null

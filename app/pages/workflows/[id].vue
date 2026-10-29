@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { workflowById } from '~/features/workflows/catalog'
+import { taskWorkflows } from '~/features/workflows/tasks'
 import { workflowActions } from '~/features/workflows/forms'
 import { dateLabel, titleCase } from '~/utils/format'
 import type { RecordData } from '~/data/source'
@@ -13,6 +14,7 @@ const id = String(route.params.id).toUpperCase()
 const flow = workflowById(id)
 if (!flow) throw createError({ statusCode: 404, statusMessage: 'Workflow not found' })
 const allowed = computed(() => session.roles.some((role) => flow.roles.includes(role)))
+const task = computed(() => taskWorkflows(session.roles).find((item) => item.id === id))
 const actions =
   [5, 18].includes(flow.number) && !session.isAdmin ? [] : workflowActions(flow.number)
 const selected = ref(actions[0]?.key ?? '')
@@ -136,9 +138,9 @@ onBeforeUnmount(() => clearInterval(timer))
 <template>
   <NuxtLink to="/workflows" class="back-link"><AppIcon name="arrow-left" />All workflows</NuxtLink
   ><PageHeading
-    :title="flow.title"
-    :description="flow.purpose"
-    :eyebrow="`${flow.id} · ${flow.group}`"
+    :title="task?.title ?? flow.title"
+    :description="task?.purpose ?? flow.purpose"
+    :eyebrow="flow.group"
     ><NuxtLink v-if="flow.route" :to="flow.route" class="text-link"
       >Open
       {{ flow.number === 40 ? 'sign-in' : flow.number === 1 ? 'sign-in' : 'main workspace screen'
@@ -179,7 +181,7 @@ onBeforeUnmount(() => clearInterval(timer))
               flow.number === 4
                 ? 'Add employee'
                 : flow.number === 14
-                  ? 'Request time off'
+                  ? 'Request leave'
                   : 'Create request draft'
             "
             icon="pi pi-plus"
@@ -284,31 +286,7 @@ onBeforeUnmount(() => clearInterval(timer))
           {{ feedback.error.value }}
         </p>
       </section>
-      <aside class="panel">
-        <h2>Current references</h2>
-        <p class="small-note workflow-intro">
-          Choose exact references from the current workspace. Record revisions are checked before
-          advanced commands.
-        </p>
-        <div
-          v-for="ref in result.data.value?.references ?? []"
-          :key="ref.id"
-          class="workflow-reference"
-        >
-          <strong>{{ ref.name }}</strong
-          ><code>{{ ref.id }}</code>
-        </div>
-        <p v-if="!result.data.value?.references.length" class="small-note">
-          This workflow has no external record selection.
-        </p>
-        <div class="gentle-note">
-          <AppIcon name="book" />
-          <p>
-            Source: <code>business-flow.md</code> → <code>{{ flow.source }}</code> → {{ flow.id }}.
-            Client preview choices do not change approved architecture or unresolved company policy.
-          </p>
-        </div>
-      </aside>
+      <TaskReferences :references="result.data.value?.references ?? []" />
     </div>
     <section class="panel workflow-records">
       <div class="section-heading">
@@ -337,9 +315,7 @@ onBeforeUnmount(() => clearInterval(timer))
           >
             <div>
               <button class="record-title-button" @click="expanded = row">{{ row.title }}</button
-              ><code>{{ row.id }}</code
-              ><small
-                >Revision {{ row.version }} ·
+              ><small>
                 {{
                   row.createdAt
                     ? dateLabel(row.createdAt, 'MMM d, h:mm a')

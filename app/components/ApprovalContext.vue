@@ -49,7 +49,15 @@ const hasContext = computed(() => Object.keys(context.value).length > 0)
       </div>
       <div>
         <dt>Team members off</dt>
-        <dd>{{ teamMembers.length ? teamMembers.join(', ') : 'No overlapping approved leave' }}</dd>
+        <dd>
+          {{
+            teamMembers.length
+              ? teamMembers.join(', ')
+              : Array.isArray(context.teamMembersOff)
+                ? 'No overlapping approved leave'
+                : 'Not provided'
+          }}
+        </dd>
       </div>
     </dl>
     <div v-if="kind === 'request' && materials.length" class="context-list">

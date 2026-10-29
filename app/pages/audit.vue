@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ roles: ['HR_ADMIN', 'OWNER'] })
+definePageMeta({ roles: ['OWNER'] })
 
 const api = useWorkspace()
 const session = useSessionStore()
@@ -57,8 +57,8 @@ function auditTime(value: string) {
   />
 
   <p v-if="session.mode === 'local'" class="info-banner">
-    <AppIcon name="info-circle" />Synthetic audit examples. Remote records remain unavailable until
-    the pending audit contract is implemented and accepted by the provider.
+    <AppIcon name="info-circle" />Synthetic audit examples. Remote mode reads identity-owned audit
+    activity; audit records from other services are outside this view.
   </p>
 
   <section class="panel no-padding">
@@ -71,7 +71,7 @@ function auditTime(value: string) {
     <form class="audit-filters" aria-label="Audit filters" @submit.prevent>
       <label>
         <span>Actor</span>
-        <PInputText v-model="actor" placeholder="Name or account" />
+        <PInputText v-model="actor" placeholder="Account ID" />
       </label>
       <label>
         <span>Action</span>

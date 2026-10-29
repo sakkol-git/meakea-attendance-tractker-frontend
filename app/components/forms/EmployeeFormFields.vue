@@ -69,26 +69,34 @@ const managerOptions = computed(() =>
   <div class="form-grid">
     <div class="field">
       <label for="form-department">Department</label>
-      <PInputText
-        id="form-department"
-        v-model="values.department"
-        placeholder="e.g. Engineering"
-        :aria-invalid="!!errors.department"
+      <PSelect
+        input-id="form-department"
+        aria-label="Department"
+        v-model="values.departmentId"
+        :options="departmentOptions"
+        option-label="name"
+        option-value="id"
+        placeholder="Choose a department"
+        :aria-invalid="!!errors.departmentId"
         aria-describedby="error-department"
       />
-      <small id="error-department" class="field-error">{{ errors.department }}</small>
+      <small id="error-department" class="field-error">{{ errors.departmentId }}</small>
     </div>
 
     <div class="field">
       <label for="form-position">Position</label>
-      <PInputText
-        id="form-position"
-        v-model="values.position"
-        placeholder="e.g. Software Engineer"
-        :aria-invalid="!!errors.position"
+      <PSelect
+        input-id="form-position"
+        aria-label="Position"
+        v-model="values.positionId"
+        :options="positionOptions"
+        option-label="name"
+        option-value="id"
+        placeholder="Choose a position"
+        :aria-invalid="!!errors.positionId"
         aria-describedby="error-position"
       />
-      <small id="error-position" class="field-error">{{ errors.position }}</small>
+      <small id="error-position" class="field-error">{{ errors.positionId }}</small>
     </div>
   </div>
 
@@ -96,10 +104,11 @@ const managerOptions = computed(() =>
     <label for="form-manager">Reporting manager</label>
     <PSelect
       input-id="form-manager"
-      v-model="values.manager"
+      aria-label="Reporting manager"
+      v-model="values.managerId"
       :options="managerOptions"
       option-label="name"
-      option-value="name"
+      option-value="id"
       placeholder="Select a manager (optional)"
     />
   </div>

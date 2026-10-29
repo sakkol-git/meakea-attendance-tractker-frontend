@@ -1,16 +1,27 @@
 <script setup lang="ts">
 const api = useWorkspace()
 const session = useSessionStore()
-const requests = useWorkspaceQuery('leave', () => api.list('myLeaves'))
+const views = useListViewsStore()
+const page = computed({
+  get: () => views.forList('leave').page,
+  set: (value) => {
+    views.forList('leave').page = value
+  },
+})
+const pageSize = 25
+const requests = useWorkspaceQuery(
+  () => `leave:${page.value}`,
+  () =>
+    api.list('myLeaves', api.mode === 'remote' ? { page: page.value, size: pageSize } : undefined),
+)
 const balances = useWorkspaceQuery('balances', () => api.balances())
 const visible = ref(false)
 const activeTab = ref<'requests' | 'calendar'>('requests')
 </script>
 <template>
   <PageHeading
-    title="Time off"
-    description="A little space to recharge. Manage your leave and see what’s ahead."
-    eyebrow="YOUR TIME, WELL SPENT"
+    title="Leave"
+    description="Check your balances, request leave and follow approval progress."
   >
     <div class="heading-actions">
       <NuxtLink v-if="session.isAdmin" to="/workflows/BF-018">
@@ -19,7 +30,7 @@ const activeTab = ref<'requests' | 'calendar'>('requests')
       <NuxtLink v-if="session.isAdmin" to="/workflows/BF-019">
         <PButton label="Carry-over rollover" icon="pi pi-replay" outlined />
       </NuxtLink>
-      <PButton label="Request time off" icon="pi pi-plus" @click="visible = true" />
+      <PButton label="Request leave" icon="pi pi-plus" @click="visible = true" />
     </div>
   </PageHeading>
 
@@ -68,7 +79,7 @@ const activeTab = ref<'requests' | 'calendar'>('requests')
     <div class="section-heading padded">
       <div>
         <h2>Your requests</h2>
-        <p>From the first plan to the final approval</p>
+        <p>Track decisions and review your submitted dates.</p>
       </div>
     </div>
     <QueryState
@@ -76,14 +87,24 @@ const activeTab = ref<'requests' | 'calendar'>('requests')
       :error="requests.error.value"
       :empty="!requests.data.value?.items.length"
       title="Your next break starts here"
-      message="When you request time off, you can follow its progress here."
+      message="When you request leave, you can follow its progress here."
       @retry="requests.refetch()"
-      ><RequestTable :rows="requests.data.value?.items || []" kind="leave" /><template #empty
-        ><PButton label="Request time off" @click="visible = true" /></template
+      ><RequestTable
+        :rows="requests.data.value?.items || []"
+        kind="leave"
+        :server-page="api.mode === 'remote'" /><template #empty
+        ><PButton label="Request leave" @click="visible = true" /></template
     ></QueryState>
   </section>
 
-  <section v-else class="panel">
+  <CollectionPager
+    v-if="activeTab === 'requests' && api.mode === 'remote'"
+    v-model:page="page"
+    :size="pageSize"
+    :total="requests.data.value?.total ?? 0"
+  />
+
+  <section v-if="activeTab === 'calendar'" class="panel">
     <LeaveCalendar />
   </section>
 

@@ -1,15 +1,27 @@
 <script setup lang="ts">
+import { requestDraftValues } from '~/utils/request-form'
+import { formCopy } from '~/utils/form-copy'
+import { focusInvalidField } from '~/utils/form-focus'
 import { z } from 'zod'
 import { useConfirm } from 'primevue/useconfirm'
-import { leaveForm, requestForm, correctionForm, employeeForm } from '~/schemas/forms'
+import {
+  leaveForm,
+  requestForm,
+  correctionForm,
+  employeeForm,
+  workSiteForm,
+  shiftForm,
+} from '~/schemas/forms'
 import type { EntityRow, Resource } from '~/types/workspace'
 import type { RecordData } from '~/data/source'
 
 import LeaveFormFields from '~/components/forms/LeaveFormFields.vue'
+import FormReview from '~/components/forms/FormReview.vue'
 import EmployeeFormFields from '~/components/forms/EmployeeFormFields.vue'
 import RequestFormFields from '~/components/forms/RequestFormFields.vue'
 import CorrectionFormFields from '~/components/forms/CorrectionFormFields.vue'
 import MasterFormFields from '~/components/forms/MasterFormFields.vue'
+import ScheduleFormFields from '~/components/forms/ScheduleFormFields.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -27,22 +39,16 @@ const confirm = useConfirm()
 
 const values = reactive<Record<string, any>>({})
 const errors = ref<Record<string, string>>({})
+const formElement = ref<HTMLFormElement>()
+const formId = useId()
 let snapshot = ''
-
-const titles = {
-  leave: 'Request time off',
-  request: 'Create a request',
-  correction: 'Report an attendance issue',
-  employee: 'Add a person',
-  master: 'Add a record',
-}
 
 const title = computed(
   () =>
     props.heading ||
     (props.initial
       ? 'Edit ' + (props.kind === 'employee' ? 'person' : 'record')
-      : titles[props.kind]),
+      : formCopy[props.kind].title),
 )
 
 watch(
@@ -62,17 +68,31 @@ watch(
       fromTime: '08:30',
       toTime: '17:30',
       date: '',
+      proposedClockIn: '',
+      proposedClockOut: '',
+      kind: 'COMPANY',
       name: '',
       email: '',
       employeeNo: '',
       hireDate: '',
-      department: '',
-      position: '',
-      manager: '',
+      departmentId: '',
+      positionId: '',
+      managerId: '',
       description: '',
       start: '09:00',
       end: '17:00',
-      ...props.initial,
+      startTime: '09:00',
+      endTime: '17:00',
+      graceMinutes: 10,
+      workingDays: 31,
+      siteId: '',
+      latitude: '',
+      longitude: '',
+      radiusM: '',
+      timezone: '',
+      ...(props.kind === 'request' && props.initial
+        ? requestDraftValues(props.initial)
+        : props.initial),
     })
     errors.value = {}
     feedback.error.value = ''
@@ -102,7 +122,10 @@ async function save() {
     name: z.string().trim().min(2, 'Enter a name.'),
     description: z.string().max(2000).optional(),
     ...(props.path === 'holidays'
-      ? { date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date.') }
+      ? {
+          date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date.'),
+          kind: z.enum(['PUBLIC', 'COMPANY']),
+        }
       : {}),
     ...(props.path === 'materials' ? { quantity: z.number().int().min(0).max(1000000) } : {}),
     ...(props.path === 'shifts' ? { start: z.string().min(1), end: z.string().min(1) } : {}),
@@ -113,7 +136,8 @@ async function save() {
     request: requestForm,
     correction: correctionForm,
     employee: employeeForm,
-    master,
+    master:
+      props.path === 'workSites' ? workSiteForm : props.path === 'shifts' ? shiftForm : master,
   }[props.kind]
 
   const parsed = schema.safeParse(values)
@@ -123,7 +147,7 @@ async function save() {
     for (const issue of parsed.error.issues) {
       errors.value[String(issue.path[0])] = issue.message
     }
-    nextTick(() => document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus())
+    nextTick(() => focusInvalidField(formElement.value))
     return
   }
 
@@ -136,7 +160,11 @@ async function save() {
   }
 
   let body = JSON.parse(JSON.stringify(parsed.data)) as RecordData
-  if (props.kind === 'leave') {
+  if (props.kind === 'correction') {
+    if (!body.proposedClockIn) delete body.proposedClockIn
+    if (!body.proposedClockOut) delete body.proposedClockOut
+  }
+  if (props.kind === 'leave' && api.mode === 'local') {
     const leaveTypeIds: Record<string, string> = {
       'Annual leave': 'annual',
       'Sick leave': 'sick',
@@ -149,13 +177,19 @@ async function save() {
     const materialId = String(body.materialId || '')
     const reason = String(body.reason || '')
     const quantity = Number(body.quantity || 1)
+    const additional = Array.isArray(props.initial?.items) ? props.initial.items.slice(1) : []
+    const requestItems =
+      type === 'MATERIAL' && materialId ? [{ materialId, quantity }, ...additional] : []
     body = {
       title: String(body.title || ''),
       type,
       reason,
       description: reason,
-      quantity: type === 'MATERIAL' ? quantity : null,
-      items: type === 'MATERIAL' && materialId ? [{ materialId, quantity }] : [],
+      quantity:
+        type === 'MATERIAL'
+          ? requestItems.reduce((total, item) => total + Number(item.quantity), 0)
+          : null,
+      items: requestItems,
       ...(['REMOTE_WORK', 'LATE_ARRIVAL', 'EARLY_LEAVE'].includes(type)
         ? { startDate: String(body.startDate || ''), endDate: String(body.endDate || '') }
         : { startDate: null, endDate: null }),
@@ -170,7 +204,7 @@ async function save() {
       props.initial
         ? api.update(paths[props.kind], props.initial.id, props.initial.version, body)
         : api.create(paths[props.kind], body),
-    props.initial ? 'Changes saved' : props.kind === 'request' ? 'Draft saved' : 'Request recorded',
+    props.initial ? 'Changes saved' : formCopy[props.kind].saved,
   )
 
   if (result) {
@@ -191,25 +225,40 @@ async function save() {
     @update:visible="close"
   >
     <p class="dialog-intro">
-      {{
-        kind === 'leave'
-          ? 'Make a little space for what matters. Your approver will review the dates below.'
-          : kind === 'request'
-            ? 'Save a draft first, then review and submit it to your approver.'
-            : kind === 'correction'
-              ? 'Tell us what needs a closer look. Your original attendance record stays unchanged until reviewed.'
-              : 'Keep your workspace information clear and up to date.'
-      }}
+      {{ formCopy[kind].intro }}
     </p>
 
-    <form class="app-form" novalidate @submit.prevent="save">
+    <form
+      ref="formElement"
+      :id="formId"
+      class="app-form"
+      novalidate
+      :aria-busy="feedback.busy.value"
+      :inert="feedback.busy.value"
+      @submit.prevent="save"
+    >
+      <p v-if="Object.keys(errors).length" class="form-error" role="alert">
+        Check the highlighted fields before continuing. Your entries are still here.
+      </p>
       <LeaveFormFields v-if="kind === 'leave'" :values="values" :errors="errors" />
 
       <EmployeeFormFields v-else-if="kind === 'employee'" :values="values" :errors="errors" />
 
-      <RequestFormFields v-else-if="kind === 'request'" :values="values" :errors="errors" />
+      <RequestFormFields
+        v-else-if="kind === 'request'"
+        :values="values"
+        :errors="errors"
+        :type-locked="api.mode === 'remote' && !!initial"
+      />
 
       <CorrectionFormFields v-else-if="kind === 'correction'" :values="values" :errors="errors" />
+
+      <ScheduleFormFields
+        v-else-if="kind === 'master' && (path === 'workSites' || path === 'shifts')"
+        :values="values"
+        :errors="errors"
+        :path="path"
+      />
 
       <MasterFormFields
         v-else-if="kind === 'master'"
@@ -221,31 +270,26 @@ async function save() {
       <p v-if="feedback.error.value" class="form-error" role="alert">
         {{ feedback.error.value }}
       </p>
-
-      <footer class="dialog-actions">
-        <PButton
-          label="Cancel"
-          severity="secondary"
-          outlined
-          :disabled="feedback.busy.value"
-          @click="close"
-        />
-        <PButton
-          type="submit"
-          :label="
-            initial
-              ? 'Save changes'
-              : kind === 'request'
-                ? 'Save draft'
-                : kind === 'leave'
-                  ? 'Send request'
-                  : kind === 'employee' || kind === 'master'
-                    ? 'Create record'
-                    : 'Submit for review'
-          "
-          :loading="feedback.busy.value"
-        />
-      </footer>
+      <FormReview
+        v-if="kind === 'request' || kind === 'leave' || kind === 'correction'"
+        :kind="kind"
+        :values="values"
+      />
     </form>
+    <template #footer>
+      <PButton
+        label="Cancel"
+        severity="secondary"
+        outlined
+        :disabled="feedback.busy.value"
+        @click="close"
+      />
+      <PButton
+        type="submit"
+        :form="formId"
+        :label="initial ? 'Save changes' : formCopy[kind].submit"
+        :loading="feedback.busy.value"
+      />
+    </template>
   </PDialog>
 </template>

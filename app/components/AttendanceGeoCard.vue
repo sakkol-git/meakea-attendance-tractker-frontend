@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
   evaluateGeofence,
+  configuredWorkSites,
   type GeolocationCoordinates,
   type GeofenceEvaluation,
-  type WorkSiteLocation,
 } from '~/utils/geofence'
 
 const emit = defineEmits<{
@@ -18,14 +18,10 @@ const error = ref('')
 const coords = ref<GeolocationCoordinates>()
 const evaluation = ref<GeofenceEvaluation>()
 
-const sites = computed<WorkSiteLocation[]>(() => {
-  return (workSitesQuery.data.value?.items || []).map((item) => ({
-    id: item.id,
-    name: item.name || 'Office Work Site',
-    latitude: typeof item.latitude === 'number' ? item.latitude : 11.5732,
-    longitude: typeof item.longitude === 'number' ? item.longitude : 104.9189,
-    radiusMeters: typeof item.radiusMeters === 'number' ? item.radiusMeters : 200,
-  }))
+const sites = computed(() => configuredWorkSites(workSitesQuery.data.value?.items || []))
+const denied = ref(false)
+watch([coords, sites], () => {
+  evaluation.value = coords.value ? evaluateGeofence(coords.value, sites.value) : undefined
 })
 
 function requestLocation() {
@@ -36,6 +32,7 @@ function requestLocation() {
 
   loading.value = true
   error.value = ''
+  denied.value = false
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -51,8 +48,12 @@ function requestLocation() {
     },
     (err) => {
       loading.value = false
+      coords.value = undefined
+      evaluation.value = undefined
       if (err.code === 1) {
-        error.value = 'Location permission denied. You can still clock with unverified GPS.'
+        denied.value = true
+        error.value =
+          'Location access is off. Enable location for this site in your browser settings, then try again.'
       } else if (err.code === 2) {
         error.value = 'Unable to determine your current position.'
       } else {
@@ -67,10 +68,6 @@ function requestLocation() {
     },
   )
 }
-
-onMounted(() => {
-  requestLocation()
-})
 </script>
 
 <template>
@@ -81,34 +78,47 @@ onMounted(() => {
           <AppIcon name="map-marker" />
         </span>
         <div>
-          <strong class="geo-title">Workspace Geolocation</strong>
-          <small v-if="loading" class="geo-status-loading">Acquiring GPS coordinates…</small>
-          <small v-else-if="evaluation" class="geo-status-text">{{ evaluation.message }}</small>
-          <small v-else-if="error" class="geo-status-error">{{ error }}</small>
-          <small v-else class="geo-status-muted">Checking work-site perimeter</small>
+          <strong class="geo-title">Attendance location</strong>
+          <div role="status" aria-live="polite">
+            <small v-if="loading" class="geo-status-loading">Finding your location…</small>
+            <small v-else-if="evaluation" class="geo-status-text">{{ evaluation.message }}</small>
+            <small v-else-if="error" class="geo-status-error">{{ error }}</small>
+            <small v-else class="geo-status-muted"
+              >Share a location sample when you are ready. Your company’s attendance rules still
+              apply.</small
+            >
+          </div>
         </div>
       </div>
 
       <div class="geo-card-actions">
         <span v-if="evaluation?.withinBoundary" class="status-badge active geo-badge">
-          Verified in boundary
+          Within site boundary · browser estimate
         </span>
         <span
-          v-else-if="evaluation && !evaluation.withinBoundary"
+          v-else-if="evaluation?.status === 'OUTSIDE_BOUNDARY'"
           class="status-badge geo-badge-warning"
         >
-          Outside perimeter
+          Outside work site
         </span>
         <PButton
-          icon="pi pi-refresh"
+          :label="coords ? 'Refresh location' : denied ? 'Try location again' : 'Share location'"
+          icon="pi pi-map-marker"
           size="small"
           text
-          rounded
-          aria-label="Refresh GPS location"
           :loading="loading"
           @click="requestLocation"
         />
       </div>
+    </div>
+
+    <p v-if="coords" class="small-note">
+      Location captured. You can now use the attendance action. Your company’s rules are checked
+      when you submit.
+    </p>
+    <div v-if="workSitesQuery.error.value" class="small-note" role="status">
+      Work site details are unavailable. Your location alone does not confirm site eligibility.
+      <PButton label="Retry work sites" text size="small" @click="workSitesQuery.refetch()" />
     </div>
 
     <div v-if="coords" class="geo-coords-bar">
@@ -120,7 +130,9 @@ onMounted(() => {
       >
       <span
         >Accuracy:
-        <strong>±{{ coords.accuracyMeters ? Math.round(coords.accuracyMeters) : 0 }}m</strong></span
+        <strong>{{
+          coords.accuracyMeters == null ? 'Unknown' : `±${Math.round(coords.accuracyMeters)} m`
+        }}</strong></span
       >
     </div>
   </div>

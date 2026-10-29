@@ -5,9 +5,34 @@ const props = defineProps<{
   rows: EntityRow[]
   kind: 'leave' | 'request' | 'correction'
   compact?: boolean
+  serverPage?: boolean
 }>()
-const query = ref('')
-const status = ref('All statuses')
+const views = useListViewsStore()
+const view = computed(() => views.forList(props.compact ? 'home-preview' : props.kind))
+const query = computed({
+  get: () => view.value.query,
+  set: (value) => {
+    view.value.query = value
+    view.value.first = 0
+  },
+})
+const status = computed({
+  get: () => view.value.status,
+  set: (value) => {
+    view.value.status = value
+    view.value.first = 0
+  },
+})
+const first = computed({
+  get: () => view.value.first,
+  set: (value) => {
+    view.value.first = value
+  },
+})
+function clearFilters() {
+  query.value = ''
+  status.value = 'All statuses'
+}
 const filtered = computed(() =>
   props.rows.filter(
     (row) =>
@@ -34,25 +59,31 @@ const target = (row: EntityRow) =>
     <div class="search-field">
       <AppIcon name="search" /><PInputText
         v-model="query"
-        :placeholder="kind === 'leave' ? 'Search time off…' : 'Search requests…'"
+        :placeholder="
+          serverPage ? 'Search this page…' : kind === 'leave' ? 'Search leave…' : 'Search requests…'
+        "
         aria-label="Search records"
       />
     </div>
     <PSelect v-model="status" :options="statuses" aria-label="Filter status"
       ><template #value>{{ status === 'All statuses' ? status : statusLabel(status) }}</template
       ><template #option="slotProps">{{ statusLabel(slotProps.option) }}</template></PSelect
-    ><span class="record-count">{{ filtered.length }} records</span>
+    ><span class="record-count"
+      >{{ filtered.length }} {{ filtered.length === 1 ? 'record' : 'records'
+      }}{{ serverPage ? ' on this page' : '' }}</span
+    >
   </div>
   <PDataTable
+    v-model:first="first"
     :value="filtered"
-    :paginator="!compact && filtered.length > 8"
+    :paginator="!compact && !serverPage && filtered.length > 8"
     :rows="8"
     data-key="id"
     class="workspace-table"
     :row-hover="true"
     :pt="{ tableContainer: { role: 'region', 'aria-label': 'Requests table', tabindex: 0 } }"
   >
-    <PColumn :header="kind === 'leave' ? 'Time off' : 'Request'" field="type"
+    <PColumn :header="kind === 'leave' ? 'Leave' : 'Request'" field="type"
       ><template #body="{ data }"
         ><NuxtLink :to="target(data)" class="table-title"
           ><span class="record-icon" :class="kind"
@@ -95,6 +126,22 @@ const target = (row: EntityRow) =>
           :aria-label="`View ${data.title || data.type || 'request'}`"
           ><AppIcon name="arrow-up-right" /></NuxtLink></template
     ></PColumn>
-    <template #empty><div class="table-empty">No records match your filters.</div></template>
+    <template #empty>
+      <div class="table-empty" role="status">
+        <p>
+          {{
+            query || status !== 'All statuses'
+              ? 'No records match your filters.'
+              : 'No records yet.'
+          }}
+        </p>
+        <PButton
+          v-if="query || status !== 'All statuses'"
+          label="Clear filters"
+          outlined
+          @click="clearFilters"
+        />
+      </div>
+    </template>
   </PDataTable>
 </template>

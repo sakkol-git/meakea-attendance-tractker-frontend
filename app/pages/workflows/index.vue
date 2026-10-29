@@ -1,26 +1,27 @@
 <script setup lang="ts">
+import { workspaceTasks } from '~/features/workflows/tasks'
 import { workflows } from '~/features/workflows/catalog'
 import { filterRecords } from '~/utils/filter'
 const session = useSessionStore()
 const search = ref('')
 const group = ref('All areas')
-const groups = ['All areas', ...new Set(workflows.map((x) => x.group))]
+const tasks = computed(() => workspaceTasks(session.roles, session.mode))
+const groups = computed(() => ['All areas', ...new Set(tasks.value.map((x) => x.group))])
 const rows = computed(() => {
   const byGroup =
-    group.value === 'All areas' ? workflows : workflows.filter((x) => x.group === group.value)
+    group.value === 'All areas' ? tasks.value : tasks.value.filter((x) => x.group === group.value)
   return filterRecords(byGroup, ['id', 'title', 'purpose'], search.value)
 })
-const allowed = (roles: string[]) => session.roles.some((x) => roles.includes(x))
 </script>
 <template>
   <PageHeading
-    title="Business workflows"
-    description="Every documented journey, with its actions, evidence and operational boundary."
-    eyebrow="40 SOURCE-MAPPED WORKFLOWS"
+    title="Tasks"
+    description="Find a task for your workday, team or organization."
+    eyebrow="YOUR WORKSPACE"
   />
   <div class="panel workflow-filter">
     <div class="field">
-      <label for="workflow-search">Find a workflow</label
+      <label for="workflow-search">Find a task</label
       ><PInputText
         id="workflow-search"
         v-model="search"
@@ -38,30 +39,36 @@ const allowed = (roles: string[]) => session.roles.some((x) => roles.includes(x)
     </div>
   </div>
   <p class="small-note workflow-caption">
-    {{ rows.length }} workflows · Access follows your current role. Operator and ML screens are
-    explicit demo previews, never production operator grants.
+    {{ rows.length }} tasks available for your workspace role.
   </p>
   <div class="workflow-grid">
-    <NuxtLink
-      v-for="flow in rows"
-      :key="flow.id"
-      :to="`/workflows/${flow.id}`"
-      class="panel workflow-card"
+    <NuxtLink v-for="flow in rows" :key="flow.id" :to="flow.to" class="panel workflow-card"
       ><div>
-        <span class="eyebrow">{{ flow.id }} · {{ flow.group }}</span
-        ><AppIcon :name="allowed(flow.roles) ? 'arrow-up-right' : 'lock'" />
+        <span class="eyebrow">{{ flow.group }}</span
+        ><AppIcon name="arrow-up-right" />
       </div>
       <h2>{{ flow.title }}</h2>
       <p>{{ flow.purpose }}</p>
-      <span class="small-note">{{
-        allowed(flow.roles)
-          ? 'Open workflow'
-          : 'Requires ' + flow.roles.map((x) => x.replaceAll('_', ' ')).join(' / ')
-      }}</span></NuxtLink
+      <span class="small-note">Open task</span></NuxtLink
     >
   </div>
   <section v-if="!rows.length" class="empty-state panel">
-    <h2>No matching workflows</h2>
+    <h2>No matching tasks</h2>
     <p>Try a different term or business area.</p>
   </section>
+  <details v-if="session.mode === 'local'" class="panel demo-catalog">
+    <summary>Developer demo catalog</summary>
+    <p>
+      All 40 documented journeys use synthetic data. This catalog is only available in demo mode.
+    </p>
+    <div class="workflow-grid">
+      <NuxtLink
+        v-for="flow in workflows.filter((flow) => !rows.some((task) => task.id === flow.id))"
+        :key="flow.id"
+        :to="`/workflows/${flow.id}`"
+        class="text-link"
+        >{{ flow.id }} · {{ flow.title }}</NuxtLink
+      >
+    </div>
+  </details>
 </template>

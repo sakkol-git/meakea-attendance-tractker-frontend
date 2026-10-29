@@ -18,7 +18,7 @@ export type UserProfile = z.infer<typeof Profile>
 export const Entity = z
   .object({
     id: z.string(),
-    version: z.number().int().positive(),
+    version: z.number().int().nonnegative(),
     status: z.string().optional(),
     name: z.string().optional(),
     title: z.string().optional(),
@@ -68,7 +68,8 @@ export const Attendance = z.object({
   id: z.string(),
   clockIn: z.string().datetime(),
   clockOut: z.string().datetime().nullable(),
-  version: z.number().int().positive(),
+  version: z.number().int().nonnegative(),
+  etag: z.string().min(1).optional(),
 })
 export type AttendanceRow = z.infer<typeof Attendance>
 export const Notice = z.object({
@@ -77,7 +78,9 @@ export const Notice = z.object({
   read: z.boolean(),
   detail: z.string().optional(),
   createdAt: z.string().optional(),
-  to: z.string().optional(),
+  to: z.string().nullish(),
+  kind: z.string().nullish(),
+  recordId: z.string().nullish(),
 })
 export type NoticeRow = z.infer<typeof Notice>
 export const Balance = z.object({
@@ -105,7 +108,7 @@ export const ExportJob = z.object({
   id: z.string(),
   status: z.enum(['QUEUED', 'PENDING', 'RUNNING', 'COMPLETED', 'FAILED', 'CANCELLED']),
   downloadUrl: z.string().optional(),
-  version: z.number().int(),
+  version: z.number().int().positive(),
 })
 export const AuditEntry = z.object({
   id: z.string().min(1),
@@ -155,13 +158,16 @@ export const EmployeeRecord = z
     id: z.string(),
     name: z.string(),
     email: z.string(),
-    employeeNo: z.string().optional(),
-    hireDate: z.string().optional(),
+    employeeNo: z.string(),
+    departmentId: z.string(),
+    positionId: z.string(),
+    managerId: z.string().nullable().optional(),
+    hireDate: z.string().nullable().optional(),
     department: z.string().optional(),
     position: z.string().optional(),
     manager: z.string().optional(),
     status: z.string().optional(),
-    version: z.number().int().positive(),
+    version: z.number().int().nonnegative(),
   })
   .passthrough()
 export type EmployeeRecord = z.infer<typeof EmployeeRecord>
@@ -195,8 +201,9 @@ export const WorkSiteRecord = z
     name: z.string(),
     latitude: z.number(),
     longitude: z.number(),
-    radiusMeters: z.number().positive(),
-    version: z.number().int().positive(),
+    radiusM: z.number().positive(),
+    timezone: z.string(),
+    version: z.number().int().nonnegative(),
   })
   .passthrough()
 export type WorkSiteRecord = z.infer<typeof WorkSiteRecord>
@@ -223,9 +230,11 @@ export const ShiftRecord = z
   .object({
     id: z.string(),
     name: z.string(),
-    start: z.string(),
-    end: z.string(),
-    version: z.number().int().positive(),
+    startTime: z.string(),
+    endTime: z.string(),
+    siteId: z.string(),
+    timezone: z.string(),
+    version: z.number().int().nonnegative(),
   })
   .passthrough()
 export type ShiftRecord = z.infer<typeof ShiftRecord>

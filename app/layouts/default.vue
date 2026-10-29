@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { initials } from '~/utils/format'
 import type { Role } from '~/types/workspace'
+import { workspaceNavigation, workspaceGroups } from '~/features/navigation'
 const session = useSessionStore()
 const route = useRoute()
 const api = useWorkspace()
-const realtime = useRealtimeNotifications()
 const notices = useWorkspaceQuery('notifications', () => api.notices())
 const unread = computed(() => notices.data.value?.items.filter((x) => !x.read).length ?? 0)
 const drawer = ref(false)
@@ -16,22 +16,8 @@ const roleOptions = [
   { label: 'HR administrator', value: 'HR_ADMIN' },
   { label: 'Owner', value: 'OWNER' },
 ]
-const navigation = computed(() => [
-  { label: 'Overview', icon: 'home', to: '/' },
-  { label: 'Workflows', icon: 'th-large', to: '/workflows' },
-  { label: 'Attendance', icon: 'clock', to: '/attendance' },
-  { label: 'Time off', icon: 'sun', to: '/leave' },
-  { label: 'Requests', icon: 'briefcase', to: '/requests' },
-  ...(session.isManager
-    ? [
-        { label: 'Approvals', icon: 'check-square', to: '/approvals' },
-        { label: 'People', icon: 'users', to: '/people' },
-      ]
-    : []),
-  ...(session.isAdmin ? [{ label: 'Organization', icon: 'sitemap', to: '/organization' }] : []),
-  ...(session.isAdmin ? [{ label: 'Audit', icon: 'history', to: '/audit' }] : []),
-  ...(session.isManager ? [{ label: 'Reports', icon: 'chart-bar', to: '/reports' }] : []),
-])
+const navigation = computed(() => workspaceNavigation(session.roles))
+const groups = computed(() => workspaceGroups(session.roles))
 const searchResults = computed(() =>
   quickSearch.value
     ? navigation.value.filter((x) =>
@@ -70,12 +56,10 @@ onMounted(() => {
   connectivity()
   window.addEventListener('online', connectivity)
   window.addEventListener('offline', connectivity)
-  realtime.connect()
 })
 onBeforeUnmount(() => {
   window.removeEventListener('online', connectivity)
   window.removeEventListener('offline', connectivity)
-  realtime.disconnect()
 })
 </script>
 <template>
@@ -112,32 +96,27 @@ onBeforeUnmount(() => {
         </div>
         <AppIcon name="chevron-down" />
       </div>
-      <p class="nav-caption">WORKSPACE</p>
       <nav aria-label="Main navigation">
-        <NuxtLink
-          v-for="item in navigation"
-          :key="item.to"
-          :to="item.to"
-          class="nav-item"
-          :class="{ active: item.to === '/' ? route.path === '/' : route.path.startsWith(item.to) }"
-          :aria-current="
-            (item.to === '/' ? route.path === '/' : route.path.startsWith(item.to))
-              ? 'page'
-              : undefined
-          "
-          ><AppIcon :name="item.icon" /><span>{{ item.label }}</span
-          ><span v-if="item.to === '/approvals'" class="nav-new">Review</span></NuxtLink
-        >
+        <template v-for="group in groups" :key="group.label">
+          <p class="nav-caption">{{ group.label }}</p>
+          <NuxtLink
+            v-for="item in group.items"
+            :key="item.to"
+            :to="item.to"
+            class="nav-item"
+            :class="{
+              active: item.to === '/' ? route.path === '/' : route.path.startsWith(item.to),
+            }"
+            :aria-current="
+              (item.to === '/' ? route.path === '/' : route.path.startsWith(item.to))
+                ? 'page'
+                : undefined
+            "
+            ><AppIcon :name="item.icon" /><span>{{ item.label }}</span></NuxtLink
+          >
+        </template>
       </nav>
       <div class="sidebar-bottom">
-        <div class="help-card">
-          <span class="help-spark"><AppIcon name="sparkles" /></span
-          ><strong>A little more connected.</strong>
-          <p>One place for your people and every workday.</p>
-          <NuxtLink to="/profile"
-            >Your workspace profile <AppIcon name="arrow-up-right"
-          /></NuxtLink>
-        </div>
         <NuxtLink to="/settings" class="nav-item"><AppIcon name="cog" />Settings</NuxtLink
         ><button class="nav-item" @click="logout"><AppIcon name="sign-out" />Sign out</button>
       </div>
@@ -169,13 +148,15 @@ onBeforeUnmount(() => {
               <p v-if="!searchResults.length">No matching pages.</p>
             </div>
           </div>
-          <NuxtLink to="/notifications" class="notification-link" aria-label="Open notifications"
-            ><AppIcon name="bell" /><span v-if="unread" class="notification-dot" /><span
-              class="realtime-status-dot"
-              :class="{ live: realtime.connected.value }"
-              :title="
-                realtime.connected.value ? 'Real-time sync active' : 'Connecting for updates'
-              " /></NuxtLink
+          <NuxtLink
+            to="/notifications"
+            class="notification-link"
+            :aria-label="
+              unread
+                ? `Open notifications, ${unread} unread in the current page`
+                : 'Open notifications'
+            "
+            ><AppIcon name="bell" /><span v-if="unread" class="notification-dot" /></NuxtLink
           ><span class="topbar-divider" /><NuxtLink to="/profile" class="account-link"
             ><span class="avatar">{{ initials(session.profile?.name || 'User') }}</span
             ><span class="account-name"
@@ -212,10 +193,10 @@ onBeforeUnmount(() => {
           >{{
             session.mode === 'local'
               ? 'Sample workspace'
-              : realtime.connected.value
-                ? 'Live connected'
-                : 'Connecting to workspace'
-          }}<i class="connection-dot" :class="{ 'is-live': realtime.connected.value }"
+              : offline
+                ? 'Offline · changes paused'
+                : 'Check notifications for updates'
+          }}<i class="connection-dot" :class="{ 'is-live': !offline }"
         /></span>
       </footer>
     </div>

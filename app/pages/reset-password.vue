@@ -13,6 +13,7 @@ const success = ref(false)
 const busy = ref(false)
 
 async function submit() {
+  if (session.mode !== 'local' || busy.value) return
   error.value = ''
   const result = resetPasswordForm.safeParse(values)
   if (!result.success) {
@@ -58,10 +59,13 @@ async function submit() {
     <section class="login-form">
       <div class="login-box">
         <span class="eyebrow">AUTHENTICATION</span>
-        <h2>Set new password</h2>
-        <p>Choose a secure new password for your account.</p>
+        <h2 v-if="session.mode === 'local'">Set new password</h2>
+        <p v-if="session.mode === 'local'">
+          Explore the demo password screen. This does not change a real account.
+        </p>
+        <AccessHelp v-if="session.mode === 'remote'" />
 
-        <div v-if="success" class="gentle-note auth-note" role="status">
+        <div v-else-if="success" class="gentle-note auth-note" role="status">
           <AppIcon name="check-circle" />
           <div>
             <strong class="auth-success-title">Password reset complete!</strong>
@@ -74,7 +78,7 @@ async function submit() {
           </NuxtLink>
         </div>
 
-        <form v-else class="app-form" @submit.prevent="submit">
+        <form v-if="session.mode === 'local' && !success" class="app-form" @submit.prevent="submit">
           <div v-if="!route.query.token" class="field">
             <label for="token">Reset token</label>
             <PInputText

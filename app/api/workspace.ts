@@ -1,4 +1,5 @@
-import { safeDownloadUrl } from '../utils/format'
+import { AttendanceClock } from './attendance-clock'
+import type { ClockSession, ClockLocation } from './attendance-clock'
 import type { Resource } from '../types/workspace'
 import { z } from 'zod'
 import type { DataRequest, DataSource, RecordData } from '../data/source.ts'
@@ -6,6 +7,15 @@ import { commandKey, DataFailure } from '../data/source.ts'
 import { fetchAuditLogs } from '../features/audit/data/audit.ts'
 import type { AuditOptions } from '../features/audit/data/audit.ts'
 import { resourcePath } from './resource-paths.ts'
+import { attendanceReport, downloadReportCsv } from '../features/reporting/data'
+import { allPages } from './collections'
+import {
+  attachmentItems,
+  privateAttachmentBytes,
+} from '../features/requests/data/attachment-records'
+import { requestRecord } from '../features/requests/data/record'
+import { materialOptions } from '../features/requests/data/material-options'
+import { LeaveApi } from '../features/leave/data/leave-api'
 import {
   Attendance,
   Balance,
@@ -23,12 +33,13 @@ import {
 } from '../schemas/contracts.ts'
 
 export class WorkspaceApi {
+  readonly leave: LeaveApi
   private readonly source: DataSource
   get mode() {
     return this.source.mode
   }
   private attempts = new Map<string, string>()
-  private clockAttempt?: { sessionId?: string; body: RecordData; etag?: string }
+  private attendanceClock: AttendanceClock
   private guard: () => void
   constructor(
     source: DataSource,
@@ -39,6 +50,11 @@ export class WorkspaceApi {
   ) {
     this.source = source
     this.guard = mutationGuard
+    this.attendanceClock = new AttendanceClock(
+      (path, body, etag) => this.command(path, body, etag),
+      mutationGuard,
+    )
+    this.leave = new LeaveApi(source, (path, body) => this.command(path, body))
   }
   private path(resource: Resource) {
     return resourcePath(this.source.mode, resource)
@@ -61,6 +77,11 @@ export class WorkspaceApi {
     )
       throw new DataFailure(400, 'INVALID_PAGINATION', 'Use page 0 or higher and size 1–100.')
     const path = this.path(resource)
+    if (
+      this.mode === 'remote' &&
+      ['leaves', 'myLeaves', 'pendingLeaves', 'myRequests', 'pendingRequests'].includes(resource)
+    )
+      options = { page: 0, size: 25, ...options }
     const query = options
       ? {
           ...(options.page !== undefined ? { page: String(options.page) } : {}),
@@ -82,7 +103,19 @@ export class WorkspaceApi {
   async detail(resource: Resource, id: string) {
     const path = `${this.path(resource)}/${encodeURIComponent(id)}`
     const r = await this.source.send({ method: 'GET', path })
-    return { row: decode(Entity, r.data), etag: r.etag }
+    return {
+      row: resource === 'requests' ? requestRecord(r.data) : decode(Entity, r.data),
+      etag: r.etag,
+    }
+  }
+  attachmentItems(scope: 'request' | 'leave', id: string) {
+    return attachmentItems(this.source, scope, id)
+  }
+  attachmentBytes(scope: 'request' | 'leave', id: string, attachmentId: string) {
+    return privateAttachmentBytes(this.source, scope, id, attachmentId)
+  }
+  materialOptions() {
+    return materialOptions(this.source)
   }
   async profile() {
     return decode(Profile, (await this.source.send({ method: 'GET', path: '/auth/me' })).data)
@@ -100,18 +133,26 @@ export class WorkspaceApi {
     )
   }
   async balances(year?: number, employeeId?: string) {
+    if (this.mode === 'remote') return this.leave.balances(year, employeeId)
     return decode(
       collection(Balance),
       (
         await this.source.send({
           method: 'GET',
           path: '/leave/balances/me',
-          query: { ...(year ? { year: String(year) } : {}), ...(employeeId ? { employeeId } : {}) },
+          query: {
+            ...(year ? { year: String(year) } : {}),
+            ...(employeeId ? { employeeId } : {}),
+          },
         })
       ).data,
     )
   }
   async notices() {
+    if (this.mode === 'remote') {
+      const items = await allPages(this.source, '/notifications', Notice)
+      return { items, total: items.length }
+    }
     return decode(
       collection(Notice),
       (await this.source.send({ method: 'GET', path: '/notifications' })).data,
@@ -126,6 +167,9 @@ export class WorkspaceApi {
       Report,
       (await this.source.send({ method: 'GET', path: '/reports/dashboard' })).data,
     )
+  }
+  attendanceReport(from?: string, to?: string) {
+    return attendanceReport(this.source, from, to)
   }
   async auditLogs(options: AuditOptions) {
     return fetchAuditLogs(this.source, options)
@@ -179,7 +223,15 @@ export class WorkspaceApi {
     }
   }
   async create(resource: Resource, body: RecordData) {
-    return decode(Entity, (await this.command(this.path(resource), body)).data)
+    return decode(
+      Entity,
+      (await this.command(this.path(resource), this.commandBody(resource, body))).data,
+    )
+  }
+  private commandBody(resource: Resource, body: RecordData) {
+    return this.mode === 'remote' && resource === 'requests' && body.type !== 'MATERIAL'
+      ? { ...body, quantity: body.quantity ?? 1 }
+      : body
   }
   async change(
     resource: Resource,
@@ -225,59 +277,14 @@ export class WorkspaceApi {
     )
   }
   async update(resource: Resource, id: string, version: number, body: RecordData) {
-    return decode(Entity, (await this.change(resource, id, '', version, body, 'PATCH')).data)
+    return decode(
+      Entity,
+      (await this.change(resource, id, '', version, this.commandBody(resource, body), 'PATCH'))
+        .data,
+    )
   }
-  async clock(
-    open?: { id: string; version: number },
-    location?: { latitude: number; longitude: number; accuracyMeters?: number },
-  ) {
-    this.guard()
-    if (!this.clockAttempt || this.clockAttempt.sessionId !== open?.id) {
-      let device: string | null = null
-      try {
-        device = localStorage.getItem('hrflow.installation-id')
-      } catch {
-        /* Storage may be disabled. The command still gets a session-local device reference. */
-      }
-      if (!device) {
-        device = commandKey()
-        try {
-          localStorage.setItem('hrflow.installation-id', device)
-        } catch {
-          /* No credentials or command receipts are persisted. */
-        }
-      }
-      this.clockAttempt = {
-        sessionId: open?.id,
-        body: {
-          deviceId: device,
-          occurredAt: new Date().toISOString(),
-          ...(location
-            ? {
-                latitude: location.latitude,
-                longitude: location.longitude,
-                accuracyMeters: location.accuracyMeters,
-              }
-            : {}),
-          ...(open ? { sessionId: open.id } : { source: 'TAP' }),
-        },
-        etag: open ? `"${open.version}"` : undefined,
-      }
-    }
-    const attempt = this.clockAttempt
-    try {
-      const result = await this.command(
-        open ? '/attendance/check-out' : '/attendance/check-in',
-        attempt.body,
-        attempt.etag,
-      )
-      this.clockAttempt = undefined
-      return result
-    } catch (e) {
-      if (e instanceof DataFailure && e.status >= 400 && e.status < 500)
-        this.clockAttempt = undefined
-      throw e
-    }
+  clock(open?: ClockSession, location?: ClockLocation) {
+    return this.attendanceClock.clock(open, location)
   }
   async adjustBalance(body: RecordData) {
     return this.command('/leave/balance-adjustments', body)
@@ -306,35 +313,13 @@ export class WorkspaceApi {
     )
   }
   async downloadLeaveReport(apiBase: string, origin: string, allowedOrigins: string[] = []) {
-    let job = await this.exportReport({ report: 'LEAVE', format: 'CSV' })
-    for (
-      let attempt = 0;
-      attempt < 10 && ['QUEUED', 'PENDING', 'RUNNING'].includes(job.status);
-      attempt += 1
-    ) {
-      await this.wait(2_000)
-      job = await this.exportStatus(job.id)
-    }
-    if (['FAILED', 'CANCELLED'].includes(job.status))
-      throw new DataFailure(0, 'EXPORT_FAILED', 'The export failed. Start a new export.')
-    if (job.status !== 'COMPLETED')
-      throw new DataFailure(0, 'EXPORT_PENDING', 'The export is not complete. Check again later.')
-    if (this.demoExport) {
-      const blob = new Blob([await this.demoExport()], { type: 'text/csv;charset=utf-8' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'hrflow-demo-leave.csv'
-      a.click()
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-    } else if (job.downloadUrl)
-      window.location.assign(safeDownloadUrl(job.downloadUrl, apiBase, origin, allowedOrigins))
-    else
-      throw new Error('The export completed without a download link. Contact your administrator.')
-    return job
+    return downloadReportCsv(this, this.source, 'LEAVE', this.wait, this.demoExport)
+  }
+  downloadAttendanceReport() {
+    return downloadReportCsv(this, this.source, 'ATTENDANCE', this.wait)
   }
   clear() {
     this.attempts.clear()
-    this.clockAttempt = undefined
+    this.attendanceClock.clear()
   }
 }

@@ -8,6 +8,7 @@ const message = ref('')
 const busy = ref(false)
 
 async function submit() {
+  if (session.mode !== 'local' || busy.value) return
   error.value = ''
   message.value = ''
   const result = forgotPasswordForm.safeParse(values)
@@ -39,8 +40,8 @@ async function submit() {
         <span class="eyebrow">ACCOUNT RECOVERY</span>
         <h1>Forgotten your password?<br />We’ll help you back in.</h1>
         <p>
-          Enter your work email address and we'll send a secure link to reset your account
-          credentials.
+          Find the right next step for your workspace. Your HR administrator can help you regain
+          access.
         </p>
         <div class="login-art">
           <span class="art-orbit" /><span class="art-orbit second" />
@@ -53,10 +54,13 @@ async function submit() {
     <section class="login-form">
       <div class="login-box">
         <span class="eyebrow">SELF-SERVICE RECOVERY</span>
-        <h2>Reset your password</h2>
-        <p>Enter your email to receive recovery instructions.</p>
+        <h2 v-if="session.mode === 'local'">Reset your password</h2>
+        <p v-if="session.mode === 'local'">
+          Explore password recovery with fictional demo details. No email is sent.
+        </p>
+        <AccessHelp v-if="session.mode === 'remote'" />
 
-        <div v-if="message" class="gentle-note auth-note" role="status">
+        <div v-else-if="message" class="gentle-note auth-note" role="status">
           <AppIcon name="check-circle" />
           <p>{{ message }}</p>
         </div>

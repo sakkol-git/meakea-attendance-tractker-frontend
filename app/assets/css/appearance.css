@@ -1,0 +1,137 @@
+/* Shared semantic palette; component layout stays identical between appearances. */
+.hrflow-dark {
+  --canvas: #0e1513;
+  --surface: #1b211f;
+  --surface-subtle: #252e2a;
+  --surface-muted: #252e2a;
+  --muted: #b8cbc3;
+  --text-primary: #f3f8f5;
+  --text-secondary: #b8cbc3;
+  --text-tertiary: #a1b7ad;
+  --text-muted: #a1b7ad;
+  --text-inverse: #0e1513;
+  --border: #46584f;
+  --border-strong: #8ea099;
+  --border-subtle: #46584f;
+  --teal: #a9e8c4;
+  --teal-hover: #c7f4da;
+  --teal-active: #d9f9e5;
+  --teal-light: #22392d;
+  --teal-subtle: #426454;
+  --teal-border: #557968;
+  --status-success: #a9e8c4;
+  --status-success-bg: #22392d;
+  --status-success-text: #a9e8c4;
+  --status-warning: #ffd48a;
+  --status-warning-bg: #44341c;
+  --status-warning-text: #ffd48a;
+  --status-danger: #ffb4ab;
+  --status-danger-bg: #3f2524;
+  --status-danger-text: #ffb4ab;
+  --status-info: #b4d7ff;
+  --status-info-bg: #22364b;
+  --status-info-text: #b4d7ff;
+}
+.hrflow-dark :is(.sidebar, .topbar, .quick-action, .quick-search, .login-form, .skip-link) {
+  background: var(--surface);
+}
+.hrflow-dark :is(.brand, .nav-item, .view-link, .back-link, .record-title-button) {
+  color: var(--teal);
+}
+.hrflow-dark .brand-mark {
+  background: #006151;
+  color: #fff;
+}
+.hrflow-dark
+  :is(.nav-item.active, .nav-item:hover, .quick-search:hover, .demo-banner, .demo-strip) {
+  background: var(--teal-light);
+  color: var(--text-primary);
+}
+.hrflow-dark
+  :is(
+    .company-mark,
+    .avatar,
+    .date-tile,
+    .gentle-note,
+    .info-banner,
+    .demo-intro,
+    .state-icon,
+    .help-card,
+    .bar-track
+  ) {
+  background: var(--surface-subtle);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+.hrflow-dark
+  :is(
+    .gentle-note strong,
+    .date-tile strong,
+    .state-icon,
+    .report-category span,
+    .field label,
+    .field label span,
+    .segmented-tabs button,
+    .record-count,
+    .table-empty,
+    .breadcrumb-company,
+    .nav-caption,
+    .company-details
+  ) {
+  color: var(--text-secondary);
+}
+.hrflow-dark :is(.view-switcher, .date-filters, .role-switch .p-select, .mini-stat) {
+  background: var(--surface);
+  border-color: var(--border);
+}
+.hrflow-dark .p-datatable-thead > tr > th {
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+.hrflow-dark .p-datatable-tbody > tr:hover {
+  background: var(--surface-subtle);
+}
+.hrflow-dark
+  :is(
+    .record-icon,
+    .record-icon.leave,
+    .record-icon.request,
+    .record-icon.blue,
+    .record-icon.violet
+  ) {
+  background: var(--surface-subtle);
+  color: var(--teal);
+}
+.hrflow-dark :is(.status-badge.active, .status-badge.approved, .p-tag-success) {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+}
+.hrflow-dark :is(.status-badge.pending, .p-tag-warn, .count-badge) {
+  background: var(--status-warning-bg);
+  color: var(--status-warning-text);
+}
+.hrflow-dark :is(.status-badge.rejected, .p-tag-danger) {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-text);
+}
+.hrflow-dark :is(.p-tag-info, .status-badge.draft) {
+  background: var(--status-info-bg);
+  color: var(--status-info-text);
+}
+.hrflow-dark :is(.status-badge.cancelled, .p-tag-secondary) {
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+}
+.appearance-preference {
+  margin-bottom: var(--space-8);
+}
+.hrflow-dark .segmented-tabs {
+  background: var(--surface-subtle);
+}
+.hrflow-dark .segmented-tabs button.selected {
+  background: var(--surface);
+  color: var(--teal);
+}
+.hrflow-dark :is(.person-cell small, .bar-column > strong) {
+  color: var(--text-secondary);
+}

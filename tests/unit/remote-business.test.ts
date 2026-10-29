@@ -68,7 +68,7 @@ describe('RemoteBusinessAdapter', () => {
     expect(calls[1]!.ifMatch).toBe('"1"')
   })
 
-  it('enables the shared workflow contract in remote mode and rejects malformed responses', async () => {
+  it('does not promote provisional generic workflows into accepted provider routes', async () => {
     const source: DataSource = {
       mode: 'remote',
       async send() {
@@ -76,7 +76,7 @@ describe('RemoteBusinessAdapter', () => {
       },
     }
     await expect(new RemoteBusinessAdapter(source).snapshot('BF-001')).rejects.toMatchObject({
-      code: 'CONTRACT_MISMATCH',
+      code: 'CONTRACT_REQUIRED',
     })
   })
 

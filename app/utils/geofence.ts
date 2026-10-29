@@ -12,6 +12,35 @@ export interface GeolocationCoordinates {
   accuracyMeters?: number
 }
 
+export function configuredWorkSites(rows: Record<string, unknown>[]): WorkSiteLocation[] {
+  return rows.flatMap((row) => {
+    const latitude = row.latitude
+    const longitude = row.longitude
+    const radius = row.radiusMeters ?? row.radiusM
+    if (
+      typeof latitude !== 'number' ||
+      !Number.isFinite(latitude) ||
+      Math.abs(latitude) > 90 ||
+      typeof longitude !== 'number' ||
+      !Number.isFinite(longitude) ||
+      Math.abs(longitude) > 180 ||
+      typeof radius !== 'number' ||
+      !Number.isFinite(radius) ||
+      radius <= 0
+    )
+      return []
+    return [
+      {
+        id: String(row.id),
+        name: String(row.name || 'Work site'),
+        latitude,
+        longitude,
+        radiusMeters: radius,
+      },
+    ]
+  })
+}
+
 export interface GeofenceEvaluation {
   withinBoundary: boolean
   nearestSite?: WorkSiteLocation
@@ -58,12 +87,12 @@ export function evaluateGeofence(
 
   if (!workSites.length) {
     return {
-      withinBoundary: true, // If no sites configured, policy allows check-in with GPS logged
+      withinBoundary: false,
       distanceMeters: 0,
       allowedRadiusMeters: defaultRadiusMeters,
       accuracyMeters: accuracy,
       status: 'NO_SITES_CONFIGURED',
-      message: 'No physical work-site perimeter configured. Coordinates will be recorded.',
+      message: 'No configured work-site boundary is available to compare this location.',
     }
   }
 

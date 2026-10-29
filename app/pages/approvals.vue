@@ -3,7 +3,7 @@ import { useConfirm } from 'primevue/useconfirm'
 definePageMeta({ roles: ['MANAGER', 'HR_ADMIN', 'OWNER'] })
 const api = useWorkspace()
 const session = useSessionStore()
-const selected = ref('Time off')
+const selected = ref('Leave')
 const searchInput = ref('')
 const search = ref('')
 const status = ref('PENDING')
@@ -33,7 +33,10 @@ const leave = useWorkspaceQuery(
 )
 const requests = useWorkspaceQuery(
   computed(() => `pending-requests:${queueKey.value}:${page.value}`),
-  () => api.list('pendingRequests', queueOptions.value),
+  () =>
+    session.canReviewRequests
+      ? api.list('pendingRequests', queueOptions.value)
+      : Promise.resolve({ items: [], total: 0 }),
 )
 const corrections = useWorkspaceQuery(
   computed(() => `pending-corrections:${queueKey.value}:${page.value}`),
@@ -84,30 +87,34 @@ async function rejectIssue(reasonText: string) {
   />
   <div class="segmented-tabs" role="group" aria-label="Approval category">
     <button
-      v-for="tab in ['Time off', 'Requests', 'Attendance issues']"
+      v-for="tab in [
+        'Leave',
+        ...(session.canReviewRequests ? ['Requests'] : []),
+        'Attendance issues',
+      ]"
       :key="tab"
       :class="{ selected: selected === tab }"
       :aria-pressed="selected === tab"
       @click="selected = tab"
     >
-      {{ tab }}<span v-if="tab === 'Time off'">{{ leave.data.value?.total ?? '—' }}</span
+      {{ tab }}<span v-if="tab === 'Leave'">{{ leave.data.value?.total ?? '—' }}</span
       ><span v-if="tab === 'Requests'">{{ requests.data.value?.total ?? '—' }}</span
       ><span v-if="tab === 'Attendance issues'">{{ corrections.data.value?.total ?? '—' }}</span>
     </button>
   </div>
-  <section v-if="selected === 'Time off'" class="panel no-padding">
+  <section v-if="selected === 'Leave'" class="panel no-padding">
     <QueryState
       :pending="leave.isPending.value"
       :error="leave.error.value"
       :empty="!leave.data.value?.items.length"
       title="You’re all caught up"
-      message="No time-off requests need your review."
+      message="No leave requests need your review."
       @retry="leave.refetch()"
       ><ApprovalTable :rows="leave.data.value?.items || []" kind="leave"
     /></QueryState>
   </section>
   <CollectionPager
-    v-if="selected === 'Time off'"
+    v-if="selected === 'Leave'"
     v-model:page="page"
     :size="pageSize"
     :total="leave.data.value?.total ?? 0"

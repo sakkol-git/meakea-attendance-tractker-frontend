@@ -26,7 +26,7 @@ const theme = definePreset(Aura, {
 })
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(PrimeVue, {
-    theme: { preset: theme, options: { darkModeSelector: false } },
+    theme: { preset: theme, options: { darkModeSelector: '.hrflow-dark' } },
     ripple: false,
   })
   nuxtApp.vueApp.use(ToastService)

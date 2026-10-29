@@ -1,0 +1,219 @@
+.role-workspace {
+  margin-bottom: 24px;
+}
+.help-page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+.help-page .panel {
+  margin-block: 16px;
+}
+.help-page .panel p,
+.access-help p {
+  margin-block: 12px;
+}
+.access-help .text-link {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+}
+.help-steps {
+  padding-inline-start: 24px;
+  line-height: 1.8;
+}
+.form-review {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.form-review summary {
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+  padding-block: 10px;
+}
+.form-review dd {
+  overflow-wrap: anywhere;
+}
+.form-section-title {
+  margin-top: 16px;
+}
+.role-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 16px;
+}
+.sidebar .nav-caption {
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+.sidebar .nav-item {
+  min-height: 44px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.sidebar-bottom {
+  margin-top: 16px;
+}
+.attendance-session-cards {
+  display: none;
+}
+.attendance-summary {
+  margin-bottom: 24px;
+}
+.attendance-summary dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  margin: 0;
+}
+.attendance-summary dl > div {
+  flex: 1 1 140px;
+}
+.attendance-summary dt {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.attendance-summary dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+.attendance-geo-card {
+  color: var(--text-primary);
+}
+.attendance-hero .attendance-geo-card .small-note {
+  color: var(--text-secondary);
+  padding: 0 16px 12px;
+}
+.attendance-session-card {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.attendance-session-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.attendance-session-card dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 12px 0 0;
+}
+.attendance-session-card dl > div {
+  flex: 1 1 64px;
+}
+@media (max-width: 360px) {
+  .date-filters .field {
+    flex-basis: 100%;
+    width: 100%;
+  }
+}
+.attendance-session-card dt {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+.attendance-session-card dd {
+  margin: 4px 0 0;
+  white-space: nowrap;
+}
+.attendance-geo-card .geo-card-main {
+  flex-wrap: wrap;
+}
+.attendance-geo-card .geo-card-actions {
+  flex-wrap: wrap;
+}
+.dialog-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  padding-block: 16px;
+  z-index: 1;
+}
+.app-form [aria-invalid='true'] {
+  scroll-margin-block: 80px 120px;
+}
+.app-form .form-error {
+  padding: 12px 16px;
+  border-inline-start: 3px solid var(--status-danger);
+  background: var(--status-danger-bg);
+  border-radius: var(--radius-sm);
+}
+.table-empty .p-button {
+  margin-top: 12px;
+}
+/* A replaced confirmation should leave the visual and accessibility tree at once. */
+.p-toast .p-toast-message-leave-active {
+  display: none !important;
+}
+.app-form .gentle-note strong {
+  color: var(--text-primary);
+}
+.app-form .gentle-note p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-caption);
+}
+.role-workspace .section-heading {
+  margin-bottom: 12px;
+}
+.page-heading p,
+.dialog-intro {
+  max-width: 68ch;
+}
+.page-heading h1,
+.table-title strong,
+.person-cell {
+  overflow-wrap: anywhere;
+}
+@media (pointer: coarse) {
+  .text-link,
+  .view-link,
+  .back-link {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+  }
+  input:not([type='checkbox']),
+  textarea {
+    font-size: 16px;
+  }
+}
+@media (max-width: 640px) {
+  .attendance-session-cards {
+    display: block;
+  }
+  .attendance-session-table {
+    display: none;
+  }
+  .attendance-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .attendance-stats .panel {
+    flex: 1 1 140px;
+    padding: 12px 16px;
+  }
+  .attendance-stats strong {
+    font-size: 20px;
+    margin: 8px 0;
+  }
+  .attendance-stats small {
+    font-size: 12px;
+  }
+  .attendance-stats .panel:last-child {
+    flex-basis: 100%;
+  }
+  .role-shortcuts {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .role-workspace .section-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}

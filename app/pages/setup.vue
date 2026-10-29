@@ -40,6 +40,7 @@ function handleReview() {
 }
 
 async function submit() {
+  if (session.mode !== 'local' || busy.value) return
   if (!validateInputs()) return
   busy.value = true
   error.value = ''
@@ -63,40 +64,36 @@ async function submit() {
       <NuxtLink to="/" class="brand"><span class="brand-mark">hf</span>HRFlow.</NuxtLink>
       <div>
         <span class="eyebrow">COMPANY ONBOARDING</span>
-        <h1>Build a calmer workplace.<br />Start with your team.</h1>
-        <p>
-          Configure your organization boundary, initial administrator account, and company time
-          zone.
+        <h1>Your team’s workspace.<br />A clear place to start.</h1>
+        <p v-if="session.mode === 'local'">
+          Explore company setup in the demo, or ask HR for access to your company workspace.
         </p>
         <div class="login-art">
           <span class="art-orbit" /><span class="art-orbit second" />
-          <span class="art-card"><AppIcon name="sitemap" />Strict logical data isolation.</span>
+          <span class="art-card"><AppIcon name="sitemap" />Your team, connected.</span>
         </div>
       </div>
-      <small>Enterprise tenant isolation &amp; role security.</small>
+      <small>Start with the sign-in details supplied by your company.</small>
     </section>
 
     <section class="login-form">
       <div class="login-box">
         <span class="eyebrow">WORKSPACE SETUP</span>
-        <h2>Set up a workspace</h2>
-        <p>
-          {{
-            session.mode === 'local'
-              ? 'Configure the fictional demo company. No real account or invitation is created.'
-              : 'An authorized company setup code is required. Your service controls onboarding and owner invitation.'
-          }}
+        <h2 v-if="session.mode === 'local'">Set up a workspace</h2>
+        <p v-if="session.mode === 'local'">
+          Configure the fictional demo company. No real account or invitation is created.
         </p>
 
         <!-- Step 3: Done state -->
-        <div v-if="done" class="setup-done" role="status">
+        <AccessHelp v-if="session.mode === 'remote'" />
+        <div v-else-if="done" class="setup-done" role="status">
           <div class="gentle-note auth-note">
             <AppIcon name="check-circle" />
             <div>
-              <strong class="auth-success-title">Workspace created!</strong>
+              <strong class="auth-success-title">Demo setup complete</strong>
               <p>
-                Follow the owner invitation supplied by your administrator, then sign in with your
-                company workspace.
+                Your fictional company details were saved in this demo. No real account or
+                invitation was created. Return to sign in and choose a demo role.
               </p>
             </div>
           </div>

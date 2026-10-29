@@ -19,6 +19,14 @@ export const leaveForm = z
     message: 'End date must be on or after the start date.',
     path: ['endDate'],
   })
+  .refine((x) => x.startDate.slice(0, 4) === x.endDate.slice(0, 4), {
+    message: 'Create a separate leave request for each calendar year.',
+    path: ['endDate'],
+  })
+  .refine((x) => x.portion === 'FULL_DAY' || x.startDate === x.endDate, {
+    message: 'Use the same start and end date for half-day leave.',
+    path: ['endDate'],
+  })
 export const requestForm = z
   .object({
     title: z.string().trim().min(3, 'Use at least three characters.').max(160),
@@ -72,23 +80,65 @@ export const requestForm = z
         })
     }
   })
-export const correctionForm = z.object({
-  date: calendarDate('Choose the affected date.'),
-  reason: z.string().trim().min(10, 'Explain the issue in at least ten characters.').max(2000),
-})
+const correctionInstant = z
+  .string()
+  .datetime({
+    offset: true,
+    message: 'Choose a valid, unambiguous date and time in your workspace time zone.',
+  })
+  .optional()
+  .or(z.literal(''))
+export const correctionForm = z
+  .object({
+    date: calendarDate('Choose the affected date.'),
+    reason: z.string().trim().min(10, 'Explain the issue in at least ten characters.').max(2000),
+    proposedClockIn: correctionInstant,
+    proposedClockOut: correctionInstant,
+  })
+  .refine(
+    (value) =>
+      !value.proposedClockIn ||
+      !value.proposedClockOut ||
+      Date.parse(value.proposedClockOut) >= Date.parse(value.proposedClockIn),
+    {
+      path: ['proposedClockOut'],
+      message: 'Clock-out cannot be before clock-in.',
+    },
+  )
 export const employeeForm = z.object({
   name: z.string().trim().min(2, 'Enter a name.').max(120),
   email: z.email('Enter a valid email address.'),
-  employeeNo: z.string().trim().max(50).optional().or(z.literal('')),
+  employeeNo: z.string().trim().min(1, 'Enter an employee number.').max(64),
   hireDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a valid calendar date.')
     .optional()
     .or(z.literal('')),
-  department: z.string().trim().min(1, 'Choose a department.'),
-  position: z.string().trim().min(1, 'Enter a position.'),
-  manager: z.string().optional().or(z.literal('')),
+  departmentId: z.string().trim().min(1, 'Choose a department.'),
+  positionId: z.string().trim().min(1, 'Choose a position.'),
+  managerId: z.string().optional().or(z.literal('')),
 })
+export const workSiteForm = z.object({
+  name: z.string().trim().min(2, 'Enter a work site name.').max(120),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  radiusM: z.number().int().min(1).max(10000),
+  timezone: z.string().trim().min(1, 'Choose a timezone.'),
+})
+export const shiftForm = z
+  .object({
+    name: z.string().trim().min(2, 'Enter a shift name.').max(120),
+    startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Choose a start time.'),
+    endTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Choose an end time.'),
+    graceMinutes: z.number().int().min(0).max(120),
+    workingDays: z.number().int().min(1).max(127),
+    siteId: z.string().min(1, 'Choose a work site.'),
+    timezone: z.string().trim().min(1, 'Choose a timezone.'),
+  })
+  .refine((value) => value.endTime > value.startTime, {
+    message: 'End time must follow start time on the same day.',
+    path: ['endTime'],
+  })
 export const setupWorkspaceForm = z.object({
   name: z.string().trim().min(3, 'Enter at least 3 characters.').max(120),
   slug: z

@@ -2,10 +2,11 @@
 const props = defineProps<{
   values: Record<string, any>
   errors: Record<string, string>
+  typeLocked?: boolean
 }>()
 
 const api = useWorkspace()
-const materials = useWorkspaceQuery('request-form-materials', () => api.list('materials'))
+const materials = useWorkspaceQuery('request-form-materials', () => api.materialOptions())
 const typeOptions = [
   { label: 'General', value: 'GENERAL' },
   { label: 'Material or equipment', value: 'MATERIAL' },
@@ -39,6 +40,7 @@ const needsTimes = computed(() =>
     <PSelect
       input-id="form-type"
       v-model="values.type"
+      :disabled="typeLocked"
       :options="typeOptions"
       option-label="label"
       option-value="value"
@@ -49,6 +51,7 @@ const needsTimes = computed(() =>
       aria-describedby="error-type"
     />
     <small id="error-type" class="field-error">{{ errors.type }}</small>
+    <small v-if="typeLocked">Create a new draft to change the request type.</small>
   </div>
 
   <div v-if="values.type === 'MATERIAL'" class="form-grid">
@@ -57,7 +60,7 @@ const needsTimes = computed(() =>
       <PSelect
         input-id="form-material"
         v-model="values.materialId"
-        :options="materials.data.value?.items || []"
+        :options="materials.data.value || []"
         option-label="name"
         option-value="id"
         aria-label="Material"
@@ -84,6 +87,13 @@ const needsTimes = computed(() =>
     </div>
   </div>
 
+  <p
+    v-if="values.type === 'MATERIAL' && Array.isArray(values.items) && values.items.length > 1"
+    class="subtle"
+  >
+    {{ values.items.length - 1 }} additional material lines will be preserved when you save.
+  </p>
+
   <div v-if="needsDates" class="form-grid">
     <div class="field">
       <label for="form-request-start">From</label>
@@ -92,8 +102,9 @@ const needsTimes = computed(() =>
         v-model="values.startDate"
         type="date"
         :aria-invalid="!!errors.startDate"
+        aria-describedby="error-request-start"
       />
-      <small class="field-error">{{ errors.startDate }}</small>
+      <small id="error-request-start" class="field-error">{{ errors.startDate }}</small>
     </div>
     <div class="field">
       <label for="form-request-end">To</label>
@@ -102,8 +113,9 @@ const needsTimes = computed(() =>
         v-model="values.endDate"
         type="date"
         :aria-invalid="!!errors.endDate"
+        aria-describedby="error-request-end"
       />
-      <small class="field-error">{{ errors.endDate }}</small>
+      <small id="error-request-end" class="field-error">{{ errors.endDate }}</small>
     </div>
   </div>
 
@@ -115,8 +127,9 @@ const needsTimes = computed(() =>
         v-model="values.fromTime"
         type="time"
         :aria-invalid="!!errors.fromTime"
+        aria-describedby="error-request-from-time"
       />
-      <small class="field-error">{{ errors.fromTime }}</small>
+      <small id="error-request-from-time" class="field-error">{{ errors.fromTime }}</small>
     </div>
     <div class="field">
       <label for="form-request-to-time">To time</label>
@@ -125,8 +138,9 @@ const needsTimes = computed(() =>
         v-model="values.toTime"
         type="time"
         :aria-invalid="!!errors.toTime"
+        aria-describedby="error-request-to-time"
       />
-      <small class="field-error">{{ errors.toTime }}</small>
+      <small id="error-request-to-time" class="field-error">{{ errors.toTime }}</small>
     </div>
   </div>
 

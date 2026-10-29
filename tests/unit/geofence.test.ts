@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { haversineDistanceMeters, evaluateGeofence } from '../../app/utils/geofence'
+import {
+  haversineDistanceMeters,
+  evaluateGeofence,
+  configuredWorkSites,
+} from '../../app/utils/geofence'
 
 describe('haversineDistanceMeters', () => {
   it('calculates distance between two Phnom Penh points accurately', () => {
@@ -15,6 +19,15 @@ describe('haversineDistanceMeters', () => {
 })
 
 describe('evaluateGeofence', () => {
+  it('does not claim a verified boundary without configured sites', () => {
+    expect(evaluateGeofence({ latitude: 11, longitude: 104 }, []).withinBoundary).toBe(false)
+    expect(
+      configuredWorkSites([
+        { id: 'unknown', name: 'Office' },
+        { id: 'invalid', latitude: 100, longitude: 104, radiusMeters: 100 },
+      ]),
+    ).toEqual([])
+  })
   const sites = [
     {
       id: 'site-hq',

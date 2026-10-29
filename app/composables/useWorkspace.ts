@@ -29,7 +29,10 @@ export function useFeedback() {
     busy.value = true
     try {
       const result = await task()
-      if (summary) toast.add({ severity: 'success', summary, life: 4000 })
+      if (summary) {
+        toast.removeGroup('action-success')
+        toast.add({ group: 'action-success', severity: 'success', summary, life: 4000 })
+      }
       await app.$queryClient.invalidateQueries({ queryKey: ['workspace'] })
       return result
     } catch (e) {

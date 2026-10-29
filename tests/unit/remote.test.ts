@@ -1,5 +1,27 @@
 import { expect, it } from 'vitest'
 import { RemoteDataSource } from '../../app/data/remote'
+
+it('downloads private UTF-8 CSV using current authentication and rejects redirects', async () => {
+  const source = new RemoteDataSource('https://hr.test/api/v1', () => 'current-access', (async (
+    url,
+    options,
+  ) => {
+    expect(String(url)).toBe('https://hr.test/api/v1/reports/exports/123/download')
+    expect(options?.headers).toMatchObject({ Authorization: 'Bearer current-access' })
+    expect(options?.redirect).toBe('error')
+    expect(options?.cache).toBe('no-store')
+    return new Response('name\nសួស្តី\n', { headers: { 'content-type': 'text/csv' } })
+  }) as typeof fetch)
+  expect(
+    (
+      await source.send({
+        method: 'GET',
+        path: '/reports/exports/123/download',
+        responseType: 'csv',
+      })
+    ).data,
+  ).toBe('name\nសួស្តី\n')
+})
 import { commandKey, DataFailure } from '../../app/data/source'
 import { failureMessage } from '../../app/utils/failure'
 

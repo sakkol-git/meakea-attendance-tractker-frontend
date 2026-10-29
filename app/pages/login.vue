@@ -6,6 +6,7 @@ const route = useRoute()
 const values = reactive({ tenant: '', email: '', password: '' })
 const error = ref('')
 const busy = ref(false)
+const passwordVisible = ref(false)
 async function submit() {
   error.value = ''
   const result = loginForm.safeParse(values)
@@ -23,6 +24,7 @@ async function submit() {
       'Sign-in could not be completed. Check your details and connection, then try again.'
   } finally {
     values.password = ''
+    passwordVisible.value = false
     busy.value = false
   }
 }
@@ -100,20 +102,26 @@ async function demo() {
             ><PInputText
               id="password"
               v-model="values.password"
-              type="password"
+              :type="passwordVisible ? 'text' : 'password'"
               autocomplete="current-password"
               required
             />
+            <PButton
+              type="button"
+              :label="passwordVisible ? 'Hide password' : 'Show password'"
+              text
+              :aria-pressed="passwordVisible"
+              aria-controls="password"
+              @click="passwordVisible = !passwordVisible"
+            />
           </div>
           <div class="field-actions">
-            <NuxtLink to="/forgot-password" class="text-link"> Forgot password? </NuxtLink>
+            <NuxtLink to="/help" class="text-link">Need help signing in?</NuxtLink>
           </div>
           <PButton type="submit" label="Sign in" :loading="busy" />
           <p class="small-note">
-            Need an account or self-service help? You can
-            <NuxtLink to="/forgot-password" class="text-link">reset your password</NuxtLink>,
-            <NuxtLink to="/setup" class="text-link">set up a workspace</NuxtLink>, or contact your
-            workspace administrator.
+            Use the company workspace and account supplied by HR. Need an account or a new password?
+            Contact your HR administrator.
           </p>
         </form>
         <p v-if="error" role="alert" class="form-error">{{ error }}</p>

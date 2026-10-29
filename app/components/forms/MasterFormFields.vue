@@ -46,6 +46,15 @@ defineProps<{
     <small id="error-date" class="field-error">{{ errors.date }}</small>
   </div>
 
+  <div v-if="path === 'holidays'" class="field">
+    <label for="form-holiday-kind">Holiday kind</label>
+    <select id="form-holiday-kind" v-model="values.kind" :aria-invalid="!!errors.kind">
+      <option value="COMPANY">Company</option>
+      <option value="PUBLIC">Public</option>
+    </select>
+    <small class="field-error">{{ errors.kind }}</small>
+  </div>
+
   <div v-if="path === 'shifts'" class="form-grid">
     <div class="field">
       <label for="form-shift-start">Start time</label>

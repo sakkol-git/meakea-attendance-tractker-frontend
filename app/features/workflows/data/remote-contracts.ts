@@ -26,7 +26,7 @@ export const RemoteWorkflowSnapshot = z.object({
 
 export const SignedUpload = z.object({
   attachmentId: z.string().min(1),
-  uploadUrl: z.string().url(),
+  uploadUrl: z.string().min(1),
   requiredHeaders: z.record(z.string(), z.string()).optional(),
 })
 

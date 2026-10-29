@@ -9,5 +9,7 @@ onBeforeUnmount(() => window.removeEventListener('hrflow:session-expired', expir
 </script>
 <template>
   <NuxtRouteAnnouncer /><NuxtLoadingIndicator color="#006151" /><NuxtLayout><NuxtPage /></NuxtLayout
-  ><PToast position="bottom-right" /><PConfirmDialog />
+  ><PToast group="action-success" position="bottom-right" /><PToast
+    position="top-right"
+  /><PConfirmDialog />
 </template>

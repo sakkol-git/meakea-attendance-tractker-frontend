@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast'
+import type { AttachmentItem } from '~/features/requests/data/attachment-records'
+import { saveFile } from '~/utils/download'
 
 const props = withDefaults(
   defineProps<{
@@ -20,24 +22,22 @@ const uploading = ref(false)
 const uploadProgress = ref(0)
 const error = ref('')
 
-interface AttachmentItem {
-  id: string
-  name: string
-  size: number
-  contentType: string
-  uploadedAt: string
+const api = useWorkspace()
+const attachments = ref<AttachmentItem[]>([])
+const loading = ref(false)
+async function load() {
+  attachments.value = []
+  if (api.mode === 'local') return
+  loading.value = true
+  try {
+    attachments.value = await api.attachmentItems(props.scope, props.recordId)
+  } catch (failure) {
+    error.value = failure instanceof Error ? failure.message : 'Could not load attachments.'
+  } finally {
+    loading.value = false
+  }
 }
-
-// Attachments list stored for this record
-const attachments = ref<AttachmentItem[]>([
-  {
-    id: 'att-sample-1',
-    name: 'supporting_document.pdf',
-    size: 245000,
-    contentType: 'application/pdf',
-    uploadedAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-])
+watch(() => [props.scope, props.recordId], load, { immediate: true })
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -68,16 +68,18 @@ async function handleFile(file: File) {
 
   try {
     uploadProgress.value = 60
-    await app.$business.upload(props.scope, props.recordId, file)
+    const result = await app.$business.upload(props.scope, props.recordId, file)
     uploadProgress.value = 100
 
-    attachments.value.push({
-      id: `att-${Date.now()}`,
-      name: file.name,
-      size: file.size,
-      contentType: file.type || 'application/octet-stream',
-      uploadedAt: new Date().toISOString(),
-    })
+    if (api.mode === 'remote') await load()
+    else
+      attachments.value.push({
+        id: result.id,
+        name: file.name,
+        size: file.size,
+        contentType: file.type || 'application/octet-stream',
+        uploadedAt: new Date().toISOString(),
+      })
 
     toast.add({
       severity: 'success',
@@ -86,15 +88,12 @@ async function handleFile(file: File) {
       life: 3000,
     })
   } catch (e) {
-    // In unaccepted backend mode or local simulation, handle gracefully
     error.value = e instanceof Error ? e.message : 'Upload failed.'
-    toast.add({ severity: 'info', summary: 'Attachment recorded', detail: file.name, life: 3000 })
-    attachments.value.push({
-      id: `att-${Date.now()}`,
-      name: file.name,
-      size: file.size,
-      contentType: file.type || 'application/octet-stream',
-      uploadedAt: new Date().toISOString(),
+    toast.add({
+      severity: 'error',
+      summary: 'Attachment upload failed',
+      detail: error.value,
+      life: 5000,
     })
   } finally {
     uploading.value = false
@@ -105,28 +104,33 @@ async function handleFile(file: File) {
 function onFileSelect(e: Event) {
   const target = e.target as HTMLInputElement
   if (target.files && target.files[0]) {
-    handleFile(target.files[0])
+    if (!uploading.value) handleFile(target.files[0])
     target.value = ''
   }
 }
 
 function onDrop(e: DragEvent) {
   dragOver.value = false
-  if (props.readonly) return
+  if (props.readonly || uploading.value) return
   if (e.dataTransfer?.files && e.dataTransfer.files[0]) {
     handleFile(e.dataTransfer.files[0])
   }
 }
 
 async function downloadAttachment(item: AttachmentItem) {
+  error.value = ''
   try {
-    await app.$business.download('BF-026', item.id)
-  } catch {
+    if (api.mode === 'remote') {
+      const bytes = await api.attachmentBytes(props.scope, props.recordId, item.id)
+      saveFile(new Uint8Array(bytes), item.name, item.contentType)
+    } else await app.$business.download('BF-026', item.id)
+  } catch (failure) {
+    error.value = failure instanceof Error ? failure.message : 'Download failed.'
     toast.add({
-      severity: 'info',
-      summary: 'Download requested',
-      detail: `Secure download link generated for ${item.name}.`,
-      life: 3000,
+      severity: 'error',
+      summary: 'Attachment download failed',
+      detail: error.value,
+      life: 5000,
     })
   }
 }
@@ -141,9 +145,10 @@ async function downloadAttachment(item: AttachmentItem) {
       </span>
     </div>
 
+    <p v-if="loading" role="status">Loading attachments…</p>
     <!-- Drop Zone -->
     <div
-      v-if="!readonly"
+      v-if="!readonly && (api.mode === 'local' || scope === 'request')"
       class="attachment-drop-target"
       :class="{ 'is-dragover': dragOver }"
       @dragover.prevent="dragOver = true"
@@ -155,12 +160,13 @@ async function downloadAttachment(item: AttachmentItem) {
         ref="fileInput"
         type="file"
         class="hidden-file-input"
-        accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,.xlsx"
+        accept=".pdf,.png,.jpg,.jpeg"
+        :disabled="uploading"
         @change="onFileSelect"
       />
       <AppIcon name="paperclip" class="attachment-drop-icon" />
       <p class="attachment-drop-prompt">Click to browse or drag and drop files here</p>
-      <small class="attachment-drop-hint">PDF, PNG, JPG, or Office documents up to 10MB</small>
+      <small class="attachment-drop-hint">PDF, PNG or JPEG up to 10MB</small>
     </div>
 
     <p v-if="error" role="alert" class="form-error">

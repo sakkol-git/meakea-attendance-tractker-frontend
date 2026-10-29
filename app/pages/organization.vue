@@ -112,7 +112,9 @@ watch(tab, () => {
           /><PColumn v-if="tab === 'holidays'" field="date" header="Date" /><PColumn
             v-if="tab === 'shifts'"
             header="Hours"
-            ><template #body="{ data }">{{ data.start }} – {{ data.end }}</template></PColumn
+            ><template #body="{ data }"
+              >{{ data.startTime || data.start }} – {{ data.endTime || data.end }}</template
+            ></PColumn
           ><PColumn
             v-if="tab === 'materials'"
             field="quantity"

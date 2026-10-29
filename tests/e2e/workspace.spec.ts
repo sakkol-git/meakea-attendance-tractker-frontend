@@ -60,8 +60,11 @@ test('admin directory, organization, reporting, preferences and accessibility', 
   await page.getByRole('button', { name: 'Add a person' }).click()
   await page.getByLabel('Full name').fill('Kim Sample')
   await page.getByLabel('Work email', { exact: true }).fill('kim@example.test')
-  await page.getByLabel('Department', { exact: true }).fill('Operations')
-  await page.getByLabel('Position', { exact: true }).fill('Coordinator')
+  await page.getByLabel('Employee ID').fill('EMP-103')
+  await page.getByLabel('Department', { exact: true }).click()
+  await page.getByRole('option', { name: 'Operations' }).click()
+  await page.getByLabel('Position', { exact: true }).click()
+  await page.getByRole('option', { name: 'Software engineer' }).click()
   await page.getByRole('button', { name: 'Create record', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Kim Sample', exact: true }).first()).toBeVisible()
   await page.getByRole('link', { name: 'Organization', exact: true }).click()
@@ -75,6 +78,8 @@ test('admin directory, organization, reporting, preferences and accessibility', 
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Export leave CSV' }).click()
   expect((await download).suggestedFilename()).toBe('hrflow-demo-leave.csv')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'Owner', exact: true }).click()
   await page.getByRole('link', { name: 'Audit', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Audit activity' })).toBeVisible()
   await page.getByLabel('Action').fill('approved')
@@ -85,8 +90,18 @@ test('admin directory, organization, reporting, preferences and accessibility', 
   await expect(page.getByRole('button', { name: 'Save preferences' })).toBeDisabled()
   await page.getByRole('link', { name: 'Overview', exact: true }).click()
   await page.setViewportSize({ width: 1440, height: 1050 })
-  await expect(page.getByRole('heading', { name: 'Your time off' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your leave requests' })).toBeVisible()
   await page.screenshot({ path: 'test-results/overview-desktop.png', fullPage: true })
+  const confirmations = await page
+    .locator('.p-toast-bottom-right .p-toast-message:visible')
+    .evaluateAll((elements) =>
+      elements.map((element) => ({
+        text: element.textContent,
+        classes: element.className,
+        display: getComputedStyle(element).display,
+      })),
+    )
+  expect(confirmations.length, JSON.stringify(confirmations)).toBeLessThanOrEqual(1)
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
   expect(
     results.violations.map((x) => ({ id: x.id, nodes: x.nodes.map((n) => n.target) })),
@@ -97,7 +112,7 @@ test('time off, correction review, request fulfillment and organization edit/del
   page,
 }) => {
   await page.goto('/leave')
-  await page.getByRole('button', { name: 'Request time off', exact: true }).click()
+  await page.getByRole('button', { name: 'Request leave', exact: true }).click()
   await page.getByRole('combobox', { name: 'Leave type', exact: true }).click()
   await page.getByRole('option', { name: 'Sick leave', exact: true }).click()
   await page.getByLabel('From', { exact: true }).fill('2030-02-04')
@@ -113,7 +128,7 @@ test('time off, correction review, request fulfillment and organization edit/del
   await page.getByRole('alertdialog').getByRole('button', { name: 'Approve', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Approve', exact: true })).toHaveCount(0)
   await page.getByRole('link', { name: 'Attendance', exact: true }).click()
-  await page.getByRole('button', { name: 'Report an issue' }).click()
+  await page.getByRole('button', { name: 'Request correction' }).click()
   await page.getByLabel('Affected date').fill('2026-10-22')
   await page.getByLabel('What happened?').fill('My clock-out time needs to be reviewed.')
   await page.getByRole('button', { name: 'Submit for review' }).click()
@@ -153,7 +168,7 @@ test('all main screens remain accessible and material quantity can be edited', a
   page.on('pageerror', (error) => errors.push(error.message))
   await page.goto('/')
   await page.getByRole('combobox', { name: 'Demo role' }).click()
-  await page.getByRole('option', { name: 'HR administrator', exact: true }).click()
+  await page.getByRole('option', { name: 'Owner', exact: true }).click()
   await expect(page.locator('.p-select-overlay')).toHaveCount(0)
   const failures: { path: string; violations: string[] }[] = []
   for (const path of [
@@ -211,6 +226,7 @@ test('all 40 business workflow screens resolve and advanced HR journeys change s
   for (let n = 1; n <= 40; n++) {
     const id = `BF-${String(n).padStart(3, '0')}`
     await page.locator('a[href="/workflows"]').first().click()
+    await page.getByText('Developer demo catalog', { exact: true }).click()
     await page.locator(`a[href="/workflows/${id}"]`).click()
     await expect(page.locator('.page-heading h1')).toBeVisible()
     await expect(page.locator('.loading-stack')).toHaveCount(0)

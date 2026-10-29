@@ -39,8 +39,9 @@ describe('workflow integration against explicit demo adapter', () => {
     const body = {
       name: 'Test Person',
       email: 'person@example.test',
-      department: 'Engineering',
-      position: 'Engineer',
+      employeeNo: 'EMP-103',
+      departmentId: 'engineering',
+      positionId: 'engineer',
     }
     const row = await api.create('employees', body)
     await expect(api.create('employees', body)).rejects.toMatchObject({ status: 409 })
@@ -103,6 +104,8 @@ describe('workflow integration against explicit demo adapter', () => {
     const { demo, api } = fixture()
     await expect(api.auditLogs({ page: 0, size: 25 })).rejects.toMatchObject({ status: 403 })
     demo.setRole('HR_ADMIN')
+    await expect(api.auditLogs({ page: 0, size: 25 })).rejects.toMatchObject({ status: 403 })
+    demo.setRole('OWNER')
     const result = await api.auditLogs({ page: 0, size: 1, action: 'approved' })
     expect(result.page).toBe(0)
     expect(result.size).toBe(1)
@@ -111,6 +114,44 @@ describe('workflow integration against explicit demo adapter', () => {
   })
 })
 describe('remote command safety', () => {
+  it('decodes identity audit provider fields and forwards filters without demo data', async () => {
+    const requests: DataRequest[] = []
+    const id = '2a5b5d85-1b7b-450e-a50c-d4cf091cce54'
+    const api = new WorkspaceApi({
+      mode: 'remote',
+      async send(request) {
+        requests.push(request)
+        return {
+          status: 200,
+          data: {
+            items: [
+              {
+                id,
+                actorId: id,
+                actor: id,
+                action: 'DEPARTMENT_CREATED',
+                entity: 'department',
+                entityId: id,
+                at: '2026-10-28T09:00:00Z',
+                diff: { name: { after: 'People' } },
+                changes: { name: { after: 'People' } },
+              },
+            ],
+            page: 0,
+            size: 25,
+            total: 1,
+          },
+        }
+      },
+    })
+    const page = await api.auditLogs({ page: 0, size: 25, actor: id, from: '2026-10-28' })
+    expect(requests[0]).toMatchObject({
+      path: '/audit-logs',
+      query: { actor: id, from: '2026-10-28' },
+    })
+    expect(page.items[0]?.actor).toBe(id)
+    expect(page.items[0]?.changes?.name?.after).toBe('People')
+  })
   it('polls asynchronous report exports and stops on a terminal failure', async () => {
     const calls: DataRequest[] = []
     let statusReads = 0

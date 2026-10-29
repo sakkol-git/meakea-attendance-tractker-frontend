@@ -150,7 +150,7 @@ it('bootstraps a missing browser CSRF cookie before sending credentials', async 
   expect(paths).toEqual(['/auth/csrf', '/auth/login', '/auth/me'])
 })
 
-it('validates setupWorkspaceForm and employeeForm with optional employeeNo and hireDate', async () => {
+it('validates setupWorkspaceForm and employeeForm with tenant catalog IDs', async () => {
   const { setupWorkspaceForm, employeeForm } = await import('../../app/schemas/forms')
 
   const validSetup = setupWorkspaceForm.safeParse({
@@ -178,17 +178,26 @@ it('validates setupWorkspaceForm and employeeForm with optional employeeNo and h
     email: 'alice@example.com',
     employeeNo: 'EMP-101',
     hireDate: '2024-02-01',
-    department: 'Engineering',
-    position: 'Lead Engineer',
-    manager: 'Bob Leader',
+    departmentId: 'engineering',
+    positionId: 'engineer',
+    managerId: 'manager',
   })
   expect(validEmployee.success).toBe(true)
 
   const employeeWithoutOptionalFields = employeeForm.safeParse({
     name: 'Bob Marley',
     email: 'bob@example.com',
-    department: 'Music',
-    position: 'Artist',
+    employeeNo: 'EMP-102',
+    departmentId: 'engineering',
+    positionId: 'engineer',
   })
   expect(employeeWithoutOptionalFields.success).toBe(true)
+  expect(
+    employeeForm.safeParse({
+      name: 'Bob',
+      email: 'bob@example.com',
+      departmentId: 'engineering',
+      positionId: 'engineer',
+    }).success,
+  ).toBe(false)
 })

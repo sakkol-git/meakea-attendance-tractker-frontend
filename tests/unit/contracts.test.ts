@@ -10,6 +10,7 @@ import {
   HolidayRecord,
   DocumentRecord,
   AuditEntry,
+  ExportJob,
 } from '../../app/schemas/contracts'
 import { DataFailure } from '../../app/data/source'
 
@@ -19,15 +20,18 @@ describe('Domain typed Zod contracts', () => {
       id: 'emp-101',
       name: 'Alice Cooper',
       email: 'alice@example.com',
+      employeeNo: 'EMP-101',
+      departmentId: 'dep-1',
+      positionId: 'pos-1',
       department: 'Engineering',
       position: 'Staff Engineer',
       manager: 'Bob Leader',
       status: 'ACTIVE',
-      version: 1,
+      version: 0,
     }
     const decoded = decode(EmployeeRecord, raw)
     expect(decoded.name).toBe('Alice Cooper')
-    expect(decoded.version).toBe(1)
+    expect(decoded.version).toBe(0)
   })
 
   it('rejects invalid EmployeeRecord missing required fields', () => {
@@ -58,10 +62,11 @@ describe('Domain typed Zod contracts', () => {
       name: 'Phnom Penh HQ',
       latitude: 11.5564,
       longitude: 104.9282,
-      radiusMeters: 200,
-      version: 1,
+      radiusM: 200,
+      timezone: 'Asia/Phnom_Penh',
+      version: 0,
     })
-    expect(site.radiusMeters).toBe(200)
+    expect(site.radiusM).toBe(200)
 
     expect(() =>
       decode(WorkSiteRecord, {
@@ -69,7 +74,8 @@ describe('Domain typed Zod contracts', () => {
         name: 'Invalid Site',
         latitude: 'bad',
         longitude: 104.9,
-        radiusMeters: -50,
+        radiusM: -50,
+        timezone: 'Asia/Phnom_Penh',
         version: 1,
       }),
     ).toThrow(DataFailure)
@@ -91,11 +97,13 @@ describe('Domain typed Zod contracts', () => {
     const shift = decode(ShiftRecord, {
       id: 'shift-1',
       name: 'Standard Day',
-      start: '08:00',
-      end: '17:00',
-      version: 1,
+      startTime: '08:00',
+      endTime: '17:00',
+      siteId: 'site-1',
+      timezone: 'Asia/Phnom_Penh',
+      version: 0,
     })
-    expect(shift.start).toBe('08:00')
+    expect(shift.startTime).toBe('08:00')
 
     const holiday = decode(HolidayRecord, {
       id: 'hol-1',
@@ -124,5 +132,18 @@ describe('Domain typed Zod contracts', () => {
     })
     expect(row.action).toBe('REQUEST_APPROVED')
     expect(() => decode(AuditEntry, { ...row, at: 'not-a-time' })).toThrow(DataFailure)
+  })
+
+  it('preserves the positive ExportJob wire version required by existing consumers', () => {
+    const job = decode(ExportJob, {
+      id: 'job-101',
+      status: 'QUEUED',
+      version: 1,
+    })
+    expect(job.id).toBe('job-101')
+    expect(job.version).toBe(1)
+    expect(() => decode(ExportJob, { id: 'job-101', status: 'QUEUED', version: 0 })).toThrow(
+      DataFailure,
+    )
   })
 })

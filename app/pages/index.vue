@@ -5,6 +5,10 @@ const api = useWorkspace()
 const feedback = useFeedback()
 const today = useWorkspaceQuery('today', () => api.today())
 const balance = useWorkspaceQuery('balances', () => api.balances())
+const homeBalance = computed(() => {
+  const items = balance.data.value?.items || []
+  return items.find((item) => item.type === 'Annual leave') || items[0]
+})
 const leave = useWorkspaceQuery('leave', () => api.list('myLeaves'))
 const notices = useWorkspaceQuery('notifications', () => api.notices())
 const holidays = useWorkspaceQuery('holidays', () => api.list('holidays'))
@@ -28,56 +32,19 @@ async function clock() {
     open.value ? 'Clock-out recorded' : 'Clock-in recorded',
   )
 }
-const pendingLeave = useWorkspaceQuery('pending-leave-home', () =>
-  session.isManager ? api.list('pendingLeaves') : Promise.resolve({ items: [], total: 0 }),
-)
-const pendingRequests = useWorkspaceQuery('pending-requests-home', () =>
-  session.isManager ? api.list('pendingRequests') : Promise.resolve({ items: [], total: 0 }),
-)
-const pendingCorrections = useWorkspaceQuery('pending-corrections-home', () =>
-  session.isManager ? api.list('corrections') : Promise.resolve({ items: [], total: 0 }),
-)
-const totalPendingApprovals = computed(() => {
-  if (!session.isManager) return 0
-  const lCount = pendingLeave.data.value?.total ?? 0
-  const rCount = pendingRequests.data.value?.total ?? 0
-  const cCount =
-    pendingCorrections.data.value?.items.filter((x) => x.status === 'PENDING').length ?? 0
-  return lCount + rCount + cCount
-})
 </script>
 <template>
   <PageHeading
     :title="`Good ${now.getHours() < 12 ? 'morning' : now.getHours() < 17 ? 'afternoon' : 'evening'}, ${session.profile?.name.split(' ')[0] || 'there'} 👋`"
-    description="A clear view of your workday. A little more room for what matters."
+    :description="
+      session.isManager
+        ? 'Your team’s priorities and your personal workday.'
+        : 'Record attendance, check your leave balance and follow your requests.'
+    "
     :eyebrow="dateLabel(now.toISOString(), 'EEEE, MMMM d, yyyy')"
-    ><PButton label="Request time off" icon="pi pi-plus" outlined @click="showLeave = true"
+    ><PButton label="Request leave" icon="pi pi-plus" outlined @click="showLeave = true"
   /></PageHeading>
-  <section
-    v-if="session.isManager && totalPendingApprovals > 0"
-    class="panel manager-review-banner"
-  >
-    <div class="manager-review-content">
-      <span class="record-icon peach"><AppIcon name="check-square" /></span>
-      <div>
-        <h3>
-          {{ totalPendingApprovals }} team
-          {{ totalPendingApprovals === 1 ? 'item requires' : 'items require' }} your decision
-        </h3>
-        <p>
-          {{ pendingLeave.data.value?.total ?? 0 }} time off ·
-          {{ pendingRequests.data.value?.total ?? 0 }} requests ·
-          {{
-            pendingCorrections.data.value?.items.filter((x) => x.status === 'PENDING').length ?? 0
-          }}
-          attendance issues
-        </p>
-      </div>
-    </div>
-    <NuxtLink to="/approvals">
-      <PButton label="Review approvals" icon="pi pi-arrow-right" icon-pos="right" size="small" />
-    </NuxtLink>
-  </section>
+  <RoleWorkspace v-if="session.isManager" />
   <div class="overview-grid">
     <section class="attendance-hero">
       <div class="hero-copy">
@@ -85,19 +52,19 @@ const totalPendingApprovals = computed(() => {
         <h2>
           {{
             open
-              ? 'You’re right on time.'
+              ? 'You’re clocked in.'
               : latest
-                ? 'A good day, well spent.'
-                : 'Ready when you are.'
+                ? 'Your clock-out is recorded.'
+                : 'Start your workday.'
           }}
         </h2>
         <p>
           {{
             open
-              ? 'You’re clocked in. Here’s to a focused, balanced day.'
+              ? 'Clock out when you finish. Attendance rules are reviewed separately.'
               : latest
                 ? 'Your clock-out is recorded. See you next time.'
-                : 'Settle in, take a breath, and start your workday.'
+                : 'Clock in to record your attendance.'
           }}
         </p>
         <AttendanceGeoCard @update:location="(loc) => (currentLocation = loc)" />
@@ -137,24 +104,24 @@ const totalPendingApprovals = computed(() => {
     </section>
     <section class="panel leave-summary">
       <div class="section-heading">
-        <h2>A little time for you</h2>
+        <h2>Leave balance</h2>
         <span class="record-icon leave"><AppIcon name="sun" /></span>
       </div>
       <QueryState
         :pending="balance.isPending.value"
         :error="balance.error.value"
+        :empty="!homeBalance"
+        title="No leave balance available"
+        message="Open Leave to review your available types, or contact HR about your entitlement."
         @retry="balance.refetch()"
         ><div class="balance-number">
-          {{ balance.data.value?.items.find((x) => x.type === 'Annual leave')?.available ?? '—'
-          }}<span>days available</span>
+          {{ homeBalance?.available ?? '—' }}<span>{{ homeBalance?.unit }} available</span>
         </div>
-        <p>Annual leave · {{ new Date().getFullYear() }}</p>
-        <div class="balance-track"><span /></div>
+        <p>{{ homeBalance?.type }} · {{ homeBalance?.year }}</p>
         <span class="small-note"
-          >{{ balance.data.value?.items.find((x) => x.type === 'Annual leave')?.pending ?? 0 }} days
-          pending approval</span
+          >{{ homeBalance?.pending ?? '—' }} {{ homeBalance?.unit }} pending approval</span
         ><NuxtLink to="/leave" class="text-link"
-          >Plan your next break<AppIcon name="arrow-up-right" /></NuxtLink
+          >View leave balances<AppIcon name="arrow-up-right" /></NuxtLink
       ></QueryState>
     </section>
   </div>
@@ -165,7 +132,9 @@ const totalPendingApprovals = computed(() => {
       <AppIcon name="arrow-up-right" /></NuxtLink
     ><button class="quick-action" @click="showRequest = true">
       <span class="record-icon violet"><AppIcon name="briefcase" /></span>
-      <div><strong>Make a request</strong><small>A little help for your workspace</small></div>
+      <div>
+        <strong>New workplace request</strong><small>Request equipment or workplace support</small>
+      </div>
       <AppIcon name="arrow-up-right" /></button
     ><NuxtLink :to="session.isManager ? '/approvals' : '/profile'" class="quick-action"
       ><span class="record-icon peach"
@@ -184,7 +153,7 @@ const totalPendingApprovals = computed(() => {
     <section class="panel no-padding">
       <div class="section-heading padded">
         <div>
-          <h2>Your time off</h2>
+          <h2>Your leave requests</h2>
           <p>Your latest plans and requests</p>
         </div>
         <NuxtLink to="/leave" class="text-link">View all<AppIcon name="arrow-right" /></NuxtLink>
@@ -194,7 +163,7 @@ const totalPendingApprovals = computed(() => {
         :error="leave.error.value"
         :empty="!leave.data.value?.items.length"
         title="Make room for a break"
-        message="Your time-off requests will appear here."
+        message="Your leave requests will appear here."
         @retry="leave.refetch()"
         ><RequestTable :rows="leave.data.value?.items.slice(0, 4) || []" kind="leave" compact
       /></QueryState>

@@ -76,7 +76,7 @@ function openReject() {
 </script>
 <template>
   <NuxtLink :to="`/${kind === 'leave' ? 'leave' : 'requests'}`" class="back-link"
-    ><AppIcon name="arrow-left" />Back to {{ kind === 'leave' ? 'time off' : 'requests' }}</NuxtLink
+    ><AppIcon name="arrow-left" />Back to {{ kind === 'leave' ? 'leave' : 'requests' }}</NuxtLink
   >
   <QueryState
     :pending="result.isPending.value"
@@ -85,7 +85,7 @@ function openReject() {
     ><template v-if="row"
       ><PageHeading
         :title="row.title || row.type || 'Request details'"
-        :description="`${kind === 'leave' ? 'Time off' : 'Workplace request'} · ${row.employeeName || 'Employee'}`"
+        :description="`${kind === 'leave' ? 'Leave' : 'Workplace request'} · ${row.employeeName || 'Employee'}`"
         ><StatusBadge :status="row.status"
       /></PageHeading>
       <div class="detail-grid">
@@ -163,13 +163,21 @@ function openReject() {
               :loading="feedback.busy.value"
               @click="requestAction('submit')"
             /><PButton
-              v-if="session.isManager && row.status === 'PENDING'"
+              v-if="
+                session.isManager &&
+                (kind === 'leave' || session.canReviewRequests) &&
+                row.status === 'PENDING'
+              "
               label="Approve"
               icon="pi pi-check"
               :loading="feedback.busy.value"
               @click="requestAction('approve')"
             /><PButton
-              v-if="session.isManager && row.status === 'PENDING'"
+              v-if="
+                session.isManager &&
+                (kind === 'leave' || session.canReviewRequests) &&
+                row.status === 'PENDING'
+              "
               label="Reject"
               severity="danger"
               outlined
@@ -250,7 +258,7 @@ function openReject() {
     ></QueryState
   >
   <MaterialFulfillDialog
-    v-if="session.isAdmin && kind === 'request' && row?.status === 'APPROVED'"
+    v-if="session.canFulfillRequests && kind === 'request' && row?.status === 'APPROVED'"
     v-model:visible="fulfillmentDialog"
     :record-id="id"
     :max-quantity="(row?.quantity ?? 1) - (row?.fulfilledQuantity ?? 0)"

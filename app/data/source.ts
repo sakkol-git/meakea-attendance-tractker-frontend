@@ -8,6 +8,10 @@ export interface DataRequest {
   body?: RecordData
   idempotencyKey?: string
   ifMatch?: string
+  bytes?: Uint8Array
+  contentType?: string
+  /** Private report downloads use the authenticated API transport. */
+  responseType?: 'csv' | 'bytes'
 }
 export interface DataResponse {
   status: number
@@ -30,6 +34,27 @@ export class DataFailure extends Error {
   }
 }
 export function validateRequest(request: DataRequest) {
+  const privateFile = /^\/requests\/[a-z0-9-]+\/attachments\/[a-z0-9-]+\/(file|upload)$/
+  if (request.bytes !== undefined || request.contentType !== undefined) {
+    if (
+      request.method !== 'PUT' ||
+      !privateFile.test(request.path) ||
+      !request.path.endsWith('/upload') ||
+      !request.bytes?.length ||
+      request.bytes.length > 10 * 1024 * 1024 ||
+      request.body !== undefined ||
+      !['application/pdf', 'image/png', 'image/jpeg'].includes(request.contentType ?? '')
+    )
+      throw new DataFailure(0, 'INVALID_PATH', 'Use a bounded private attachment upload.')
+  }
+  if (
+    request.responseType &&
+    (request.method !== 'GET' ||
+      (request.responseType === 'bytes'
+        ? !privateFile.test(request.path) || !request.path.endsWith('/file')
+        : !/^\/reports\/exports\/[a-z0-9-]+\/download$/.test(request.path)))
+  )
+    throw new DataFailure(0, 'INVALID_PATH', 'CSV downloads require a private export path.')
   if (
     !['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) ||
     !/^\/[a-z0-9/-]+$/.test(request.path) ||

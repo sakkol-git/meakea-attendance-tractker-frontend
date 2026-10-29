@@ -1,15 +1,14 @@
+import { AttachmentTransfers } from '../features/requests/data/attachment-transfers'
 import type { DataSource, RecordData } from './source.ts'
 import { DataFailure, commandKey } from './source.ts'
 import type { BusinessPort, WorkflowRecord, WorkflowSnapshot } from '../types/business.ts'
-import { workflowById, workflows } from '../features/workflows/catalog.ts'
+import { workflowById } from '../features/workflows/catalog.ts'
 import {
   decodeRemote,
   RemoteWorkflowRecord,
   RemoteWorkflowSnapshot,
   SignedDownload,
-  SignedUpload,
   signedUrl,
-  uploadHeaders,
 } from '../features/workflows/data/remote-contracts.ts'
 
 interface RemoteBusinessOptions {
@@ -26,14 +25,16 @@ interface RemoteBusinessOptions {
  * workflows are protected by an explicit CONTRACT_REQUIRED gate rather than silent mock fallback.
  */
 export class RemoteBusinessAdapter implements BusinessPort {
+  private attachments: AttachmentTransfers
   private activeWorkflows = new Set<string>()
 
   constructor(
     private source: DataSource,
     private guard: () => void = () => {},
-    acceptedWorkflows: string[] = workflows.map((workflow) => workflow.id),
+    acceptedWorkflows: string[] = [],
     private options: RemoteBusinessOptions = {},
   ) {
+    this.attachments = new AttachmentTransfers(source, options)
     for (const id of acceptedWorkflows) {
       this.activeWorkflows.add(id)
     }
@@ -124,75 +125,10 @@ export class RemoteBusinessAdapter implements BusinessPort {
     }
   }
 
-  async upload(scope: 'leave' | 'request', ownerId: string, file: File): Promise<WorkflowRecord> {
+  async upload(scope: 'leave' | 'request', ownerId: string, file: File) {
     this.guard()
-    this.assertContractAccepted('BF-026')
-
-    if (!ownerId) throw new DataFailure(422, 'OWNER_REQUIRED', 'Choose a request before attaching.')
-    if (file.size > 10 * 1024 * 1024)
-      throw new DataFailure(422, 'FILE_TOO_LARGE', 'Choose a file smaller than 10 MB.')
-    const allowedTypes = new Set(['application/pdf', 'image/png', 'image/jpeg'])
-    if (!allowedTypes.has(file.type))
-      throw new DataFailure(422, 'FILE_TYPE_UNSUPPORTED', 'Choose a PDF, PNG or JPEG file.')
-    const owner = encodeURIComponent(ownerId)
-    const base = scope === 'leave' ? `/leave/requests/${owner}` : `/requests/${owner}`
-    try {
-      const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer())
-      const sha256 = [...new Uint8Array(digest)]
-        .map((byte) => byte.toString(16).padStart(2, '0'))
-        .join('')
-      const presign = decodeRemote(
-        SignedUpload,
-        (
-          await this.source.send({
-            method: 'POST',
-            path: `${base}/attachments/presign`,
-            body: {
-              fileName: file.name,
-              contentType: file.type,
-              size: file.size,
-              sha256,
-            },
-            idempotencyKey: commandKey(),
-          })
-        ).data,
-      )
-      const uploadUrl = signedUrl(presign.uploadUrl, new Set(this.options.allowedFileOrigins ?? []))
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 60_000)
-      let uploaded: Response
-      try {
-        uploaded = await (this.options.fetcher ?? globalThis.fetch)(uploadUrl, {
-          method: 'PUT',
-          headers: uploadHeaders(presign.requiredHeaders, file.type),
-          body: file,
-          credentials: 'omit',
-          redirect: 'error',
-          signal: controller.signal,
-        })
-      } catch {
-        throw new DataFailure(0, 'UPLOAD_FAILED', 'Upload failed. Retry the attachment.')
-      } finally {
-        clearTimeout(timer)
-      }
-      if (!uploaded.ok)
-        throw new DataFailure(0, 'UPLOAD_FAILED', 'Upload failed. Retry the attachment.')
-      const response = await this.source.send({
-        method: 'POST',
-        path: `${base}/attachments/${encodeURIComponent(presign.attachmentId)}/complete`,
-        idempotencyKey: commandKey(),
-      })
-      return decodeRemote(RemoteWorkflowRecord, response.data) as WorkflowRecord
-    } catch (e) {
-      if (e instanceof DataFailure && (e.status === 404 || e.status === 501)) {
-        throw new DataFailure(
-          501,
-          'CONTRACT_REQUIRED',
-          `Attachment upload endpoint for ${scope} is not available.`,
-        )
-      }
-      throw e
-    }
+    if (scope === 'leave') this.assertContractAccepted('BF-026')
+    return this.attachments.upload(scope, ownerId, file)
   }
 
   async download(id: string, recordId: string): Promise<void> {
@@ -213,6 +149,6 @@ export class RemoteBusinessAdapter implements BusinessPort {
   }
 
   clear(): void {
-    // Adapter is stateless; cache clears can be handled here if caching is added
+    this.attachments.clear()
   }
 }

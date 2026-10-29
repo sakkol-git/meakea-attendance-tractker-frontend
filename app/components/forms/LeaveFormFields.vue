@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { calculateWorkingDays, type DayPortion } from '~/utils/working-days'
+import { failureMessage } from '~/utils/failure'
+import LeaveOwnerPreview from './LeaveOwnerPreview.vue'
 
 const props = defineProps<{
   values: Record<string, any>
@@ -7,7 +9,17 @@ const props = defineProps<{
 }>()
 
 const api = useWorkspace()
-const holidays = useWorkspaceQuery('form-holidays', () => api.list('holidays'))
+const types = useWorkspaceQuery('form-leave-types', () =>
+  api.mode === 'remote' ? api.leave.types() : Promise.resolve([]),
+)
+const typeOptions = computed(() =>
+  api.mode === 'remote'
+    ? (types.data.value || []).map((type) => ({ label: type.name, value: type.code }))
+    : ['Annual leave', 'Sick leave', 'Personal leave'].map((value) => ({ label: value, value })),
+)
+const holidays = useWorkspaceQuery('form-holidays', () =>
+  api.mode === 'local' ? api.list('holidays') : Promise.resolve({ items: [], total: 0 }),
+)
 const holidayDates = computed(() => (holidays.data.value?.items || []).map((h) => String(h.date)))
 
 const workingDaysBreakdown = computed(() =>
@@ -26,7 +38,10 @@ const workingDaysBreakdown = computed(() =>
     <PSelect
       input-id="form-type"
       v-model="values.type"
-      :options="['Annual leave', 'Sick leave', 'Personal leave']"
+      :options="typeOptions"
+      option-label="label"
+      option-value="value"
+      :loading="api.mode === 'remote' && types.isPending.value"
       aria-label="Leave type"
       placeholder="Select a leave type"
       :invalid="!!errors.type"
@@ -34,6 +49,12 @@ const workingDaysBreakdown = computed(() =>
       aria-describedby="error-type"
     />
     <small id="error-type" class="field-error">{{ errors.type }}</small>
+    <small v-if="types.error.value" role="alert" class="field-error">{{
+      failureMessage(types.error.value)
+    }}</small>
+    <small v-else-if="api.mode === 'remote' && types.isSuccess.value && !typeOptions.length"
+      >No leave types are configured. Contact HR.</small
+    >
   </div>
 
   <div class="form-grid">
@@ -75,10 +96,13 @@ const workingDaysBreakdown = computed(() =>
       option-label="label"
       option-value="value"
     />
-    <small>Half-day requests must use one working date.</small>
+    <small
+      >Half-day requests use one date. Submit separate requests for different calendar years.</small
+    >
   </div>
 
-  <div v-if="workingDaysBreakdown?.valid" class="gentle-note form-note" role="status">
+  <LeaveOwnerPreview v-if="api.mode === 'remote'" :values="values" />
+  <div v-else-if="workingDaysBreakdown?.valid" class="gentle-note form-note" role="status">
     <AppIcon name="clock" />
     <div>
       <strong>
