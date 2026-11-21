@@ -25,13 +25,16 @@ defineProps<{ history: NonNullable<EntityRow['history']> }>()
           {{ event.remainingAfter ?? '—' }} remaining · stock {{ event.stockBefore ?? '—' }} →
           {{ event.stockAfter ?? '—' }}
         </p>
-        <p v-if="event.reason">{{ event.reason }}</p>
+        <p v-if="event.reason" class="issue-reason">{{ event.reason }}</p>
       </div>
     </article>
   </section>
 </template>
 
 <style scoped>
+.issue-reason {
+  white-space: pre-wrap;
+}
 .activity-item > div {
   min-width: 0;
   overflow-wrap: anywhere;
