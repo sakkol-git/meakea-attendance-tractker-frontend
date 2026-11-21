@@ -22,7 +22,7 @@ defineEmits<{ retry: [] }>()
     <p>{{ failureMessage(error) }}</p>
     <PButton type="button" label="Try again" icon="pi pi-refresh" outlined @click="$emit('retry')" />
   </div>
-  <div v-else-if="empty" class="empty-state">
+  <div v-else-if="empty" class="empty-state" role="status">
     <span class="state-icon"><AppIcon name="inbox" /></span>
     <h2>{{ title || 'Nothing here yet' }}</h2>
     <p>{{ message || 'New records will appear here when they are available.' }}</p>
