@@ -88,3 +88,7 @@ const rows = computed(() => {
     </div>
   </details>
 </template>
+
+<style scoped>
+.detail-list dd { white-space: pre-wrap; overflow-wrap: anywhere; }
+</style>
