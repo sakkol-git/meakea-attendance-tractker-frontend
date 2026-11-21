@@ -75,42 +75,16 @@ function clearDates() {
       icon="pi pi-clock"
       @click="navigateTo('/')"
   /></PageHeading>
-  <section v-if="inferredItem" class="panel inferred-review-panel">
-    <div class="inferred-badge">
-      <AppIcon name="clock" />
-      <span>Review proposed attendance</span>
-    </div>
-    <div class="inferred-body">
-      <div>
-        <h3>{{ inferredItem.title }} · {{ String(inferredItem.details?.workDate ?? '') }}</h3>
-        <p>
-          Proposed attendance from
-          <strong>{{ String(inferredItem.details?.clockIn ?? '') }}</strong> to
-          <strong>{{ String(inferredItem.details?.clockOut ?? '') }}</strong
-          >.
-        </p>
-        <small class="subtle"
-          >Source: {{ String(inferredItem.details?.source ?? 'INFERRED') }} (Wi-Fi &amp; BLE beacon
-          cluster)</small
-        >
-      </div>
-      <div class="inline-actions">
-        <PButton
-          label="Confirm workday"
-          icon="pi pi-check"
-          :loading="feedback.busy.value"
-          @click="confirmInferred(inferredItem.id)"
-        />
-        <PButton
-          label="Decline"
-          severity="secondary"
-          outlined
-          :disabled="feedback.busy.value"
-          @click="rejectInferred(inferredItem.id)"
-        />
-      </div>
-    </div>
-  </section>
+  <ProposedAttendanceCard
+    v-if="inferredItem"
+    :work-date="String(inferredItem.details?.workDate ?? '')"
+    :clock-in="String(inferredItem.details?.clockIn ?? '')"
+    :clock-out="String(inferredItem.details?.clockOut ?? '')"
+    :source="String(inferredItem.details?.source ?? 'INFERRED')"
+    :busy="feedback.busy.value"
+    @confirm="confirmInferred(inferredItem.id)"
+    @decline="rejectInferred(inferredItem.id)"
+  />
   <section class="panel attendance-summary" aria-label="Attendance summary">
     <dl>
       <div>
