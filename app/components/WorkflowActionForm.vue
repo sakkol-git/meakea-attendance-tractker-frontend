@@ -38,11 +38,12 @@ function referenceOptions(key: string) {
   )
 }
 function submit() {
+  if (props.busy) return
   emit('submit', { ...values })
 }
 </script>
 <template>
-  <form class="app-form workflow-form" @submit.prevent="submit">
+  <form :aria-busy="busy" class="app-form workflow-form" @submit.prevent="submit">
     <p v-if="action.warning" class="info-banner">{{ action.warning }}</p>
     <div class="form-grid">
       <div
