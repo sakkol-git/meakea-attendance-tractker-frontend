@@ -199,3 +199,8 @@ async function downloadAttachment(item: AttachmentItem) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.attachment-item-lead { min-width: 0; }
+.attachment-item-lead > div { min-width: 0; overflow-wrap: anywhere; }
+</style>
