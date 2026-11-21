@@ -25,6 +25,7 @@ function openForm() {
 }
 
 function requestClose() {
+  if (feedback.busy.value) return
   if (!dirty.value) {
     visible.value = false
     return
@@ -141,7 +142,7 @@ function cancel(id: string, version: number, delegateName: string) {
     :close-on-escape="false"
     @update:visible="updateVisible"
   >
-    <form class="app-form" @input="dirty = true" @change="dirty = true" @submit.prevent="save">
+    <form :inert="feedback.busy.value" :aria-busy="feedback.busy.value" class="app-form" @input="dirty = true" @change="dirty = true" @submit.prevent="save">
       <div class="field">
         <div v-if="candidates.error.value" role="alert" class="field-error">
       {{ failureMessage(candidates.error.value) }}
