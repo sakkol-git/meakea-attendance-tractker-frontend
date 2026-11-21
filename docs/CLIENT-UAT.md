@@ -9,6 +9,10 @@ Use this runbook for a repeatable client review before connecting a live backend
 3. Test at 390 × 844, 820 × 1180 and at least 1440 × 900.
 4. Record role, viewport, scenario, result and a screenshot for any failure. Refresh to reset in-memory demo changes.
 
+## Home attendance
+
+- On Home, verify the workday state before and after clocking. If today’s attendance fails to load, the card should show the available support reference and **Retry attendance**. Retrying reads the day before offering a clock action.
+
 ## Role journeys
 
 | Role     | Scenario                                                                                                     | Expected result                                                                                                                   |

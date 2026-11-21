@@ -579,3 +579,66 @@ test('notification domain links use real local views and unknown legacy notices 
   await expect(row('Legacy update').getByRole('link')).toHaveCount(0)
   await expect(row('Legacy update').getByRole('button', { name: 'Mark read' })).toBeVisible()
 })
+
+test('today can be retried without mistaking a failed read for a clock-in opportunity', async ({
+  page,
+}) => {
+  let recovered = false
+  let attendanceCommands = 0
+  await page.route('**/api/v1/**', async (route) => {
+    const path = new URL(route.request().url()).pathname.replace('/api/v1', '')
+    if (path === '/auth/refresh') return route.fulfill({ json: { accessToken: 'demo-test-token' } })
+    if (path === '/auth/me')
+      return route.fulfill({
+        json: {
+          userId: 'user-1',
+          employeeId: 'employee-1',
+          tenantId: 'tenant-1',
+          name: 'Demo Employee',
+          roles: ['EMPLOYEE'],
+          timeZone: 'Asia/Phnom_Penh',
+        },
+      })
+    if (path === '/attendance/today')
+      return recovered
+        ? route.fulfill({
+            json: {
+              date: '2026-10-29',
+              sessions: [
+                {
+                  id: 'second',
+                  clockIn: '2026-10-29T06:00:00Z',
+                  clockOut: '2026-10-29T09:00:00Z',
+                  version: 1,
+                },
+                {
+                  id: 'first',
+                  clockIn: '2026-10-29T01:00:00Z',
+                  clockOut: '2026-10-29T05:00:00Z',
+                  version: 1,
+                },
+              ],
+            },
+          })
+        : route.fulfill({
+            status: 503,
+            json: { detail: 'Attendance temporarily unavailable.', traceId: 'demo-trace-501' },
+          })
+    if (path.startsWith('/attendance/') && route.request().method() === 'POST') attendanceCommands++
+    return route.fulfill({ json: { items: [], total: 0 } })
+  })
+  await page.goto('/')
+  const clockPanel = page.locator('.attendance-hero')
+  await expect(clockPanel.getByRole('alert')).toContainText('demo-trace-501')
+  await expect(clockPanel.getByText('Not recorded', { exact: true })).toHaveCount(0)
+  await expect(clockPanel.getByRole('button', { name: 'Clock in', exact: true })).toHaveCount(0)
+  await expect(clockPanel.getByRole('link', { name: 'View attendance' })).toHaveAttribute(
+    'href',
+    '/attendance',
+  )
+  recovered = true
+  await clockPanel.getByRole('button', { name: 'Retry attendance' }).click()
+  await expect(clockPanel.getByRole('button', { name: 'Clock in', exact: true })).toBeEnabled()
+  await expect(clockPanel.locator('.hero-bottom')).toContainText('3h 0m')
+  expect(attendanceCommands).toBe(0)
+})

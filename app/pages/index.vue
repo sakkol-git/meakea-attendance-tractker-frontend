@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 import { dateLabel, clockLabel, duration } from '~/utils/format'
 const session = useSessionStore()
 const api = useWorkspace()
@@ -15,7 +16,10 @@ const holidays = useWorkspaceQuery('holidays', () => api.list('holidays'))
 const showLeave = ref(false)
 const showRequest = ref(false)
 const open = computed(() => today.data.value?.sessions.find((x) => !x.clockOut))
-const latest = computed(() => today.data.value?.sessions.at(-1))
+const latest = computed(
+  () =>
+    today.data.value?.sessions.toSorted((a, b) => Date.parse(b.clockIn) - Date.parse(a.clockIn))[0],
+)
 const now = ref(new Date())
 let timer: ReturnType<typeof setInterval>
 onMounted(() => {
@@ -49,33 +53,44 @@ async function clock() {
     <section class="attendance-hero">
       <div class="hero-copy">
         <span class="hero-eyebrow"><i class="live-dot" /> YOUR WORKDAY</span>
-        <h2>
+        <div v-if="today.error.value" role="alert">
+          <h2>Attendance unavailable</h2>
+          <p>{{ failureMessage(today.error.value) }}</p>
+        </div>
+        <div
+          v-else-if="today.isPending.value"
+          role="status"
+          aria-label="Loading today's attendance"
+        >
+          <h2>Loading attendance…</h2>
+          <PSkeleton height="var(--control-height)" />
+        </div>
+        <h2 v-else>
           {{
             open
               ? 'You’re clocked in.'
               : latest
                 ? 'Your clock-out is recorded.'
-                : 'Start your workday.'
+                : 'Ready to clock in'
           }}
         </h2>
-        <p>
-          {{
-            open
-              ? 'Clock out when you finish. Attendance rules are reviewed separately.'
-              : latest
-                ? 'Your clock-out is recorded. See you next time.'
-                : 'Clock in to record your attendance.'
-          }}
-        </p>
-        <AttendanceGeoCard @update:location="(loc) => (currentLocation = loc)" />
         <div class="clock-action">
           <PButton
+            v-if="today.error.value"
+            label="Retry attendance"
+            :loading="today.isFetching.value"
+            @click="today.refetch()"
+          />
+          <PButton
+            v-else-if="!today.isPending.value"
             :label="open ? 'Clock out' : 'Clock in'"
             :icon="open ? 'pi pi-sign-out' : 'pi pi-sign-in'"
             :loading="feedback.busy.value"
-            :disabled="today.isPending.value || !!today.error.value"
             @click="clock"
-          /><NuxtLink to="/attendance">View attendance<AppIcon name="arrow-right" /></NuxtLink>
+          />
+          <NuxtLink prefetch-on="interaction" to="/attendance"
+            >View attendance<AppIcon name="arrow-right"
+          /></NuxtLink>
         </div>
         <p v-if="feedback.error.value" class="hero-error" role="alert">
           {{ feedback.error.value }}
@@ -85,9 +100,12 @@ async function clock() {
         <span class="clock-halo"><AppIcon name="clock" /></span
         ><strong>{{ clockLabel(now.toISOString(), session.profile?.timeZone) }}</strong
         ><span>{{ session.profile?.timeZone?.replaceAll('_', ' ') }}</span
-        ><span class="hero-status">{{
+        ><span v-if="today.data.value && !today.error.value" class="hero-status">{{
           open ? 'Clocked in' : latest ? 'Completed' : 'Not recorded'
         }}</span>
+      </div>
+      <div class="workday-location">
+        <AttendanceGeoCard @update:location="(loc) => (currentLocation = loc)" />
       </div>
       <div class="hero-bottom">
         <span
@@ -97,7 +115,7 @@ async function clock() {
           ><AppIcon name="sign-out" /> Clock out
           <strong>{{ clockLabel(latest?.clockOut, session.profile?.timeZone) }}</strong></span
         ><span
-          ><AppIcon name="hourglass" /> Total
+          ><AppIcon name="hourglass" /> Session length
           <strong>{{ latest ? duration(latest.clockIn, latest.clockOut) : '—' }}</strong></span
         >
       </div>
@@ -120,13 +138,13 @@ async function clock() {
         <p>{{ homeBalance?.type }} · {{ homeBalance?.year }}</p>
         <span class="small-note"
           >{{ homeBalance?.pending ?? '—' }} {{ homeBalance?.unit }} pending approval</span
-        ><NuxtLink to="/leave" class="text-link"
+        ><NuxtLink prefetch-on="interaction" to="/leave" class="text-link"
           >View leave balances<AppIcon name="arrow-up-right" /></NuxtLink
       ></QueryState>
     </section>
   </div>
   <div class="quick-actions-grid">
-    <NuxtLink to="/attendance" class="quick-action"
+    <NuxtLink prefetch-on="interaction" to="/attendance" class="quick-action"
       ><span class="record-icon blue"><AppIcon name="calendar" /></span>
       <div><strong>Attendance history</strong><small>Your workdays, at a glance</small></div>
       <AppIcon name="arrow-up-right" /></NuxtLink
@@ -136,7 +154,10 @@ async function clock() {
         <strong>New workplace request</strong><small>Request equipment or workplace support</small>
       </div>
       <AppIcon name="arrow-up-right" /></button
-    ><NuxtLink :to="session.isManager ? '/approvals' : '/profile'" class="quick-action"
+    ><NuxtLink
+      prefetch-on="interaction"
+      :to="session.isManager ? '/approvals' : '/profile'"
+      class="quick-action"
       ><span class="record-icon peach"
         ><AppIcon :name="session.isManager ? 'check-square' : 'user'"
       /></span>
@@ -156,7 +177,9 @@ async function clock() {
           <h2>Your leave requests</h2>
           <p>Your latest plans and requests</p>
         </div>
-        <NuxtLink to="/leave" class="text-link">View all<AppIcon name="arrow-right" /></NuxtLink>
+        <NuxtLink prefetch-on="interaction" to="/leave" class="text-link"
+          >View all<AppIcon name="arrow-right"
+        /></NuxtLink>
       </div>
       <QueryState
         :pending="leave.isPending.value"
@@ -207,7 +230,7 @@ async function clock() {
         <h2>Around your workspace</h2>
         <p>The latest updates, without the noise</p>
       </div>
-      <NuxtLink to="/notifications" class="text-link"
+      <NuxtLink prefetch-on="interaction" to="/notifications" class="text-link"
         >All updates<AppIcon name="arrow-right"
       /></NuxtLink>
     </div>
@@ -242,3 +265,34 @@ async function clock() {
     @saved="(row) => navigateTo(`/requests/${row.id}`)"
   />
 </template>
+
+<style scoped>
+.workday-location {
+  grid-column: 1 / -1;
+  padding: 0 var(--space-4) var(--space-4);
+}
+.clock-action a {
+  min-height: var(--control-height);
+  font-size: var(--font-size-caption);
+}
+@media (max-width: 720px) {
+  .attendance-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-copy h2 {
+    max-width: none;
+  }
+  .hero-clock {
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    padding: 0 var(--space-4) var(--space-4);
+  }
+  .clock-halo {
+    display: none;
+  }
+  .hero-status {
+    margin: 0;
+  }
+}
+</style>
