@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 const props = defineProps<{
   values: Record<string, any>
   errors: Record<string, string>
@@ -74,12 +75,17 @@ const managerOptions = computed(() =>
         aria-label="Department"
         v-model="values.departmentId"
         :options="departmentOptions"
+        :loading="departments.isPending.value"
         option-label="name"
         option-value="id"
         placeholder="Choose a department"
         :aria-invalid="!!errors.departmentId"
         aria-describedby="error-department"
       />
+      <div v-if="departments.error.value" role="alert" class="field-error">
+      {{ failureMessage(departments.error.value) }}
+      <PButton label="Retry departments" text :loading="departments.isFetching.value" @click="departments.refetch()" />
+    </div>
       <small id="error-department" class="field-error">{{ errors.departmentId }}</small>
     </div>
 
