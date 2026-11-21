@@ -49,6 +49,7 @@ function onFileSelect(e: Event) {
   const selected = target.files?.[0]
   if (selected) {
     emit('fileSelected', selected)
+    target.value = ''
   }
 }
 
