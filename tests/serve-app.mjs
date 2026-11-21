@@ -8,6 +8,7 @@ const server = spawn(process.execPath, ['.output/server/index.mjs'], {
     HOST: '127.0.0.1',
     PORT: remote ? '3101' : '3100',
     NUXT_PUBLIC_DATA_SOURCE: remote ? 'remote' : 'local',
+    NUXT_PUBLIC_PAGE_SEARCH: remote ? 'false' : 'true',
     NUXT_PUBLIC_API_BASE_URL: 'http://127.0.0.1:3101/api/v1',
   },
 })

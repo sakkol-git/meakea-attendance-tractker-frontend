@@ -17,6 +17,11 @@ Use this runbook for a repeatable client review before connecting a live backend
 
 - Select **Unread only**, visit Preferences, and return to Your updates. The filter should stay selected until you switch accounts. If marking an update as read fails, its unread action and the support reference should remain available.
 
+## Search and returning to lists
+
+- To exercise page search, start the web instance with `NUXT_PUBLIC_PAGE_SEARCH=true`. Use the search button, Ctrl+K or ⌘+K. Search for Attendance, open it with Enter, then repeat and close with Escape. Check that focus returns to the opening control and an employee cannot find administrative pages. Set the flag to false to restore the original search.
+- Select dates on Attendance. Navigate away and return within the workspace. The selected filters should survive navigation and clear when the account changes. An inverted attendance date range should keep both entries and explain which date to correct.
+
 ## Form lookup recovery
 
 - Interrupt leave-type, leave-preview, material, department, position, manager and work-site reads. Use the corresponding Retry control and confirm entered form values remain available and no save command is sent.

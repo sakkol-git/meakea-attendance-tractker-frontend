@@ -22,6 +22,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       dataSource: 'local',
+      pageSearch: false,
       apiBaseUrl: '',
       csrfCookieName: 'XSRF-TOKEN',
       fileOrigins: '',

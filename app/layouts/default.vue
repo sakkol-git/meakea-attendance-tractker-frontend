@@ -7,6 +7,7 @@ const route = useRoute()
 const api = useWorkspace()
 const notices = useWorkspaceQuery('notifications', () => api.notices())
 const unread = computed(() => notices.data.value?.items.filter((x) => !x.read).length ?? 0)
+const pageSearch = String(useRuntimeConfig().public.pageSearch) === 'true'
 const drawer = ref(false)
 const offline = ref(false)
 const quickSearch = ref('')
@@ -38,7 +39,9 @@ const activeTitle = computed(
       item.to === '/'
         ? route.path === '/'
         : route.path === item.to || route.path.startsWith(item.to + '/'),
-    )?.label || secondaryTitles[route.path] || 'Workspace',
+    )?.label ||
+    secondaryTitles[route.path] ||
+    'Workspace',
 )
 watch(
   () => route.path,
@@ -83,19 +86,20 @@ onBeforeUnmount(() => {
       dismissable-mask
       ><nav aria-label="Mobile navigation">
         <NuxtLink
+          prefetch-on="interaction"
           v-for="item in navigation"
           :key="item.to"
           :to="item.to"
           class="nav-item"
           @click="drawer = false"
           ><AppIcon :name="item.icon" />{{ item.label }}</NuxtLink
-        ><NuxtLink to="/settings" class="nav-item">Settings</NuxtLink
-        ><NuxtLink to="/profile" class="nav-item">My profile</NuxtLink>
+        ><NuxtLink prefetch-on="interaction" to="/settings" class="nav-item">Settings</NuxtLink
+        ><NuxtLink prefetch-on="interaction" to="/profile" class="nav-item">My profile</NuxtLink>
       </nav></PDialog
     >
     <aside class="sidebar">
-      <NuxtLink class="brand" to="/" aria-label="HRFlow home"
-        ><span class="brand-mark">h<span>f</span></span
+      <NuxtLink prefetch-on="interaction" class="brand" to="/" title="Home"
+        ><span aria-hidden="true" class="brand-mark">h<span>f</span></span
         ><span>HRFlow<span class="brand-dot">.</span></span></NuxtLink
       >
       <div class="workspace-name">
@@ -110,6 +114,7 @@ onBeforeUnmount(() => {
         <template v-for="group in groups" :key="group.label">
           <p class="nav-caption">{{ group.label }}</p>
           <NuxtLink
+            prefetch-on="interaction"
             v-for="item in group.items"
             :key="item.to"
             :to="item.to"
@@ -127,7 +132,8 @@ onBeforeUnmount(() => {
         </template>
       </nav>
       <div class="sidebar-bottom">
-        <NuxtLink to="/settings" class="nav-item"><AppIcon name="cog" />Settings</NuxtLink
+        <NuxtLink prefetch-on="interaction" to="/settings" class="nav-item"
+          ><AppIcon name="cog" />Settings</NuxtLink
         ><button class="nav-item" @click="logout"><AppIcon name="sign-out" />Sign out</button>
       </div>
     </aside>
@@ -144,7 +150,8 @@ onBeforeUnmount(() => {
           ><AppIcon name="angle-right" /><strong>{{ activeTitle }}</strong>
         </div>
         <div class="topbar-actions">
-          <div class="quick-search">
+          <LazyPageSearch v-if="pageSearch" :pages="navigation" />
+          <div v-else class="quick-search">
             <AppIcon name="search" /><input
               v-model="quickSearch"
               aria-label="Find a page"
@@ -152,13 +159,18 @@ onBeforeUnmount(() => {
               autocomplete="off"
             /><kbd>/</kbd>
             <div v-if="quickSearch" class="search-results">
-              <NuxtLink v-for="result in searchResults" :key="result.to" :to="result.to"
+              <NuxtLink
+                prefetch-on="interaction"
+                v-for="result in searchResults"
+                :key="result.to"
+                :to="result.to"
                 >{{ result.label }}<AppIcon name="arrow-up-right"
               /></NuxtLink>
               <p v-if="!searchResults.length">No matching pages.</p>
             </div>
           </div>
           <NuxtLink
+            prefetch-on="interaction"
             to="/notifications"
             class="notification-link"
             :aria-label="
@@ -167,7 +179,10 @@ onBeforeUnmount(() => {
                 : 'Open notifications'
             "
             ><AppIcon name="bell" /><span v-if="unread" class="notification-dot" /></NuxtLink
-          ><span class="topbar-divider" /><NuxtLink to="/profile" class="account-link"
+          ><span class="topbar-divider" /><NuxtLink
+            prefetch-on="interaction"
+            to="/profile"
+            class="account-link"
             ><span class="avatar">{{ initials(session.profile?.name || 'User') }}</span
             ><span class="account-name"
               >{{ session.profile?.name
