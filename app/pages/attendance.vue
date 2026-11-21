@@ -42,21 +42,23 @@ async function rejectInferred(recordId: string) {
   }
 }
 
-const from = ref('')
-const to = ref('')
+const views = useListViewsStore()
+const dates = computed(() => views.attendanceDates)
+const invalidRange = computed(() => Boolean(dates.value.to && dates.value.from > dates.value.to))
 const visible = ref(false)
 const rows = computed(() =>
   (history.data.value?.items || [])
     .filter(
       (x) =>
-        (!from.value || tenantDay(x.clockIn, session.profile?.timeZone) >= from.value) &&
-        (!to.value || tenantDay(x.clockIn, session.profile?.timeZone) <= to.value),
+        (!dates.value.from ||
+          tenantDay(x.clockIn, session.profile?.timeZone) >= dates.value.from) &&
+        (!dates.value.to || tenantDay(x.clockIn, session.profile?.timeZone) <= dates.value.to),
     )
     .toSorted((a, b) => b.clockIn.localeCompare(a.clockIn)),
 )
 function clearDates() {
-  from.value = ''
-  to.value = ''
+  dates.value.from = ''
+  dates.value.to = ''
 }
 </script>
 <template>
@@ -113,7 +115,13 @@ function clearDates() {
     <dl>
       <div>
         <dt>Sessions in view</dt>
-        <dd>{{ history.isPending.value || history.error.value ? 'Unavailable' : rows.length }}</dd>
+        <dd>
+          {{
+            history.isPending.value || history.error.value || invalidRange
+              ? 'Unavailable'
+              : rows.length
+          }}
+        </dd>
       </div>
       <div>
         <dt>Current session</dt>
@@ -143,20 +151,35 @@ function clearDates() {
     <div class="table-toolbar date-filters">
       <div class="field">
         <label for="history-from">From date</label
-        ><input id="history-from" v-model="from" type="date" />
+        ><input id="history-from" v-model="dates.from" :max="dates.to || undefined" type="date" />
       </div>
       <div class="field">
         <label for="history-to">To date</label
-        ><input id="history-to" v-model="to" type="date" :min="from" />
+        ><input
+          id="history-to"
+          v-model="dates.to"
+          type="date"
+          :min="dates.from || undefined"
+          :aria-invalid="invalidRange"
+          :aria-describedby="invalidRange ? 'history-range-error' : undefined"
+        />
       </div>
-      <PButton label="Clear dates" text @click="clearDates" />
+      <PButton label="Clear dates" :disabled="!dates.from && !dates.to" text @click="clearDates" />
     </div>
+    <p v-if="invalidRange" id="history-range-error" class="field-error padded" role="alert">
+      End date must be on or after the start date.
+    </p>
     <QueryState
+      v-else
       :pending="history.isPending.value"
       :error="history.error.value"
       :empty="!rows.length"
-      title="No recorded sessions"
-      message="Try a different date range, or clock in from your overview."
+      :title="dates.from || dates.to ? 'No sessions in this date range' : 'No recorded sessions'"
+      :message="
+        dates.from || dates.to
+          ? 'Change or clear the dates to review other sessions.'
+          : 'Your sessions appear here after you clock in.'
+      "
       @retry="history.refetch()"
       ><AttendanceSessions :rows="rows" :time-zone="session.profile?.timeZone"
     /></QueryState>

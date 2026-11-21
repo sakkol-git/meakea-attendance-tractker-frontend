@@ -6,6 +6,7 @@ type ListView = { query: string; status: string; page: number; first: number }
 export const useListViewsStore = defineStore('list-views', {
   state: () => ({
     views: {} as Record<string, ListView>,
+    attendanceDates: { from: '', to: '' },
     unreadOnly: false,
   }),
   actions: {
