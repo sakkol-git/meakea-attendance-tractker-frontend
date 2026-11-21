@@ -27,6 +27,7 @@ watch(
 )
 
 function submit() {
+  if (props.loading) return
   if (reason.value.trim().length < 5) {
     reasonError.value = 'Add a reason in at least five characters.'
     return
@@ -41,6 +42,8 @@ function submit() {
     :header="
       title || (action === 'reject' ? 'Reject this request' : 'Cancel future approved leave')
     "
+    :closable="!loading"
+    :close-on-escape="!loading"
     modal
     class="dialog-md"
     :breakpoints="{ '640px': '95vw' }"
@@ -61,6 +64,8 @@ function submit() {
       <div class="dialog-actions">
         <PButton
           label="Go back"
+          type="button"
+          :disabled="loading"
           severity="secondary"
           outlined
           @click="emit('update:visible', false)"
