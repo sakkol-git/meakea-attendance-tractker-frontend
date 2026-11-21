@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 import { correctionInstant, correctionLocalTime } from '~/utils/correction-input'
 import { clockLabel, tenantDay } from '~/utils/format'
 const props = defineProps<{
@@ -47,8 +48,8 @@ const clockOut = clockInput('proposedClockOut')
       <strong>Original recorded time</strong>
       <p v-if="history.isPending.value" role="status">Loading recorded sessions…</p>
       <div v-else-if="history.error.value" role="status">
-        Recorded sessions are unavailable.
-        <PButton label="Retry recorded sessions" text @click="history.refetch()" />
+        {{ failureMessage(history.error.value) }}
+        <PButton label="Retry recorded sessions" :loading="history.isFetching.value" text @click="history.refetch()" />
       </div>
       <p v-else-if="!original.length">No session on this date in the loaded history.</p>
       <p v-for="row in original" :key="row.id">
