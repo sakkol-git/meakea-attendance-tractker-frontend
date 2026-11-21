@@ -143,6 +143,8 @@ async function savePassword() {
           <label for="profileTimeZone">Time zone</label>
           <PInputText
             id="profileTimeZone"
+            autocapitalize="none"
+            :spellcheck="false"
             v-model="profileValues.timeZone"
             placeholder="e.g. Asia/Phnom_Penh"
             required
