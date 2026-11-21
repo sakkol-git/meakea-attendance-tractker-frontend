@@ -101,7 +101,9 @@ const activeValue = computed(() => {
       >
         <span class="legend-swatch" :style="{ backgroundColor: seg.color }" />
         <span class="legend-label">{{ seg.label }}</span>
-        <span class="legend-pct">{{ seg.percentage }}%</span>
+        <span class="legend-pct"
+          >{{ seg.value }}{{ unit ? ` ${unit}` : '' }} · {{ seg.percentage }}%</span
+        >
       </div>
     </div>
   </div>
