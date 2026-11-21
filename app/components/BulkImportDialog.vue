@@ -242,7 +242,7 @@ async function startImport() {
       </div>
 
       <!-- Import result -->
-      <div v-if="importResult" class="result-section">
+      <div v-if="importResult" class="result-section" role="status">
         <span class="result-icon success"><AppIcon name="check-circle" /></span>
         <h3>Import Complete</h3>
         <p>
