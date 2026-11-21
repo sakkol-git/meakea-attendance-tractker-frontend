@@ -60,6 +60,9 @@ function triggerFileSelect() {
 <template>
   <div
     class="csv-dropzone"
+    role="button" tabindex="0" aria-label="Choose a CSV file"
+    @keydown.enter.self.prevent="triggerFileSelect"
+    @keydown.space.self.prevent="triggerFileSelect"
     :class="{ dragging: isDragging, 'has-file': Boolean(fileName) }"
     @dragover="onDragOver"
     @dragleave="onDragLeave"
@@ -67,7 +70,7 @@ function triggerFileSelect() {
     @click="triggerFileSelect"
   >
     <input
-      ref="fileInput"
+      ref="fileInput" aria-label="CSV file" @click.stop
       type="file"
       accept=".csv,text/csv"
       class="hidden-file-input"
