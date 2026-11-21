@@ -17,6 +17,12 @@ Use this runbook for a repeatable client review before connecting a live backend
 
 - Select **Unread only**, visit Preferences, and return to Your updates. The filter should stay selected until you switch accounts. If marking an update as read fails, its unread action and the support reference should remain available.
 
+## Form lookup recovery
+
+- Interrupt leave-type, leave-preview, material, department, position, manager and work-site reads. Use the corresponding Retry control and confirm entered form values remain available and no save command is sent.
+- Review empty catalogs and the available recovery guidance. Check schedule field errors with keyboard and assistive technology.
+- Verify the workspace header on Your updates, My profile, Settings, Approval delegation and the access restriction page.
+
 ## Role journeys
 
 | Role     | Scenario                                                                                                     | Expected result                                                                                                                   |

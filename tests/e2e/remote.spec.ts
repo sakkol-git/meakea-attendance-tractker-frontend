@@ -350,6 +350,10 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
   await expect(page.getByText('Assigned calendar is not available.', { exact: true })).toBeVisible()
   await expect(page.getByText(/weekend day\(s\)/)).toHaveCount(0)
   rejectPreview = false
+  await page.getByRole('button', { name: 'Retry calculation', exact: true }).click()
+  await expect(page.getByText('0.5 working days', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('To', { exact: true })).toHaveValue('2026-11-03')
+  expect(submitted).toHaveLength(0)
   await page.getByLabel('To', { exact: true }).fill('2026-11-02')
   await page.getByLabel('Reason', { exact: true }).fill('An owner-calculated UAT request.')
   await page.getByRole('button', { name: 'Send request', exact: true }).click()

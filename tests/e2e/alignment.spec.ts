@@ -249,3 +249,15 @@ test('attendance filters survive a return visit and explain an invalid range', a
   await expect(from).toHaveValue('')
   await expect(to).toHaveValue('')
 })
+
+test('secondary pages have accurate workspace breadcrumbs', async ({ page }) => {
+  for (const [path, label] of [
+    ['/notifications', 'Your updates'],
+    ['/profile', 'My profile'],
+    ['/settings', 'Settings'],
+    ['/forbidden', 'Access restricted'],
+  ]) {
+    await page.goto(path!)
+    await expect(page.locator('.breadcrumb strong')).toHaveText(label!)
+  }
+})

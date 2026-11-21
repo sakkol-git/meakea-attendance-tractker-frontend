@@ -85,10 +85,17 @@ const managerOptions = computed(() =>
         aria-describedby="error-department"
       />
       <div v-if="departments.error.value" role="alert" class="field-error">
-      {{ failureMessage(departments.error.value) }}
-      <PButton label="Retry departments" text :loading="departments.isFetching.value" @click="departments.refetch()" />
-    </div>
-      <small v-if="departments.isSuccess.value && !departmentOptions.length">No departments are available. Add one in Organization.</small>
+        {{ failureMessage(departments.error.value) }}
+        <PButton
+          label="Retry departments"
+          text
+          :loading="departments.isFetching.value"
+          @click="departments.refetch()"
+        />
+      </div>
+      <small v-if="departments.isSuccess.value && !departmentOptions.length"
+        >No departments are available. Add one in Organization.</small
+      >
       <small id="error-department" class="field-error">{{ errors.departmentId }}</small>
     </div>
 
@@ -107,15 +114,25 @@ const managerOptions = computed(() =>
         aria-describedby="error-position"
       />
       <div v-if="positions.error.value" role="alert" class="field-error">
-      {{ failureMessage(positions.error.value) }}
-      <PButton label="Retry positions" text :loading="positions.isFetching.value" @click="positions.refetch()" />
-    </div>
-      <small v-if="positions.isSuccess.value && !positionOptions.length">No positions are available. Add one in Organization.</small>
+        {{ failureMessage(positions.error.value) }}
+        <PButton
+          label="Retry positions"
+          text
+          :loading="positions.isFetching.value"
+          @click="positions.refetch()"
+        />
+      </div>
+      <small v-if="positions.isSuccess.value && !positionOptions.length"
+        >No positions are available. Add one in Organization.</small
+      >
       <small id="error-position" class="field-error">{{ errors.positionId }}</small>
     </div>
   </div>
 
-  <div v-if="managerOptions.length || employees.isPending.value || employees.error.value" class="field">
+  <div
+    v-if="managerOptions.length || employees.isPending.value || employees.error.value"
+    class="field"
+  >
     <label for="form-manager">Reporting manager</label>
     <PSelect
       input-id="form-manager"
@@ -129,7 +146,12 @@ const managerOptions = computed(() =>
     />
     <div v-if="employees.error.value" role="alert" class="field-error">
       {{ failureMessage(employees.error.value) }}
-      <PButton label="Retry managers" text :loading="employees.isFetching.value" @click="employees.refetch()" />
+      <PButton
+        label="Retry managers"
+        text
+        :loading="employees.isFetching.value"
+        @click="employees.refetch()"
+      />
     </div>
   </div>
 </template>

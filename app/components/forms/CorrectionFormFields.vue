@@ -49,7 +49,12 @@ const clockOut = clockInput('proposedClockOut')
       <p v-if="history.isPending.value" role="status">Loading recorded sessions…</p>
       <div v-else-if="history.error.value" role="status">
         {{ failureMessage(history.error.value) }}
-        <PButton label="Retry recorded sessions" :loading="history.isFetching.value" text @click="history.refetch()" />
+        <PButton
+          label="Retry recorded sessions"
+          :loading="history.isFetching.value"
+          text
+          @click="history.refetch()"
+        />
       </div>
       <p v-else-if="!original.length">No session on this date in the loaded history.</p>
       <p v-for="row in original" :key="row.id">
