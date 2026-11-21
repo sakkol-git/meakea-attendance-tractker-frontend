@@ -223,8 +223,15 @@ async function startImport() {
 
       <!-- Import result -->
       <div v-if="importResult" class="result-section" role="status">
-        <span class="result-icon success"><AppIcon name="check-circle" /></span>
-        <h3>{{ importResult.failed ? 'Import finished with issues' : 'Import complete' }}</h3>
+        <span class="result-icon" :class="{ success: !importResult.failed && !invalidCount }"
+          ><AppIcon
+            :name="importResult.failed || invalidCount ? 'exclamation-triangle' : 'check-circle'"
+        /></span>
+        <h3>
+          {{
+            importResult.failed || invalidCount ? 'Import finished with issues' : 'Import complete'
+          }}
+        </h3>
         <p v-if="invalidCount">
           {{ invalidCount }} rows were skipped because they have validation issues.
         </p>
