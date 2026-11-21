@@ -68,7 +68,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', shortcut))
         @keydown.enter.prevent="firstMatch"
       />
       <p v-if="!matches.length" role="status">No matching pages. Try another name.</p>
-      <nav v-else aria-label="Matching pages">
+      <p v-else role="status">{{ matches.length }} matching pages</p>
+      <nav v-if="matches.length" aria-label="Matching pages">
         <NuxtLink
           prefetch-on="interaction"
           v-for="item in matches"
