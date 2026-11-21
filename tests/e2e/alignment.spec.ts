@@ -213,3 +213,21 @@ test('keyboard users can skip navigation and leave a dialog safely', async ({ pa
   await expect(page.getByRole('dialog')).not.toBeVisible()
   await expect(trigger).toBeFocused()
 })
+
+test('the unread filter follows a return visit within the same account', async ({ page }) => {
+  await page.goto('/notifications')
+  const unread = page.getByRole('switch', { name: 'Unread only' })
+  await unread.check()
+  await page.getByRole('link', { name: 'Preferences', exact: true }).click()
+  await expect(page).toHaveURL('/settings')
+  await page.goBack()
+  await expect(page).toHaveURL('/notifications')
+  await expect(unread).toBeChecked()
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'Manager', exact: true }).click()
+  await page
+    .getByRole('link', { name: /Open notifications/ })
+    .first()
+    .click()
+  await expect(unread).not.toBeChecked()
+})

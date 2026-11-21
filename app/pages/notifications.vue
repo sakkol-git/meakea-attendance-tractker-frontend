@@ -3,7 +3,7 @@ import { notificationRoute } from '~/utils/notification-route'
 import { dateLabel } from '~/utils/format'
 const api = useWorkspace()
 const feedback = useFeedback()
-const onlyUnread = ref(false)
+const { unreadOnly: onlyUnread } = storeToRefs(useListViewsStore())
 const result = useWorkspaceQuery('notifications', () => api.notices())
 const rows = computed(
   () => result.data.value?.items.filter((x) => !onlyUnread.value || !x.read) || [],
@@ -15,13 +15,10 @@ async function mark(id?: string) {
 <template>
   <PageHeading
     title="Your updates"
-    description="The things that matter, all in one place."
-    eyebrow="STAY IN THE LOOP"
+    description="Review updates about your requests and attendance."
   >
     <div class="heading-actions">
-      <NuxtLink to="/settings">
-        <PButton label="Preferences" icon="pi pi-cog" outlined />
-      </NuxtLink>
+      <NuxtLink class="text-link" to="/settings"><AppIcon name="cog" />Preferences</NuxtLink>
       <PButton
         label="Mark all read"
         icon="pi pi-check"
@@ -33,6 +30,7 @@ async function mark(id?: string) {
     </div>
   </PageHeading>
   <section class="panel">
+    <p v-if="feedback.error.value" class="field-error" role="alert">{{ feedback.error.value }}</p>
     <div class="section-heading">
       <h2>Workspace notifications</h2>
       <label class="toggle-label"

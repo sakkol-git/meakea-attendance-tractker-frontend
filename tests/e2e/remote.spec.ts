@@ -525,6 +525,8 @@ test('notification domain links use real local views and unknown legacy notices 
         timeZone: 'Asia/Phnom_Penh',
       })
     if (path === '/attendance/today') return reply(200, { date: '2026-10-29', sessions: [] })
+    if (path === '/notifications/notice-c/read' && request.method() === 'POST')
+      return reply(503, { detail: 'Could not confirm the read.', traceId: 'notice-read-503' })
     if (path === '/notifications')
       return reply(200, {
         items: [
@@ -578,6 +580,9 @@ test('notification domain links use real local views and unknown legacy notices 
   )
   await expect(row('Legacy update').getByRole('link')).toHaveCount(0)
   await expect(row('Legacy update').getByRole('button', { name: 'Mark read' })).toBeVisible()
+  await row('Legacy update').getByRole('button', { name: 'Mark read' }).click()
+  await expect(page.locator('.panel').getByRole('alert')).toContainText('notice-read-503')
+  await expect(row('Legacy update').getByRole('button', { name: 'Mark read' })).toBeEnabled()
 })
 
 test('today can be retried without mistaking a failed read for a clock-in opportunity', async ({

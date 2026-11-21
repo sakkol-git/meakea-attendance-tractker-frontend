@@ -13,6 +13,10 @@ Use this runbook for a repeatable client review before connecting a live backend
 
 - On Home, verify the workday state before and after clocking. If today’s attendance fails to load, the card should show the available support reference and **Retry attendance**. Retrying reads the day before offering a clock action.
 
+## Inbox preferences
+
+- Select **Unread only**, visit Preferences, and return to Your updates. The filter should stay selected until you switch accounts. If marking an update as read fails, its unread action and the support reference should remain available.
+
 ## Role journeys
 
 | Role     | Scenario                                                                                                     | Expected result                                                                                                                   |
