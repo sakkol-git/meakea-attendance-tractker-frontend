@@ -13,7 +13,7 @@ const ageOptions = [
 </script>
 
 <template>
-  <div class="table-toolbar approval-filters" aria-label="Approval filters">
+  <div class="table-toolbar approval-filters" role="group" aria-label="Approval filters">
     <div class="search-field">
       <AppIcon name="search" />
       <PInputText v-model="search" placeholder="Search approvals…" aria-label="Search approvals" />
