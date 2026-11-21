@@ -38,6 +38,7 @@ const activeValue = computed(() => {
 
 <template>
   <div class="donut-chart-card">
+    <p v-if="!segments.length" role="status">No data is available for this chart.</p>
     <div
       class="chart-visual"
       role="img"
