@@ -183,6 +183,8 @@ async function startImport() {
       <!-- Dropzone -->
       <CsvDropzone
         v-if="!importResult"
+        :inert="isImporting"
+        :aria-disabled="isImporting"
         :file-name="fileName"
         :row-count="parsedRows.length"
         @file-selected="loadFile"
