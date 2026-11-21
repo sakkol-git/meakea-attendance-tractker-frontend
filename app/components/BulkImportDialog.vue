@@ -201,11 +201,12 @@ async function startImport() {
 
         <div class="preview-table-wrapper">
           <table class="preview-table">
+            <caption class="sr-only">First five rows of the selected CSV file</caption>
             <thead>
               <tr>
-                <th class="col-index">#</th>
-                <th v-for="h in parsedHeaders.slice(0, 4)" :key="h">{{ h }}</th>
-                <th>Status</th>
+                <th scope="col" class="col-index">#</th>
+                <th scope="col" v-for="h in parsedHeaders.slice(0, 4)" :key="h">{{ h }}</th>
+                <th scope="col">Status</th>
               </tr>
             </thead>
             <tbody>
