@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 const props = defineProps<{
   values: Record<string, any>
   errors: Record<string, string>
@@ -70,6 +71,10 @@ const needsTimes = computed(() =>
         :aria-invalid="!!errors.materialId"
         aria-describedby="error-material"
       />
+      <div v-if="materials.error.value" role="alert" class="field-error">
+      {{ failureMessage(materials.error.value) }}
+      <PButton label="Retry materials" text :loading="materials.isFetching.value" @click="materials.refetch()" />
+    </div>
       <small id="error-material" class="field-error">{{ errors.materialId }}</small>
     </div>
     <div class="field">
