@@ -63,7 +63,7 @@ function triggerFileSelect() {
     class="csv-dropzone"
     role="button"
     tabindex="0"
-    aria-label="Choose a CSV file"
+    :aria-label="fileName ? `Change CSV file: ${fileName}` : 'Choose a CSV file'"
     @keydown.enter.self.prevent="triggerFileSelect"
     @keydown.space.self.prevent="triggerFileSelect"
     :class="{ dragging: isDragging, 'has-file': Boolean(fileName) }"
