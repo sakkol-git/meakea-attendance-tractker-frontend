@@ -52,7 +52,14 @@ const workingDaysBreakdown = computed(() =>
     <small v-if="types.error.value" role="alert" class="field-error">{{
       failureMessage(types.error.value)
     }}</small>
-    <small v-else-if="api.mode === 'remote' && types.isSuccess.value && !typeOptions.length"
+    <PButton
+      v-if="types.error.value"
+      label="Retry leave types"
+      text
+      :loading="types.isFetching.value"
+      @click="types.refetch()"
+    />
+    <small v-if="api.mode === 'remote' && types.isSuccess.value && !typeOptions.length"
       >No leave types are configured. Contact HR.</small
     >
   </div>
