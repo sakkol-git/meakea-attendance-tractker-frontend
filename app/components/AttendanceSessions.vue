@@ -11,7 +11,7 @@ watch(
 )
 </script>
 <template>
-  <div class="attendance-session-cards" aria-label="Attendance sessions">
+  <div class="attendance-session-cards" role="region" aria-label="Attendance sessions">
     <article v-for="row in rows.slice(0, limit)" :key="row.id" class="attendance-session-card">
       <header>
         <strong>{{ dateLabel(tenantDay(row.clockIn, timeZone)) }}</strong
