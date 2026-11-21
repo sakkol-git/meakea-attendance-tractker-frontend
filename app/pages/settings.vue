@@ -99,7 +99,9 @@ const options = [
           <p v-if="feedback.error.value" role="alert" class="form-error">
             {{ feedback.error.value }}
           </p>
-          <p v-if="dirty" class="small-note" role="status">You have unsaved notification preferences.</p>
+          <p v-if="dirty" class="small-note" role="status">
+            You have unsaved notification preferences.
+          </p>
           <div class="dialog-actions">
             <PButton
               label="Save preferences"

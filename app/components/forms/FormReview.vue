@@ -90,5 +90,8 @@ const rows = computed(() => {
 </template>
 
 <style scoped>
-.detail-list dd { white-space: pre-wrap; overflow-wrap: anywhere; }
+.detail-list dd {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 </style>

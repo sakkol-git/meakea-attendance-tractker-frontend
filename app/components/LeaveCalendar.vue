@@ -135,9 +135,14 @@ function updateDayDialog(visible: boolean) {
 
       <div class="calendar-dept-filter">
         <div v-if="departmentsQuery.error.value" role="alert" class="field-error">
-      {{ failureMessage(departmentsQuery.error.value) }}
-      <PButton label="Retry departments" text :loading="departmentsQuery.isFetching.value" @click="departmentsQuery.refetch()" />
-    </div>
+          {{ failureMessage(departmentsQuery.error.value) }}
+          <PButton
+            label="Retry departments"
+            text
+            :loading="departmentsQuery.isFetching.value"
+            @click="departmentsQuery.refetch()"
+          />
+        </div>
         <label for="calendar-dept" class="calendar-dept-label">Department:</label>
         <PSelect
           input-id="calendar-dept"

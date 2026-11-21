@@ -81,7 +81,18 @@ const target = (row: EntityRow) =>
     data-key="id"
     class="workspace-table"
     :row-hover="true"
-    :pt="{ tableContainer: { role: 'region', 'aria-label': kind === 'leave' ? 'Leave requests' : kind === 'correction' ? 'Attendance corrections' : 'Requests table', tabindex: 0 } }"
+    :pt="{
+      tableContainer: {
+        role: 'region',
+        'aria-label':
+          kind === 'leave'
+            ? 'Leave requests'
+            : kind === 'correction'
+              ? 'Attendance corrections'
+              : 'Requests table',
+        tabindex: 0,
+      },
+    }"
   >
     <PColumn :header="kind === 'leave' ? 'Leave' : 'Request'" field="type"
       ><template #body="{ data }"

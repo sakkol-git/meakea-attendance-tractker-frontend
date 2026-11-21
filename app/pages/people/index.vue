@@ -64,8 +64,7 @@ const rows = computed(() =>
             </template></PColumn
           ><PColumn field="department" header="Department" sortable /><PColumn
             field="position"
-            header="Position"
-          /><PColumn header="Status"
+            header="Position" /><PColumn header="Status"
             ><template #body="{ data }"><StatusBadge :status="data.status" /></template></PColumn
           ><PColumn header="Details"
             ><template #body="{ data }"
@@ -74,10 +73,11 @@ const rows = computed(() =>
                 :aria-label="`View ${data.name}`"
                 class="text-link"
                 >View<AppIcon name="arrow-up-right" /></NuxtLink></template></PColumn
-          ><template #empty><p role="status">No people match your search.</p><PButton v-if="search" label="Clear search" text @click="search = ''" /></template></PDataTable
-        >
-      </div></QueryState
-    >
+          ><template #empty
+            ><p role="status">No people match your search.</p>
+            <PButton v-if="search" label="Clear search" text @click="search = ''" /></template
+        ></PDataTable></div
+    ></QueryState>
   </section>
   <ResourceForm
     v-model:visible="add"

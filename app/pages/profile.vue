@@ -134,7 +134,12 @@ async function savePassword() {
     <!-- Edit Profile Form -->
     <div v-if="editProfileOpen" id="profile-editor" class="panel profile-subpanel">
       <h3 class="form-heading">Edit your profile details</h3>
-      <form class="app-form" :inert="profileBusy" :aria-busy="profileBusy" @submit.prevent="saveProfile">
+      <form
+        class="app-form"
+        :inert="profileBusy"
+        :aria-busy="profileBusy"
+        @submit.prevent="saveProfile"
+      >
         <div class="field">
           <label for="profileName">Preferred name</label>
           <PInputText id="profileName" v-model="profileValues.name" required />

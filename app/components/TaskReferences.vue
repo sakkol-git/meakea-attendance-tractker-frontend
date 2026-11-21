@@ -16,5 +16,7 @@ defineProps<{ references: { id: string; name: string }[] }>()
 </template>
 
 <style scoped>
-.workflow-reference { overflow-wrap: anywhere; }
+.workflow-reference {
+  overflow-wrap: anywhere;
+}
 </style>
