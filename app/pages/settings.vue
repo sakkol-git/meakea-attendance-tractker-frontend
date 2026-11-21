@@ -88,10 +88,11 @@ const options = [
           <div v-for="option in options" :key="option.key" class="preference-row">
             <label :for="`pref-${option.key}`"
               ><strong>{{ option.title }}</strong
-              ><span>{{ option.detail }}</span></label
+              ><span :id="`pref-help-${option.key}`">{{ option.detail }}</span></label
             ><PToggleSwitch
               v-model="values[option.key]"
               :input-id="`pref-${option.key}`"
+              :aria-describedby="`pref-help-${option.key}`"
               @update:model-value="dirty = true"
             />
           </div>
