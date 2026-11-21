@@ -140,7 +140,7 @@ async function downloadAttachment(item: AttachmentItem) {
   <div class="attachment-manager">
     <div class="attachment-header">
       <h3 class="attachment-title">Attachments ({{ attachments.length }})</h3>
-      <span v-if="uploading" class="attachment-uploading-status">
+      <span v-if="uploading" class="attachment-uploading-status" role="status">
         Uploading… {{ uploadProgress }}%
       </span>
     </div>
