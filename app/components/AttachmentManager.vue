@@ -189,6 +189,7 @@ async function downloadAttachment(item: AttachmentItem) {
         <PButton
           icon="pi pi-download"
           label="Download"
+          :aria-label="`Download ${item.name}`"
           size="small"
           text
           @click="downloadAttachment(item)"
