@@ -118,7 +118,7 @@ function requestLocation() {
     </p>
     <div v-if="workSitesQuery.error.value" class="small-note" role="status">
       Work site details are unavailable. Your location alone does not confirm site eligibility.
-      <PButton label="Retry work sites" text size="small" @click="workSitesQuery.refetch()" />
+      <PButton label="Retry work sites" :loading="workSitesQuery.isFetching.value" text size="small" @click="workSitesQuery.refetch()" />
     </div>
 
     <div v-if="coords" class="geo-coords-bar">
