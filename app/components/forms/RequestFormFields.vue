@@ -75,6 +75,7 @@ const needsTimes = computed(() =>
       {{ failureMessage(materials.error.value) }}
       <PButton label="Retry materials" text :loading="materials.isFetching.value" @click="materials.refetch()" />
     </div>
+      <small v-if="materials.isSuccess.value && !materials.data.value?.length">No materials are available. Contact your workspace administrator.</small>
       <small id="error-material" class="field-error">{{ errors.materialId }}</small>
     </div>
     <div class="field">
