@@ -84,7 +84,7 @@ const options = [
         :pending="result.isPending.value"
         :error="result.error.value"
         @retry="result.refetch()"
-        ><form @submit.prevent="save">
+        ><form :inert="feedback.busy.value" :aria-busy="feedback.busy.value" @submit.prevent="save">
           <div v-for="option in options" :key="option.key" class="preference-row">
             <label :for="`pref-${option.key}`"
               ><strong>{{ option.title }}</strong
