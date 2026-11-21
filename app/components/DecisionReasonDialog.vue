@@ -58,8 +58,9 @@ function submit() {
           rows="4"
           :disabled="loading"
           :aria-invalid="!!reasonError"
-          aria-describedby="decision-error"
+          aria-describedby="decision-help decision-error"
         />
+        <small id="decision-help">Use at least five characters to explain your decision.</small>
         <small id="decision-error" class="field-error" aria-live="polite">{{ reasonError }}</small>
       </div>
       <div class="dialog-actions">
