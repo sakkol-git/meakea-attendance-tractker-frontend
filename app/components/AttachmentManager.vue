@@ -176,6 +176,7 @@ async function downloadAttachment(item: AttachmentItem) {
       {{ error }}
     </p>
 
+    <p v-if="!loading && !error && !uploading && !attachments.length" class="small-note">No attachments have been added.</p>
     <!-- Attachments List -->
     <div v-if="attachments.length" class="attachment-list">
       <div v-for="item in attachments" :key="item.id" class="attachment-item">
