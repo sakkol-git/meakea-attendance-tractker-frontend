@@ -14,3 +14,7 @@ defineProps<{ references: { id: string; name: string }[] }>()
     <p v-if="!references.length" class="small-note">No additional records to select.</p>
   </aside>
 </template>
+
+<style scoped>
+.workflow-reference { overflow-wrap: anywhere; }
+</style>
