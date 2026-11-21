@@ -96,3 +96,8 @@ function triggerFileSelect() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.dropzone-content { min-width: 0; }
+.dropzone-content > div { min-width: 0; overflow-wrap: anywhere; }
+</style>
