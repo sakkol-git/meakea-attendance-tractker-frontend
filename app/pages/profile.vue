@@ -104,6 +104,8 @@ async function savePassword() {
       <div class="profile-actions">
         <PButton
           label="Edit details"
+          :aria-expanded="editProfileOpen"
+          aria-controls="profile-editor"
           icon="pi pi-user-edit"
           size="small"
           outlined
@@ -129,7 +131,7 @@ async function savePassword() {
     </div>
 
     <!-- Edit Profile Form -->
-    <div v-if="editProfileOpen" class="panel profile-subpanel">
+    <div v-if="editProfileOpen" id="profile-editor" class="panel profile-subpanel">
       <h3 class="form-heading">Edit your profile details</h3>
       <form class="app-form" @submit.prevent="saveProfile">
         <div class="field">
