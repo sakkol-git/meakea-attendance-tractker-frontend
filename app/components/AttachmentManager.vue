@@ -150,6 +150,9 @@ async function downloadAttachment(item: AttachmentItem) {
     <div
       v-if="!readonly && (api.mode === 'local' || scope === 'request')"
       class="attachment-drop-target"
+      role="button" :tabindex="uploading ? -1 : 0" :aria-disabled="uploading" aria-label="Choose an attachment"
+      @keydown.enter.self.prevent="fileInput?.click()"
+      @keydown.space.self.prevent="fileInput?.click()"
       :class="{ 'is-dragover': dragOver }"
       @dragover.prevent="dragOver = true"
       @dragleave.prevent="dragOver = false"
@@ -157,7 +160,7 @@ async function downloadAttachment(item: AttachmentItem) {
       @click="fileInput?.click()"
     >
       <input
-        ref="fileInput"
+        ref="fileInput" aria-label="Attachment file" @click.stop
         type="file"
         class="hidden-file-input"
         accept=".pdf,.png,.jpg,.jpeg"
