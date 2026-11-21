@@ -156,7 +156,9 @@ async function startImport() {
     :header="title || `Bulk import ${resource}`"
     class="dialog-xl"
     :breakpoints="{ '640px': '95vw' }"
-    dismissable-mask
+    :dismissable-mask="!isImporting"
+    :closable="!isImporting"
+    :close-on-escape="!isImporting"
     @update:visible="emit('update:visible', $event)"
   >
     <div class="bulk-import-container">
