@@ -25,10 +25,20 @@ const searchResults = computed(() =>
       )
     : [],
 )
+const secondaryTitles: Record<string, string> = {
+  '/notifications': 'Your updates',
+  '/profile': 'My profile',
+  '/settings': 'Settings',
+  '/delegations': 'Approval delegation',
+  '/forbidden': 'Access restricted',
+}
 const activeTitle = computed(
   () =>
-    navigation.value.find((x) => (x.to === '/' ? route.path === '/' : route.path.startsWith(x.to)))
-      ?.label || (route.path === '/profile' ? 'My profile' : 'Settings'),
+    navigation.value.find((item) =>
+      item.to === '/'
+        ? route.path === '/'
+        : route.path === item.to || route.path.startsWith(item.to + '/'),
+    )?.label || secondaryTitles[route.path] || 'Workspace',
 )
 watch(
   () => route.path,
