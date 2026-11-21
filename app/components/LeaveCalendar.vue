@@ -110,7 +110,7 @@ function updateDayDialog(visible: boolean) {
   <div class="calendar-shell">
     <div class="calendar-header">
       <div class="calendar-title-group">
-        <h3 class="calendar-month-title">{{ monthTitle }}</h3>
+        <h3 class="calendar-month-title" aria-live="polite">{{ monthTitle }}</h3>
         <div class="calendar-nav-buttons">
           <PButton
             icon="pi pi-chevron-left"
