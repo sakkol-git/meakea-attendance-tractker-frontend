@@ -30,3 +30,7 @@ defineProps<{ history: NonNullable<EntityRow['history']> }>()
     </article>
   </section>
 </template>
+
+<style scoped>
+.activity-item > div { min-width: 0; overflow-wrap: anywhere; }
+</style>
