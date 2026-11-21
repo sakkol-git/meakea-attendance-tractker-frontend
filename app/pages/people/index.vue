@@ -74,7 +74,7 @@ const rows = computed(() =>
                 :aria-label="`View ${data.name}`"
                 class="text-link"
                 >View<AppIcon name="arrow-up-right" /></NuxtLink></template></PColumn
-          ><template #empty>No people match your search.</template></PDataTable
+          ><template #empty><p role="status">No people match your search.</p><PButton v-if="search" label="Clear search" text @click="search = ''" /></template></PDataTable
         >
       </div></QueryState
     >
