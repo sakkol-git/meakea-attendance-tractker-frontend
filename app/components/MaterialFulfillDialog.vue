@@ -116,6 +116,7 @@ async function issue() {
         <label for="issue-material">Material</label>
         <PSelect
           input-id="issue-material"
+          :disabled="feedback.busy.value"
           v-model="materialId"
           aria-label="Material"
           :options="materials.data.value?.items ?? []"
@@ -129,6 +130,7 @@ async function issue() {
         <label for="issue-quantity">Quantity to issue</label>
         <input
           id="issue-quantity"
+          :disabled="feedback.busy.value"
           v-model.number="issueQuantity"
           type="number"
           min="1"
@@ -140,6 +142,7 @@ async function issue() {
         <label for="issue-reason">Issue reason</label>
         <PTextarea
           id="issue-reason"
+          :disabled="feedback.busy.value"
           v-model="issueReason"
           minlength="5"
           maxlength="2000"
