@@ -73,7 +73,7 @@ function matchesSearch(node: OrgNode): boolean {
       </div>
       <div class="org-chart-search">
         <PInputText
-          v-model="search"
+          v-model="search" type="search"
           placeholder="Filter by person, position, or department…"
           size="small"
           class="org-chart-search-input"
