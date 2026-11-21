@@ -260,7 +260,7 @@ async function startImport() {
       <!-- Import result -->
       <div v-if="importResult" class="result-section" role="status">
         <span class="result-icon success"><AppIcon name="check-circle" /></span>
-        <h3>Import Complete</h3>
+        <h3>{{ importResult.failed ? 'Import finished with issues' : 'Import complete' }}</h3>
         <p>
           Successfully created <strong>{{ importResult.success }}</strong> {{ resource }}.
           <span v-if="importResult.failed > 0">
