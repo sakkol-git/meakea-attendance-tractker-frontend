@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 const props = defineProps<{
   values: Record<string, any>
   errors: Record<string, string>
@@ -73,6 +74,10 @@ watch(
           {{ site.name }}
         </option>
       </select>
+      <div v-if="sites.error.value" role="alert" class="field-error">
+      {{ failureMessage(sites.error.value) }}
+      <PButton label="Retry work sites" text :loading="sites.isFetching.value" @click="sites.refetch()" />
+    </div>
       <small class="field-error">{{ errors.siteId }}</small>
     </div>
     <div class="form-grid">
