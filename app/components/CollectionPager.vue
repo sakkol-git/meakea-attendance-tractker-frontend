@@ -7,6 +7,7 @@ const pages = computed(() => Math.max(1, Math.ceil(props.total / props.size)))
 <template>
   <nav v-if="pages > 1" class="collection-pager" aria-label="Result pages">
     <PButton
+      type="button"
       label="Previous"
       outlined
       :disabled="page === 0"
@@ -14,6 +15,7 @@ const pages = computed(() => Math.max(1, Math.ceil(props.total / props.size)))
     />
     <span aria-live="polite">Page {{ page + 1 }} of {{ pages }}</span>
     <PButton
+      type="button"
       label="Next"
       outlined
       :disabled="page + 1 >= pages"
