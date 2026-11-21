@@ -25,9 +25,10 @@ const preview = useWorkspaceQuery(
   <p v-if="complete && preview.isPending.value" role="status">
     Calculating your assigned working days…
   </p>
-  <p v-else-if="preview.error.value" role="alert" class="field-error">
+  <div v-else-if="preview.error.value" role="alert" class="field-error">
     {{ failureMessage(preview.error.value) }}
-  </p>
+    <PButton label="Retry calculation" text :loading="preview.isFetching.value" @click="preview.refetch()" />
+  </div>
   <div v-else-if="preview.data.value" class="gentle-note form-note" role="status">
     <AppIcon name="clock" />
     <div>
