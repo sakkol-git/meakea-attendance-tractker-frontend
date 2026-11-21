@@ -157,8 +157,10 @@ async function issue() {
           v-model="issueReason"
           minlength="5"
           maxlength="2000"
+          aria-describedby="issue-reason-help"
           required
         />
+        <small id="issue-reason-help">Use 5–2,000 characters to describe what was issued.</small>
       </div>
       <p v-if="feedback.error.value" role="alert" class="form-error">
         {{ feedback.error.value }}
