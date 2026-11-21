@@ -236,7 +236,7 @@ async function startImport() {
       <!-- Progress during import -->
       <div v-if="isImporting" class="progress-section">
         <p>Importing {{ validRows.length }} records... ({{ progress }}%)</p>
-        <div class="progress-bar-track">
+        <div class="progress-bar-track" role="progressbar" aria-label="Import progress" :aria-valuenow="progress" :aria-valuemin="0" :aria-valuemax="100">
           <div class="progress-bar-fill" :style="{ width: `${progress}%` }" />
         </div>
       </div>
