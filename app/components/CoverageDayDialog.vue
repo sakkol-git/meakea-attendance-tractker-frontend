@@ -16,7 +16,7 @@ const emit = defineEmits<{ 'update:visible': [boolean] }>()
   <PDialog
     :visible="visible"
     modal
-    :header="day ? dateLabel(`${day.dateStr}T12:00:00Z`, 'EEEE, MMMM d') : 'Coverage details'"
+    :header="day ? dateLabel(`${day.dateStr}T12:00:00Z`, 'EEEE, MMMM d, yyyy') : 'Coverage details'"
     class="dialog-md"
     @update:visible="emit('update:visible', $event)"
   >
