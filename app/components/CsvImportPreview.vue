@@ -10,7 +10,16 @@ defineProps<{
 <template>
   <!-- Preview Section -->
   <div v-if="rows.length > 0" class="preview-section">
-    <div class="stats-pills">
+    <details v-if="invalidCount" class="form-review">
+      <summary>Review {{ invalidCount }} row issues</summary>
+      <ul>
+        <template v-for="(error, index) in rowErrors" :key="index"
+          ><li v-if="error">Data row {{ index + 1 }}: {{ error }}</li></template
+        >
+      </ul>
+      <p>Fix these rows in your CSV and choose the file again. Only valid rows will be imported.</p>
+    </details>
+    <div class="stats-pills" role="status">
       <span class="pill-total">Total: {{ rows.length }}</span>
       <span class="pill-valid">Valid: {{ validCount }}</span>
       <span v-if="invalidCount > 0" class="pill-invalid">Issues: {{ invalidCount }}</span>
