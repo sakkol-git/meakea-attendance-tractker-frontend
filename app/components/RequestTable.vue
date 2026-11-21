@@ -68,7 +68,7 @@ const target = (row: EntityRow) =>
     <PSelect v-model="status" :options="statuses" aria-label="Filter status"
       ><template #value>{{ status === 'All statuses' ? status : statusLabel(status) }}</template
       ><template #option="slotProps">{{ statusLabel(slotProps.option) }}</template></PSelect
-    ><span class="record-count"
+    ><span class="record-count" role="status"
       >{{ filtered.length }} {{ filtered.length === 1 ? 'record' : 'records'
       }}{{ serverPage ? ' on this page' : '' }}</span
     >
