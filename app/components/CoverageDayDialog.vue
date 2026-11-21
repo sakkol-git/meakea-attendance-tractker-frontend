@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CalendarDay } from '~/utils/calendar'
 import { coverageLabel } from '~/utils/calendar'
-import { dateLabel } from '~/utils/format'
+import { dateLabel, titleCase } from '~/utils/format'
 
 defineProps<{
   visible: boolean
@@ -26,7 +26,7 @@ const emit = defineEmits<{ 'update:visible': [boolean] }>()
       <ul v-if="day.absences.length" class="coverage-people-list">
         <li v-for="absence in day.absences" :key="absence.id">
           <strong>{{ absence.employeeName }}</strong>
-          <span>{{ absence.type }} · {{ absence.status }}</span>
+          <span>{{ absence.type }} · {{ titleCase(absence.status) }}</span>
         </li>
       </ul>
       <p v-else>No team members are recorded as off on this day.</p>
