@@ -110,9 +110,14 @@ async function issue() {
       </dl>
       <div class="field">
         <div v-if="materials.error.value" role="alert" class="field-error">
-      {{ failureMessage(materials.error.value) }}
-      <PButton label="Retry materials" text :loading="materials.isFetching.value" @click="materials.refetch()" />
-    </div>
+          {{ failureMessage(materials.error.value) }}
+          <PButton
+            label="Retry materials"
+            text
+            :loading="materials.isFetching.value"
+            @click="materials.refetch()"
+          />
+        </div>
         <label for="issue-material">Material</label>
         <PSelect
           input-id="issue-material"

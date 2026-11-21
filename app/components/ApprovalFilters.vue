@@ -16,7 +16,12 @@ const ageOptions = [
   <div class="table-toolbar approval-filters" role="group" aria-label="Approval filters">
     <div class="search-field">
       <AppIcon name="search" />
-      <PInputText v-model="search" type="search" placeholder="Search approvals…" aria-label="Search approvals" />
+      <PInputText
+        v-model="search"
+        type="search"
+        placeholder="Search approvals…"
+        aria-label="Search approvals"
+      />
     </div>
     <PSelect
       v-model="status"

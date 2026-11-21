@@ -156,7 +156,7 @@ test('mobile-aligned approvals, delegation and accessible coverage view', async 
   await expect(page.getByRole('combobox', { name: 'Demo role' })).toContainText('Manager')
   await page.getByRole('link', { name: 'Approvals', exact: false }).first().click()
 
-  await expect(page.getByRole('textbox', { name: 'Search approvals' })).toBeVisible()
+  await expect(page.getByRole('searchbox', { name: 'Search approvals' })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Filter waiting age' })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Sort approvals' })).toContainText('Oldest first')
   await page.screenshot({ path: 'test-results/aligned-approvals.png', fullPage: true })

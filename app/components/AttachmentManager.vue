@@ -150,7 +150,10 @@ async function downloadAttachment(item: AttachmentItem) {
     <div
       v-if="!readonly && (api.mode === 'local' || scope === 'request')"
       class="attachment-drop-target"
-      role="button" :tabindex="uploading ? -1 : 0" :aria-disabled="uploading" aria-label="Choose an attachment"
+      role="button"
+      :tabindex="uploading ? -1 : 0"
+      :aria-disabled="uploading"
+      aria-label="Choose an attachment"
       @keydown.enter.self.prevent="fileInput?.click()"
       @keydown.space.self.prevent="fileInput?.click()"
       :class="{ 'is-dragover': dragOver }"
@@ -160,7 +163,9 @@ async function downloadAttachment(item: AttachmentItem) {
       @click="fileInput?.click()"
     >
       <input
-        ref="fileInput" aria-label="Attachment file" @click.stop
+        ref="fileInput"
+        aria-label="Attachment file"
+        @click.stop
         type="file"
         class="hidden-file-input"
         accept=".pdf,.png,.jpg,.jpeg"
@@ -176,7 +181,9 @@ async function downloadAttachment(item: AttachmentItem) {
       {{ error }}
     </p>
 
-    <p v-if="!loading && !error && !uploading && !attachments.length" class="small-note">No attachments have been added.</p>
+    <p v-if="!loading && !error && !uploading && !attachments.length" class="small-note">
+      No attachments have been added.
+    </p>
     <!-- Attachments List -->
     <div v-if="attachments.length" class="attachment-list">
       <div v-for="item in attachments" :key="item.id" class="attachment-item">
@@ -201,6 +208,11 @@ async function downloadAttachment(item: AttachmentItem) {
 </template>
 
 <style scoped>
-.attachment-item-lead { min-width: 0; }
-.attachment-item-lead > div { min-width: 0; overflow-wrap: anywhere; }
+.attachment-item-lead {
+  min-width: 0;
+}
+.attachment-item-lead > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 </style>
