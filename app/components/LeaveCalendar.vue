@@ -169,6 +169,7 @@ function updateDayDialog(visible: boolean) {
         icon="pi pi-calendar"
         size="small"
         :outlined="view !== 'month'"
+        :aria-pressed="view === 'month'"
         @click="view = 'month'"
       />
       <PButton
@@ -176,6 +177,7 @@ function updateDayDialog(visible: boolean) {
         icon="pi pi-list"
         size="small"
         :outlined="view !== 'list'"
+        :aria-pressed="view === 'list'"
         @click="view = 'list'"
       />
     </div>
