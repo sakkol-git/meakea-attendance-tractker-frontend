@@ -86,6 +86,7 @@ const managerOptions = computed(() =>
       {{ failureMessage(departments.error.value) }}
       <PButton label="Retry departments" text :loading="departments.isFetching.value" @click="departments.refetch()" />
     </div>
+      <small v-if="departments.isSuccess.value && !departmentOptions.length">No departments are available. Add one in Organization.</small>
       <small id="error-department" class="field-error">{{ errors.departmentId }}</small>
     </div>
 
