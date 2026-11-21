@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 const props = defineProps<{
   visible: boolean
   recordId: string
@@ -108,12 +109,17 @@ async function issue() {
         </div>
       </dl>
       <div class="field">
+        <div v-if="materials.error.value" role="alert" class="field-error">
+      {{ failureMessage(materials.error.value) }}
+      <PButton label="Retry materials" text :loading="materials.isFetching.value" @click="materials.refetch()" />
+    </div>
         <label for="issue-material">Material</label>
         <PSelect
           input-id="issue-material"
           v-model="materialId"
           aria-label="Material"
           :options="materials.data.value?.items ?? []"
+          :loading="materials.isPending.value"
           option-label="name"
           option-value="id"
           filter
