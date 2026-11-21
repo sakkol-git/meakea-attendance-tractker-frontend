@@ -136,6 +136,8 @@ watch(
       id="schedule-timezone"
       v-model="values.timezone"
       placeholder="Asia/Phnom_Penh"
+      autocapitalize="none"
+      :spellcheck="false"
       :aria-invalid="!!errors.timezone" aria-describedby="schedule-error-timezone"
     />
     <small id="schedule-error-timezone" class="field-error">{{ errors.timezone }}</small>
