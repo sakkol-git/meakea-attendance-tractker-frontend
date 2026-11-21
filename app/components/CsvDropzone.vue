@@ -77,6 +77,7 @@ function triggerFileSelect() {
       aria-label="CSV file"
       @click.stop
       type="file"
+      hidden
       accept=".csv,text/csv"
       class="hidden-file-input"
       @change="onFileSelect"
@@ -98,6 +99,23 @@ function triggerFileSelect() {
 </template>
 
 <style scoped>
+.csv-dropzone {
+  padding: var(--space-4);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  cursor: pointer;
+}
+.csv-dropzone.dragging {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+.dropzone-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .dropzone-content {
   min-width: 0;
 }

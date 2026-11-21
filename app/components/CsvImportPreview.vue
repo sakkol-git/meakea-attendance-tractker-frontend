@@ -11,7 +11,7 @@ defineProps<{
   <!-- Preview Section -->
   <div v-if="rows.length > 0" class="preview-section">
     <details v-if="invalidCount" class="form-review">
-      <summary>Review {{ invalidCount }} row issues</summary>
+      <summary>Review {{ invalidCount }} row {{ invalidCount === 1 ? 'issue' : 'issues' }}</summary>
       <ul>
         <template v-for="(error, index) in rowErrors" :key="index"
           ><li v-if="error">Data row {{ index + 1 }}: {{ error }}</li></template
@@ -27,7 +27,7 @@ defineProps<{
 
     <div class="preview-table-wrapper" tabindex="0" role="region" aria-label="CSV preview">
       <table class="preview-table">
-        <caption class="sr-only">
+        <caption class="small-note">
           Preview: first five rows and first four columns of the selected CSV file
         </caption>
         <thead>
@@ -60,3 +60,46 @@ defineProps<{
     </div>
   </div>
 </template>
+
+<style scoped>
+.preview-section {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.stats-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.stats-pills span {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+}
+.pill-invalid {
+  color: var(--status-danger-text);
+}
+.preview-table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.preview-table caption {
+  text-align: left;
+  padding-bottom: var(--space-2);
+}
+.preview-table th,
+.preview-table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.table-more-hint {
+  margin-top: var(--space-2);
+}
+</style>

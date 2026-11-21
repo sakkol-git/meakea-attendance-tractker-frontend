@@ -167,8 +167,8 @@ async function startImport() {
     :close-on-escape="!isImporting"
     @update:visible="emit('update:visible', $event)"
   >
-    <div class="bulk-import-container">
-      <div class="template-bar">
+    <div class="bulk-import-container app-form">
+      <div class="template-bar section-heading">
         <div>
           <p class="template-lead">Upload a CSV file to import multiple {{ resource }} at once.</p>
           <small class="text-secondary">Save time by downloading our pre-formatted template.</small>
@@ -210,16 +210,12 @@ async function startImport() {
       <div v-if="isImporting" class="progress-section">
         <p>Importing {{ validRows.length }} records... ({{ progress }}%)</p>
         <p class="small-note">Keep this dialog open until the import finishes.</p>
-        <div
-          class="progress-bar-track"
-          role="progressbar"
+        <progress
+          class="import-progress"
+          :value="progress"
+          max="100"
           aria-label="Import progress"
-          :aria-valuenow="progress"
-          :aria-valuemin="0"
-          :aria-valuemax="100"
-        >
-          <div class="progress-bar-fill" :style="{ width: `${progress}%` }" />
-        </div>
+        />
       </div>
 
       <!-- Import result -->
@@ -234,7 +230,8 @@ async function startImport() {
           }}
         </h3>
         <p v-if="invalidCount">
-          {{ invalidCount }} rows were skipped because they have validation issues.
+          {{ invalidCount }} {{ invalidCount === 1 ? 'row was' : 'rows were' }} skipped because of
+          validation issues.
         </p>
         <p>
           Successfully created <strong>{{ importResult.success }}</strong> {{ resource }}.
@@ -268,3 +265,14 @@ async function startImport() {
     </template>
   </PDialog>
 </template>
+
+<style scoped>
+.template-bar {
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.import-progress {
+  width: 100%;
+  accent-color: var(--teal);
+}
+</style>

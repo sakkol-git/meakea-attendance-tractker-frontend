@@ -47,7 +47,13 @@ const rows = computed(() =>
       title="Your people belong here"
       @retry="result.refetch()"
       ><div class="table-region" role="region" aria-label="People directory" tabindex="0">
-        <PDataTable :value="rows" paginator :rows="10" data-key="id" class="table-people"
+        <PDataTable
+          :table-style="{ minWidth: '52rem' }"
+          :value="rows"
+          paginator
+          :rows="10"
+          data-key="id"
+          class="table-people"
           ><PColumn header="Person"
             ><template #body="{ data }"
               ><NuxtLink :to="`/people/${data.id}`" class="person-cell"

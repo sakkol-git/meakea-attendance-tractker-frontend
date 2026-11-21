@@ -167,6 +167,7 @@ async function downloadAttachment(item: AttachmentItem) {
         aria-label="Attachment file"
         @click.stop
         type="file"
+        hidden
         class="hidden-file-input"
         accept=".pdf,.png,.jpg,.jpeg"
         :disabled="uploading"

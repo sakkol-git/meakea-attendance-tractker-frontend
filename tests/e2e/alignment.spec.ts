@@ -311,3 +311,49 @@ test('calendar view selection and profile disclosure expose their state', async 
   await expect(list).toHaveAttribute('aria-pressed', 'true')
   await expect(month).toHaveAttribute('aria-pressed', 'false')
 })
+
+test('CSV preview exposes offscreen row issues and reports skipped rows', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'HR administrator', exact: true }).click()
+  await page.getByRole('link', { name: 'People', exact: true }).click()
+  await page.getByRole('button', { name: 'Bulk import', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  const csv = [
+    'name,email',
+    ...Array.from({ length: 5 }, (_, i) => `Preview Person ${i},preview${i}@example.test`),
+    'Invalid Sixth Person,invalid-email',
+  ].join('\n')
+  await dialog
+    .getByLabel('CSV file', { exact: true })
+    .setInputFiles({ name: 'preview.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) })
+  await expect(dialog.getByRole('table')).toHaveAccessibleName(
+    'Preview: first five rows and first four columns of the selected CSV file',
+  )
+  await dialog.getByText('Review 1 row issue', { exact: true }).click()
+  await expect(
+    dialog.getByText('Data row 6: Valid email is required', { exact: true }),
+  ).toBeVisible()
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 })
+    for (const theme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme: theme })
+      await expect(dialog).toBeVisible()
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      )
+      await page.screenshot({
+        path: `test-results/final-import-${width}-${theme}.png`,
+        fullPage: true,
+      })
+    }
+  }
+  await dialog.getByRole('button', { name: 'Import 5 employees', exact: true }).click()
+  await expect(
+    dialog.getByRole('heading', { name: 'Import finished with issues', exact: true }),
+  ).toBeVisible()
+  await expect(
+    dialog.getByText('1 row was skipped because of validation issues.', { exact: true }),
+  ).toBeVisible()
+  await expect(dialog.getByText('Successfully created', { exact: false })).toContainText('5')
+})

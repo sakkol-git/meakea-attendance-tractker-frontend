@@ -30,6 +30,14 @@ Use this runbook for a repeatable client review before connecting a live backend
 - Simulate an unavailable delegation reviewer list, retry in place, and preserve the dates and reason. A failed cancellation must show feedback on the list.
 - Navigate the attendance session list, CSV preview and chart legend with the keyboard. Confirm visible focus and meaningful status announcements.
 
+## Final UX batch acceptance
+
+- Change notification preferences and confirm the unsaved state is visible. During save, editing is unavailable; a failed save retains your choices. Expand and cancel profile editing with the keyboard.
+- Switch the team calendar between Month and Accessible list. Confirm the selected view is exposed, dates include the year, and a failed department lookup offers Retry.
+- Import a CSV with six data rows, including an invalid sixth row. The preview identifies its five-row/four-column limit; expand row issues to find the sixth-row error. Only valid rows are imported, and the result separately reports skipped rows and server failures. Correct the source file before selecting it again; avoid re-importing records already created.
+- Read chart category counts alongside percentages, page ranges, long reference names and multiline reasons. Check narrow screens and keyboard focus in both appearances.
+- These are manual acceptance steps. Automated demo and mock-provider coverage does not establish deployed business acceptance.
+
 ## Role journeys
 
 | Role     | Scenario                                                                                                     | Expected result                                                                                                                   |
