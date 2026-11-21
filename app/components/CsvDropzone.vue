@@ -91,7 +91,7 @@ function triggerFileSelect() {
       </div>
       <div v-else>
         <strong>Choose a CSV file or drag & drop it here</strong>
-        <p>Standard comma-separated format up to 5MB</p>
+        <p>Comma-separated CSV with a header row</p>
       </div>
     </div>
   </div>
