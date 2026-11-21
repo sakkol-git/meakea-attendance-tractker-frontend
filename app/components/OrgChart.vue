@@ -110,6 +110,7 @@ function matchesSearch(node: OrgNode): boolean {
 
               <div v-if="rootNode.children.length" class="org-node-actions">
                 <PButton
+                  :aria-expanded="!rootNode.collapsed"
                   :icon="rootNode.collapsed ? 'pi pi-plus' : 'pi pi-minus'"
                   :label="`${rootNode.children.length} report${rootNode.children.length > 1 ? 's' : ''}`"
                   size="small"
