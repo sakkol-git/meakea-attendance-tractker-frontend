@@ -70,7 +70,7 @@ function triggerFileSelect() {
     @dragover="onDragOver"
     @dragleave="onDragLeave"
     @drop="onDrop"
-    @click="triggerFileSelect"
+    @click.self="triggerFileSelect"
   >
     <input
       ref="fileInput"
@@ -81,7 +81,7 @@ function triggerFileSelect() {
       class="hidden-file-input"
       @change="onFileSelect"
     />
-    <div class="dropzone-content">
+    <div class="dropzone-content" @click.stop="triggerFileSelect">
       <span class="dropzone-icon">
         <AppIcon name="upload" />
       </span>
