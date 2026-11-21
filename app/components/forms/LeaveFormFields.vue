@@ -54,6 +54,7 @@ const workingDaysBreakdown = computed(() =>
     }}</small>
     <PButton
       v-if="types.error.value"
+      type="button"
       label="Retry leave types"
       text
       :loading="types.isFetching.value"

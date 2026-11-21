@@ -247,6 +247,8 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
   ])
   let signedIn = false
   let rejectPreview = false
+  let rejectTypes = false
+  let typeReads = 0
   const submitted: unknown[] = []
   await page.route('**/api/v1/**', async (route) => {
     const request = route.request()
@@ -286,7 +288,9 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
         total: 26,
       })
     }
-    if (path === '/leave/types')
+    if (path === '/leave/types') {
+      typeReads++
+      if (rejectTypes) return reply(503, { detail: 'Leave types are temporarily unavailable.' })
       return reply(200, {
         items: [
           {
@@ -303,6 +307,7 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
         size: 100,
         total: 1,
       })
+    }
     if (path === '/leave/requests/preview')
       return rejectPreview
         ? reply(503, { detail: 'Assigned calendar is not available.' })
@@ -335,7 +340,18 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
     .getByRole('button', { name: 'Next', exact: true })
     .click()
   await expect(page.getByRole('link', { name: /^My request 26/ })).toBeVisible()
+  rejectTypes = true
   await page.getByRole('button', { name: 'Request leave', exact: true }).first().click()
+  await expect(page.getByRole('alert')).toContainText('Leave types are temporarily unavailable.')
+  await page.getByRole('button', { name: 'Retry leave types', exact: true }).click()
+  await expect.poll(() => typeReads).toBe(2)
+  await expect(
+    page.getByText('Check the highlighted fields before continuing. Your entries are still here.'),
+  ).toHaveCount(0)
+  expect(submitted).toHaveLength(0)
+  rejectTypes = false
+  await page.getByRole('button', { name: 'Retry leave types', exact: true }).click()
+  await expect(page.getByRole('combobox', { name: 'Leave type', exact: true })).toBeEnabled()
   await page.getByRole('combobox', { name: 'Leave type', exact: true }).click()
   await page.getByRole('option', { name: 'Owner unpaid leave', exact: true }).click()
   await page.getByLabel('From', { exact: true }).fill('2026-11-02')
