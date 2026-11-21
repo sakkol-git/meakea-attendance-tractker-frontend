@@ -36,3 +36,11 @@ const emit = defineEmits<{ 'update:visible': [boolean] }>()
     </p>
   </PDialog>
 </template>
+
+<style scoped>
+.coverage-people-list li {
+  min-width: 0;
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+</style>
