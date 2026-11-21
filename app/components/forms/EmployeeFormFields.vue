@@ -111,16 +111,21 @@ const managerOptions = computed(() =>
     </div>
   </div>
 
-  <div v-if="managerOptions.length" class="field">
+  <div v-if="managerOptions.length || employees.isPending.value || employees.error.value" class="field">
     <label for="form-manager">Reporting manager</label>
     <PSelect
       input-id="form-manager"
       aria-label="Reporting manager"
       v-model="values.managerId"
       :options="managerOptions"
+      :loading="employees.isPending.value"
       option-label="name"
       option-value="id"
       placeholder="Select a manager (optional)"
     />
+    <div v-if="employees.error.value" role="alert" class="field-error">
+      {{ failureMessage(employees.error.value) }}
+      <PButton label="Retry managers" text :loading="employees.isFetching.value" @click="employees.refetch()" />
+    </div>
   </div>
 </template>
