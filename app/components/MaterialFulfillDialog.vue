@@ -142,8 +142,12 @@ async function issue() {
           type="number"
           min="1"
           :max="maxQuantity"
+          aria-describedby="issue-quantity-help"
           required
         />
+        <small id="issue-quantity-help">
+          Use a whole number, up to the remaining request quantity and available stock.
+        </small>
       </div>
       <div class="field">
         <label for="issue-reason">Issue reason</label>
