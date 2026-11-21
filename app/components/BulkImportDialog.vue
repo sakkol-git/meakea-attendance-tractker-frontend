@@ -209,6 +209,7 @@ async function startImport() {
       <!-- Progress during import -->
       <div v-if="isImporting" class="progress-section">
         <p>Importing {{ validRows.length }} records... ({{ progress }}%)</p>
+        <p class="small-note">Keep this dialog open until the import finishes.</p>
         <div
           class="progress-bar-track"
           role="progressbar"
