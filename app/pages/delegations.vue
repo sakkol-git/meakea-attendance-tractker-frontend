@@ -96,7 +96,9 @@ function cancel(id: string, version: number, delegateName: string) {
     <PButton label="New delegation" icon="pi pi-plus" @click="openForm" />
   </PageHeading>
 
-  <p v-if="!visible && feedback.error.value" class="form-error" role="alert">{{ feedback.error.value }}</p>
+  <p v-if="!visible && feedback.error.value" class="form-error" role="alert">
+    {{ feedback.error.value }}
+  </p>
   <QueryState
     :pending="delegations.isPending.value"
     :error="delegations.error.value"
@@ -143,12 +145,24 @@ function cancel(id: string, version: number, delegateName: string) {
     :close-on-escape="false"
     @update:visible="updateVisible"
   >
-    <form :inert="feedback.busy.value" :aria-busy="feedback.busy.value" class="app-form" @input="dirty = true" @change="dirty = true" @submit.prevent="save">
+    <form
+      :inert="feedback.busy.value"
+      :aria-busy="feedback.busy.value"
+      class="app-form"
+      @input="dirty = true"
+      @change="dirty = true"
+      @submit.prevent="save"
+    >
       <div class="field">
         <div v-if="candidates.error.value" role="alert" class="field-error">
-      {{ failureMessage(candidates.error.value) }}
-      <PButton label="Retry reviewers" text :loading="candidates.isFetching.value" @click="candidates.refetch()" />
-    </div>
+          {{ failureMessage(candidates.error.value) }}
+          <PButton
+            label="Retry reviewers"
+            text
+            :loading="candidates.isFetching.value"
+            @click="candidates.refetch()"
+          />
+        </div>
         <label for="delegate-reviewer">Reviewer · Required</label>
         <PSelect
           input-id="delegate-reviewer"

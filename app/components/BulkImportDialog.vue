@@ -89,6 +89,10 @@ function validateRow(row: Record<string, string>): string {
 }
 
 function loadFile(f: File) {
+  if (isImporting.value) return
+  parsedHeaders.value = []
+  parsedRows.value = []
+  rowErrors.value = []
   file.value = f
   fileName.value = f.name
   globalError.value = null
@@ -96,6 +100,7 @@ function loadFile(f: File) {
 
   const reader = new FileReader()
   reader.onload = (e) => {
+    if (file.value !== f) return
     try {
       const text = String(e.target?.result || '')
       const { headers, rows } = parseCsv(text)
@@ -111,13 +116,14 @@ function loadFile(f: File) {
     }
   }
   reader.onerror = () => {
+    if (file.value !== f) return
     globalError.value = 'Error reading the file.'
   }
   reader.readAsText(f)
 }
 
 async function startImport() {
-  if (validRows.value.length === 0) return
+  if (isImporting.value || validRows.value.length === 0) return
   isImporting.value = true
   progress.value = 0
   let successCount = 0
@@ -201,7 +207,9 @@ async function startImport() {
 
         <div class="preview-table-wrapper" tabindex="0" role="region" aria-label="CSV preview">
           <table class="preview-table">
-            <caption class="sr-only">First five rows of the selected CSV file</caption>
+            <caption class="sr-only">
+              First five rows of the selected CSV file
+            </caption>
             <thead>
               <tr>
                 <th scope="col" class="col-index">#</th>
@@ -237,7 +245,14 @@ async function startImport() {
       <!-- Progress during import -->
       <div v-if="isImporting" class="progress-section">
         <p>Importing {{ validRows.length }} records... ({{ progress }}%)</p>
-        <div class="progress-bar-track" role="progressbar" aria-label="Import progress" :aria-valuenow="progress" :aria-valuemin="0" :aria-valuemax="100">
+        <div
+          class="progress-bar-track"
+          role="progressbar"
+          aria-label="Import progress"
+          :aria-valuenow="progress"
+          :aria-valuemin="0"
+          :aria-valuemax="100"
+        >
           <div class="progress-bar-fill" :style="{ width: `${progress}%` }" />
         </div>
       </div>

@@ -261,3 +261,32 @@ test('secondary pages have accurate workspace breadcrumbs', async ({ page }) => 
     await expect(page.locator('.breadcrumb strong')).toHaveText(label!)
   }
 })
+
+test('CSV keyboard replacement cannot import rows from the previous file', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'HR administrator', exact: true }).click()
+  await page.getByRole('link', { name: 'People', exact: true }).click()
+  await page.getByRole('button', { name: 'Bulk import', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  const chooser = page.waitForEvent('filechooser')
+  await dialog.getByRole('button', { name: 'Choose a CSV file', exact: true }).focus()
+  await page.keyboard.press('Enter')
+  await (
+    await chooser
+  ).setFiles({
+    name: 'people.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from('name,email\nSample Person,sample@example.test\n'),
+  })
+  await expect(
+    dialog.getByRole('button', { name: 'Import 1 employees', exact: true }),
+  ).toBeEnabled()
+  await dialog
+    .getByLabel('CSV file', { exact: true })
+    .setInputFiles({ name: 'empty.csv', mimeType: 'text/csv', buffer: Buffer.from('name,email\n') })
+  await expect(dialog.getByRole('alert')).toContainText('empty or missing data rows')
+  await expect(
+    dialog.getByRole('button', { name: 'Import 0 employees', exact: true }),
+  ).toBeDisabled()
+})

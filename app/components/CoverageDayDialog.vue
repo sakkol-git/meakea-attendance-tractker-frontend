@@ -31,6 +31,8 @@ const emit = defineEmits<{ 'update:visible': [boolean] }>()
       </ul>
       <p v-else>No team members are recorded as off on this day.</p>
     </template>
-    <p v-else role="status">No day is selected. Close this dialog and select a day in the calendar.</p>
+    <p v-else role="status">
+      No day is selected. Close this dialog and select a day in the calendar.
+    </p>
   </PDialog>
 </template>

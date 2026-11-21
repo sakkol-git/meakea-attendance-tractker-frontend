@@ -23,6 +23,13 @@ Use this runbook for a repeatable client review before connecting a live backend
 - Review empty catalogs and the available recovery guidance. Check schedule field errors with keyboard and assistive technology.
 - Verify the workspace header on Your updates, My profile, Settings, Approval delegation and the access restriction page.
 
+## Import and delegation recovery
+
+- Replace a populated CSV with an empty file. The old rows must disappear and Import must be disabled. Select files using Enter and Space, including choosing the same file again.
+- While import is running, confirm the selected file and dialog remain stable. Read progress and completion with assistive technology.
+- Simulate an unavailable delegation reviewer list, retry in place, and preserve the dates and reason. A failed cancellation must show feedback on the list.
+- Navigate the attendance session list, CSV preview and chart legend with the keyboard. Confirm visible focus and meaningful status announcements.
+
 ## Role journeys
 
 | Role     | Scenario                                                                                                     | Expected result                                                                                                                   |

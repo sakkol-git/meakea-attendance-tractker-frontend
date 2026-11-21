@@ -90,7 +90,8 @@ const activeValue = computed(() => {
       <div
         v-for="seg in segments"
         :key="seg.label"
-        class="legend-item" tabindex="0"
+        class="legend-item"
+        tabindex="0"
         :aria-label="`${seg.label}: ${seg.value}${unit ? ' ' + unit : ''}, ${seg.percentage}%`"
         @focus="hoveredSegment = seg"
         @blur="hoveredSegment = null"

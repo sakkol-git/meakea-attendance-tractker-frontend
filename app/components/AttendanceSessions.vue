@@ -32,7 +32,9 @@ watch(
         </div>
       </dl>
     </article>
-    <p v-if="rows.length > 8" class="small-note" role="status">Showing {{ Math.min(limit, rows.length) }} of {{ rows.length }} sessions</p>
+    <p v-if="rows.length > 8" class="small-note" role="status">
+      Showing {{ Math.min(limit, rows.length) }} of {{ rows.length }} sessions
+    </p>
     <PButton v-if="rows.length > limit" label="Show more sessions" outlined @click="limit += 8" />
   </div>
   <div class="attendance-session-table">
