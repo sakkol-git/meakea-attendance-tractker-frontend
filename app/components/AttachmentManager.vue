@@ -181,7 +181,11 @@ async function downloadAttachment(item: AttachmentItem) {
       {{ error }}
     </p>
 
-    <p v-if="!loading && !error && !uploading && !attachments.length" class="small-note">
+    <p
+      v-if="!loading && !error && !uploading && !attachments.length"
+      class="small-note"
+      role="status"
+    >
       No attachments have been added.
     </p>
     <!-- Attachments List -->
