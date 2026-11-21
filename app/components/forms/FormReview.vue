@@ -64,6 +64,7 @@ const rows = computed(() => {
       'Times',
       `${value.fromTime || 'Choose start time'} → ${value.toTime || 'Choose end time'}`,
     ])
+  rows.push(['Reason', String(value.reason || 'Enter a reason')])
   return rows
 })
 </script>
