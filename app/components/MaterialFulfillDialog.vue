@@ -69,11 +69,13 @@ async function issue() {
     :visible="visible"
     modal
     header="Record material fulfillment"
+    :closable="!feedback.busy.value"
+    :close-on-escape="!feedback.busy.value"
     class="dialog-md"
     :breakpoints="{ '640px': '95vw' }"
     @update:visible="emit('update:visible', $event)"
   >
-    <form class="app-form" @submit.prevent="issue">
+    <form class="app-form" :aria-busy="feedback.busy.value" @submit.prevent="issue">
       <p class="small-note">
         Issued quantities reduce available stock. A partial issue keeps the request approved until
         the full quantity is fulfilled.
