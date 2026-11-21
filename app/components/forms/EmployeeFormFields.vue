@@ -96,12 +96,17 @@ const managerOptions = computed(() =>
         aria-label="Position"
         v-model="values.positionId"
         :options="positionOptions"
+        :loading="positions.isPending.value"
         option-label="name"
         option-value="id"
         placeholder="Choose a position"
         :aria-invalid="!!errors.positionId"
         aria-describedby="error-position"
       />
+      <div v-if="positions.error.value" role="alert" class="field-error">
+      {{ failureMessage(positions.error.value) }}
+      <PButton label="Retry positions" text :loading="positions.isFetching.value" @click="positions.refetch()" />
+    </div>
       <small id="error-position" class="field-error">{{ errors.positionId }}</small>
     </div>
   </div>
