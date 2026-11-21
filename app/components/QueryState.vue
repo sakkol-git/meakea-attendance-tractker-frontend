@@ -20,7 +20,7 @@ defineEmits<{ retry: [] }>()
     <span class="state-icon"><AppIcon name="exclamation-circle" /></span>
     <h2>We couldn’t load this</h2>
     <p>{{ failureMessage(error) }}</p>
-    <PButton label="Try again" icon="pi pi-refresh" outlined @click="$emit('retry')" />
+    <PButton type="button" label="Try again" icon="pi pi-refresh" outlined @click="$emit('retry')" />
   </div>
   <div v-else-if="empty" class="empty-state">
     <span class="state-icon"><AppIcon name="inbox" /></span>
