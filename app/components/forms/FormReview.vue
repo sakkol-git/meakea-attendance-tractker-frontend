@@ -71,7 +71,16 @@ const rows = computed(() => {
 <template>
   <details class="form-review">
     <summary>Review details</summary>
-    <div role="region" aria-label="Request review">
+    <div
+      role="region"
+      :aria-label="
+        kind === 'leave'
+          ? 'Leave request review'
+          : kind === 'correction'
+            ? 'Attendance correction review'
+            : 'Request review'
+      "
+    >
       <dl class="detail-list">
         <div v-for="[label, value] in rows" :key="label">
           <dt>{{ label }}</dt>
