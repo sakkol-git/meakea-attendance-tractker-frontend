@@ -56,10 +56,11 @@ function submit() {
           id="decision-reason"
           v-model="reason"
           rows="4"
+          :disabled="loading"
           :aria-invalid="!!reasonError"
           aria-describedby="decision-error"
         />
-        <small id="decision-error" class="field-error">{{ reasonError }}</small>
+        <small id="decision-error" class="field-error" aria-live="polite">{{ reasonError }}</small>
       </div>
       <div class="dialog-actions">
         <PButton
