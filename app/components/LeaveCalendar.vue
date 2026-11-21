@@ -205,7 +205,7 @@ function updateDayDialog(visible: boolean) {
             'is-weekend': cell.isWeekend,
             'coverage-low': isCoverageLow(cell, teamSize, coverageThreshold),
           }"
-          :aria-label="`${dateLabel(`${cell.dateStr}T12:00:00Z`, 'MMMM d')}, ${coverageLabel(cell, teamSize, coverageThreshold)}`"
+          :aria-label="`${dateLabel(`${cell.dateStr}T12:00:00Z`, 'MMMM d, yyyy')}, ${coverageLabel(cell, teamSize, coverageThreshold)}`"
           @click="selectedDay = cell"
         >
           <div class="calendar-cell-top">
@@ -239,7 +239,7 @@ function updateDayDialog(visible: boolean) {
     <ul v-else class="coverage-day-list">
       <li v-for="cell in currentMonthDays" :key="cell.dateStr">
         <button type="button" @click="selectedDay = cell">
-          <strong>{{ dateLabel(`${cell.dateStr}T12:00:00Z`, 'EEEE, MMMM d') }}</strong>
+          <strong>{{ dateLabel(`${cell.dateStr}T12:00:00Z`, 'EEEE, MMMM d, yyyy') }}</strong>
           <span>{{ coverageLabel(cell, teamSize, coverageThreshold) }}</span>
         </button>
       </li>
