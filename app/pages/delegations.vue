@@ -96,6 +96,7 @@ function cancel(id: string, version: number, delegateName: string) {
     <PButton label="New delegation" icon="pi pi-plus" @click="openForm" />
   </PageHeading>
 
+  <p v-if="!visible && feedback.error.value" class="form-error" role="alert">{{ feedback.error.value }}</p>
   <QueryState
     :pending="delegations.isPending.value"
     :error="delegations.error.value"
