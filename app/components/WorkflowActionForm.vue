@@ -66,6 +66,7 @@ function submit() {
           ><PSelect
             v-if="field.key.endsWith('Id')"
             :input-id="`wf-${field.key}`"
+            :aria-describedby="field.help ? `wf-help-${field.key}` : undefined"
             v-model="values[field.key]"
             :aria-label="field.label"
             :options="referenceOptions(field.key)"
@@ -79,6 +80,7 @@ function submit() {
             v-else-if="field.type === 'select'"
             v-model="values[field.key]"
             :input-id="`wf-${field.key}`"
+            :aria-describedby="field.help ? `wf-help-${field.key}` : undefined"
             :aria-label="field.label"
             :options="field.options"
             :disabled="busy"
@@ -86,6 +88,7 @@ function submit() {
           /><PTextarea
             v-else-if="field.type === 'textarea'"
             :id="`wf-${field.key}`"
+            :aria-describedby="field.help ? `wf-help-${field.key}` : undefined"
             v-model="values[field.key]"
             :required="field.required"
             :disabled="busy"
@@ -94,6 +97,7 @@ function submit() {
           /><input
             v-else
             :id="`wf-${field.key}`"
+            :aria-describedby="field.help ? `wf-help-${field.key}` : undefined"
             v-model="values[field.key]"
             :type="field.type"
             :required="field.required"
@@ -107,7 +111,7 @@ function submit() {
               field.type === 'number' &&
               (values[field.key] = Number(($event.target as HTMLInputElement).value))
             "
-          /><small v-if="field.help">{{ field.help }}</small></template
+          /><small v-if="field.help" :id="`wf-help-${field.key}`">{{ field.help }}</small></template
         >
       </div>
     </div>
