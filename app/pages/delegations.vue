@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { failureMessage } from '~/utils/failure'
 import { useConfirm } from 'primevue/useconfirm'
 
 definePageMeta({ roles: ['MANAGER', 'HR_ADMIN', 'OWNER'] })
@@ -142,11 +143,16 @@ function cancel(id: string, version: number, delegateName: string) {
   >
     <form class="app-form" @input="dirty = true" @change="dirty = true" @submit.prevent="save">
       <div class="field">
+        <div v-if="candidates.error.value" role="alert" class="field-error">
+      {{ failureMessage(candidates.error.value) }}
+      <PButton label="Retry reviewers" text :loading="candidates.isFetching.value" @click="candidates.refetch()" />
+    </div>
         <label for="delegate-reviewer">Reviewer · Required</label>
         <PSelect
           input-id="delegate-reviewer"
           v-model="delegateId"
           :options="candidates.data.value?.items ?? []"
+          :loading="candidates.isPending.value"
           option-label="name"
           option-value="id"
           aria-label="Reviewer"
