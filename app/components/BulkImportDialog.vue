@@ -199,7 +199,7 @@ async function startImport() {
           <span v-if="invalidCount > 0" class="pill-invalid">Issues: {{ invalidCount }}</span>
         </div>
 
-        <div class="preview-table-wrapper">
+        <div class="preview-table-wrapper" tabindex="0" role="region" aria-label="CSV preview">
           <table class="preview-table">
             <caption class="sr-only">First five rows of the selected CSV file</caption>
             <thead>
