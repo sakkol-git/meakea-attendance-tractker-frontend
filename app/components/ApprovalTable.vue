@@ -77,5 +77,6 @@ const target = (row: EntityRow, index: number) => {
         </NuxtLink>
       </template>
     </PColumn>
+    <template #empty><p role="status">No approvals match the current filters.</p></template>
   </PDataTable>
 </template>
