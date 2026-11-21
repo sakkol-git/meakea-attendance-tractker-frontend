@@ -197,50 +197,14 @@ async function startImport() {
         @file-rejected="(msg) => (globalError = msg)"
       />
 
-      <!-- Preview Section -->
-      <div v-if="parsedRows.length > 0 && !importResult" class="preview-section">
-        <div class="stats-pills">
-          <span class="pill-total">Total: {{ parsedRows.length }}</span>
-          <span class="pill-valid">Valid: {{ validRows.length }}</span>
-          <span v-if="invalidCount > 0" class="pill-invalid">Issues: {{ invalidCount }}</span>
-        </div>
-
-        <div class="preview-table-wrapper" tabindex="0" role="region" aria-label="CSV preview">
-          <table class="preview-table">
-            <caption class="sr-only">
-              First five rows of the selected CSV file
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col" class="col-index">#</th>
-                <th scope="col" v-for="h in parsedHeaders.slice(0, 4)" :key="h">{{ h }}</th>
-                <th scope="col">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(row, idx) in parsedRows.slice(0, 5)"
-                :key="idx"
-                :class="{ 'row-issue': Boolean(rowErrors[idx]) }"
-              >
-                <td>{{ idx + 1 }}</td>
-                <td v-for="h in parsedHeaders.slice(0, 4)" :key="h">
-                  {{ row[h] || '—' }}
-                </td>
-                <td>
-                  <span v-if="rowErrors[idx]" class="status-pill issue">
-                    {{ rowErrors[idx] }}
-                  </span>
-                  <span v-else class="status-pill ok">Valid</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <p v-if="parsedRows.length > 5" class="table-more-hint">
-            ...and {{ parsedRows.length - 5 }} more rows
-          </p>
-        </div>
-      </div>
+      <CsvImportPreview
+        v-if="!importResult"
+        :rows="parsedRows"
+        :headers="parsedHeaders"
+        :row-errors="rowErrors"
+        :valid-count="validRows.length"
+        :invalid-count="invalidCount"
+      />
 
       <!-- Progress during import -->
       <div v-if="isImporting" class="progress-section">
