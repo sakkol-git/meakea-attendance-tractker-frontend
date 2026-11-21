@@ -11,7 +11,15 @@ watch(
 )
 </script>
 <template>
-  <div class="attendance-session-cards" role="region" aria-label="Attendance sessions">
+  <p v-if="!rows.length" class="small-note" role="status">
+    No attendance sessions are recorded for this selection.
+  </p>
+  <div
+    v-if="rows.length"
+    class="attendance-session-cards"
+    role="region"
+    aria-label="Attendance sessions"
+  >
     <article v-for="row in rows.slice(0, limit)" :key="row.id" class="attendance-session-card">
       <header>
         <strong>{{ dateLabel(tenantDay(row.clockIn, timeZone)) }}</strong
@@ -37,7 +45,7 @@ watch(
     </p>
     <PButton v-if="rows.length > limit" label="Show more sessions" outlined @click="limit += 8" />
   </div>
-  <div class="attendance-session-table">
+  <div v-if="rows.length" class="attendance-session-table">
     <PDataTable
       :value="rows"
       :paginator="rows.length > 8"
