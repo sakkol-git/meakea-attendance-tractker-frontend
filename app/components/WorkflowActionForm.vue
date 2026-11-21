@@ -112,7 +112,8 @@ function submit() {
               field.type === 'number' &&
               (values[field.key] = Number(($event.target as HTMLInputElement).value))
             "
-          /><small v-if="field.help" :id="`wf-help-${field.key}`">{{ field.help }}</small></template
+          /><small v-if="field.key.endsWith('Id') && !referenceOptions(field.key).length">No matching records are available for this field.</small>
+          <small v-if="field.help" :id="`wf-help-${field.key}`">{{ field.help }}</small></template
         >
       </div>
     </div>
