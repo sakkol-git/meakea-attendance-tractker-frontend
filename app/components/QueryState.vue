@@ -36,3 +36,10 @@ defineEmits<{ retry: [] }>()
   </div>
   <slot v-else />
 </template>
+
+<style scoped>
+.empty-state p {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+</style>
