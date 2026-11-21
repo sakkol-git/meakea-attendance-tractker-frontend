@@ -95,7 +95,7 @@ const target = (row: EntityRow) =>
             ><strong>{{ data.title || data.type || 'Attendance issue' }}</strong
             ><small>{{
               kind === 'leave'
-                ? `${dateLabel(data.startDate, 'MMM d')} – ${dateLabel(data.endDate, 'MMM d')}`
+                ? `${dateLabel(data.startDate, 'MMM d, yyyy')} – ${dateLabel(data.endDate, 'MMM d, yyyy')}`
                 : data.reason
             }}</small></span
           ></NuxtLink
