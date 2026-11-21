@@ -35,6 +35,8 @@ const managerOptions = computed(() =>
       id="form-email"
       v-model="values.email"
       type="email"
+      autocapitalize="none"
+      :spellcheck="false"
       :aria-invalid="!!errors.email"
       aria-describedby="error-email"
     />
