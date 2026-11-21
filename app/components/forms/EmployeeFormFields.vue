@@ -108,6 +108,7 @@ const managerOptions = computed(() =>
       {{ failureMessage(positions.error.value) }}
       <PButton label="Retry positions" text :loading="positions.isFetching.value" @click="positions.refetch()" />
     </div>
+      <small v-if="positions.isSuccess.value && !positionOptions.length">No positions are available. Add one in Organization.</small>
       <small id="error-position" class="field-error">{{ errors.positionId }}</small>
     </div>
   </div>
