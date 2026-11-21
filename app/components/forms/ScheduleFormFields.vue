@@ -78,6 +78,7 @@ watch(
       {{ failureMessage(sites.error.value) }}
       <PButton label="Retry work sites" text :loading="sites.isFetching.value" @click="sites.refetch()" />
     </div>
+      <small v-if="sites.isSuccess.value && !sites.data.value?.items.length">No work sites are available. Add a work site before assigning a shift.</small>
       <small id="schedule-error-siteId" class="field-error">{{ errors.siteId }}</small>
     </div>
     <div class="form-grid">
