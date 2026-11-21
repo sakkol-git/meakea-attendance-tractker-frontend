@@ -86,3 +86,13 @@ const hasContext = computed(() => Object.keys(context.value).length > 0)
     </div>
   </section>
 </template>
+
+<style scoped>
+.review-context {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.activity-item > div {
+  min-width: 0;
+}
+</style>
