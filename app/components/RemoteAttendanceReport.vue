@@ -46,13 +46,13 @@ const time = (value: string | null, zone: string | null) =>
           </caption>
           <thead>
             <tr>
-              <th>Employee ID</th>
-              <th>Work date</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
-              <th>Time zone</th>
-              <th>Status</th>
-              <th>Worked minutes</th>
+              <th scope="col">Employee ID</th>
+              <th scope="col">Work date</th>
+              <th scope="col">Check-in</th>
+              <th scope="col">Check-out</th>
+              <th scope="col">Time zone</th>
+              <th scope="col">Status</th>
+              <th scope="col">Worked minutes</th>
             </tr>
           </thead>
           <tbody>
