@@ -10,6 +10,7 @@ const action = ref('')
 const target = ref('')
 const from = ref('')
 const to = ref('')
+const invalidRange = computed(() => Boolean(from.value && to.value && to.value < from.value))
 const query = computed(() => ({
   page: page.value,
   size,
@@ -87,11 +88,22 @@ function auditTime(value: string) {
       </label>
       <label>
         <span>To</span>
-        <input v-model="to" class="p-inputtext" type="date" />
+        <input
+          v-model="to"
+          class="p-inputtext"
+          type="date"
+          :min="from || undefined"
+          :aria-invalid="invalidRange"
+          aria-describedby="audit-date-error"
+        />
       </label>
     </form>
+    <p v-if="invalidRange" id="audit-date-error" class="form-error" role="alert">
+      To date must be on or after From date.
+    </p>
 
     <QueryState
+      v-if="!invalidRange"
       :pending="result.isPending.value"
       :error="result.error.value"
       :empty="!result.data.value?.items.length"
