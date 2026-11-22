@@ -63,6 +63,9 @@ function auditTime(value: string) {
   </p>
 
   <section class="panel no-padding">
+    <p class="audit-timezone small-note">
+      Activity times are shown in {{ session.profile?.timeZone || 'UTC' }}.
+    </p>
     <div class="table-toolbar audit-toolbar">
       <h2>
         Activity
@@ -153,3 +156,9 @@ function auditTime(value: string) {
     </QueryState>
   </section>
 </template>
+
+<style scoped>
+.audit-timezone {
+  padding: var(--space-4) var(--space-6) 0;
+}
+</style>
