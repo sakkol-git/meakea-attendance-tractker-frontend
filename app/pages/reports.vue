@@ -107,7 +107,7 @@ async function download() {
           </section>
           <section class="panel metric-card">
             <span class="record-icon emerald"><AppIcon name="clock" /></span>
-            <p>Average attendance rate</p>
+            <p>Recorded attendance rate</p>
             <strong>{{ attendanceRate === null ? 'Unavailable' : `${attendanceRate}%` }}</strong>
           </section>
           <section class="panel metric-card">
