@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { dateLabel } from '~/utils/format'
+import { recordedAttendanceRate } from '~/utils/report-summary'
 import type { ExportJob } from '~/schemas/contracts'
 import type { z } from 'zod'
 
@@ -24,12 +25,7 @@ const leaveChartData = computed(() =>
   })),
 )
 
-const attendanceRate = computed(() => {
-  const list = result.data.value?.attendance || []
-  const recorded = list.reduce((s, x) => s + x.recorded, 0)
-  const expected = list.reduce((s, x) => s + x.expected, 0)
-  return expected > 0 ? Math.round((recorded / expected) * 1000) / 10 : 100
-})
+const attendanceRate = computed(() => recordedAttendanceRate(result.data.value?.attendance || []))
 
 const attendanceBreakdown = computed(() => {
   const list = result.data.value?.attendance || []
@@ -112,7 +108,7 @@ async function download() {
           <section class="panel metric-card">
             <span class="record-icon emerald"><AppIcon name="clock" /></span>
             <p>Average attendance rate</p>
-            <strong>{{ attendanceRate }}%</strong>
+            <strong>{{ attendanceRate === null ? 'Unavailable' : `${attendanceRate}%` }}</strong>
           </section>
           <section class="panel metric-card">
             <span class="record-icon peach"><AppIcon name="check-square" /></span>
