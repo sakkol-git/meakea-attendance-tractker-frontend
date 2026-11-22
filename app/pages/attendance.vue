@@ -15,9 +15,12 @@ const inferredItem = computed(() =>
   pendingInferred.data.value?.items.find((x) => x.status === 'PENDING'),
 )
 
-async function confirmInferred(recordId: string) {
+async function confirmInferred(recordId: string, version: number) {
   const result = await feedback.run(
-    () => app.$business.execute('BF-011', 'confirm', { recordId }, crypto.randomUUID()),
+    () =>
+      app.$business.execute('BF-011', 'confirm', { recordId }, crypto.randomUUID(), {
+        [recordId]: version,
+      }),
     'Attendance session confirmed',
   )
   if (result) {
@@ -26,7 +29,7 @@ async function confirmInferred(recordId: string) {
   }
 }
 
-async function rejectInferred(recordId: string) {
+async function rejectInferred(recordId: string, version: number) {
   const result = await feedback.run(
     () =>
       app.$business.execute(
@@ -34,6 +37,7 @@ async function rejectInferred(recordId: string) {
         'reject',
         { recordId, reason: 'Reported presence was declined by employee.' },
         crypto.randomUUID(),
+        { [recordId]: version },
       ),
     'Proposed session declined',
   )
@@ -82,8 +86,8 @@ function clearDates() {
     :clock-out="String(inferredItem.details?.clockOut ?? '')"
     :source="String(inferredItem.details?.source ?? 'INFERRED')"
     :busy="feedback.busy.value"
-    @confirm="confirmInferred(inferredItem.id)"
-    @decline="rejectInferred(inferredItem.id)"
+    @confirm="confirmInferred(inferredItem.id, inferredItem.version)"
+    @decline="rejectInferred(inferredItem.id, inferredItem.version)"
   />
   <section class="panel attendance-summary" aria-label="Attendance summary">
     <dl>

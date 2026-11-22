@@ -1,6 +1,18 @@
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
+for (const action of ['Confirm workday', 'Decline']) {
+  test(`proposed attendance ${action.toLowerCase()} uses the reviewed version`, async ({
+    page,
+  }) => {
+    await page.goto('/attendance')
+    const card = page.getByRole('region', { name: 'Review your proposed workday' })
+    await expect(card).toBeVisible()
+    await card.getByRole('button', { name: action, exact: true }).click()
+    await expect(card).toHaveCount(0)
+  })
+}
+
 test('approval filters reset together and fit phone and desktop widths', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('combobox', { name: 'Demo role' }).click()
