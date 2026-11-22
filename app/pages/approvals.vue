@@ -143,8 +143,12 @@ async function rejectIssue(reasonText: string) {
       :pending="leave.isPending.value"
       :error="leave.error.value"
       :empty="!leave.data.value?.items.length"
-      title="You’re all caught up"
-      message="No leave requests need your review."
+      :title="filtersChanged ? 'No matching leave requests' : 'You’re all caught up'"
+      :message="
+        filtersChanged
+          ? 'Change or clear the filters to review other leave requests.'
+          : 'No leave requests need your review.'
+      "
       @retry="leave.refetch()"
       ><ApprovalTable :rows="leave.data.value?.items || []" kind="leave"
     /></QueryState>
@@ -160,8 +164,12 @@ async function rejectIssue(reasonText: string) {
       :pending="requests.isPending.value"
       :error="requests.error.value"
       :empty="!requests.data.value?.items.length"
-      title="A clear inbox"
-      message="New requests will appear here when they need a decision."
+      :title="filtersChanged ? 'No matching requests' : 'A clear inbox'"
+      :message="
+        filtersChanged
+          ? 'Change or clear the filters to review other requests.'
+          : 'New requests will appear here when they need a decision.'
+      "
       @retry="requests.refetch()"
       ><ApprovalTable :rows="requests.data.value?.items || []" kind="request"
     /></QueryState>
