@@ -60,4 +60,8 @@ legend {
 input {
   accent-color: var(--teal);
 }
+.day-options label:has(input:checked) {
+  background: var(--teal-light);
+  border-color: var(--teal);
+}
 </style>
