@@ -138,8 +138,9 @@ watch(
           min="0"
           max="120"
           :aria-invalid="!!errors.graceMinutes"
-          aria-describedby="schedule-error-graceMinutes"
+          aria-describedby="grace-help schedule-error-graceMinutes"
         />
+        <small id="grace-help">Enter 0–120 minutes.</small>
         <small id="schedule-error-graceMinutes" class="field-error">{{
           errors.graceMinutes
         }}</small>
