@@ -30,7 +30,10 @@ const rows = computed(() =>
   <section class="panel no-padding">
     <div class="table-toolbar">
       <h2>
-        Your team <span class="count-badge">{{ result.data.value?.total ?? '—' }}</span>
+        Your team
+        <span class="count-badge">{{
+          result.isPending.value || result.error.value ? '—' : (result.data.value?.total ?? '—')
+        }}</span>
       </h2>
       <div class="search-field">
         <AppIcon name="search" /><PInputText
