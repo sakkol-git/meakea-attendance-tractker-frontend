@@ -23,7 +23,7 @@ export default defineConfig({
     },
     {
       name: 'remote-contract',
-      testMatch: 'remote.spec.ts',
+      testMatch: ['remote.spec.ts', 'attachment-recovery.spec.ts'],
       use: { baseURL: 'http://127.0.0.1:3101' },
     },
   ],

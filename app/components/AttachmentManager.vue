@@ -210,7 +210,7 @@ async function downloadAttachment(item: AttachmentItem) {
           label="Download"
           :aria-label="`Download ${item.name}`"
           :loading="downloading === item.id"
-          :disabled="!!downloading && downloading !== item.id"
+          :disabled="!!downloading"
           size="small"
           text
           @click="downloadAttachment(item)"
