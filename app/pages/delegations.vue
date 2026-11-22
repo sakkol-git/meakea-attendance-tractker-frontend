@@ -124,7 +124,11 @@ function cancel(id: string, version: number, delegateName: string) {
             >{{ dateLabel(data.startsOn) }} – {{ dateLabel(data.endsOn) }}</template
           >
         </PColumn>
-        <PColumn field="reason" header="Reason" />
+        <PColumn field="reason" header="Reason"
+          ><template #body="{ data }"
+            ><span class="delegation-reason">{{ data.reason }}</span></template
+          ></PColumn
+        >
         <PColumn header="Status"
           ><template #body="{ data }"><StatusBadge :status="data.status" /></template
         ></PColumn>
@@ -230,3 +234,10 @@ function cancel(id: string, version: number, delegateName: string) {
     </form>
   </PDialog>
 </template>
+
+<style scoped>
+.delegation-reason {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+</style>
