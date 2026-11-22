@@ -85,3 +85,21 @@ const time = (value: string | null, zone: string | null) =>
     </section>
   </QueryState>
 </template>
+
+<style scoped>
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+th,
+td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+th {
+  color: var(--text-secondary);
+  font-size: var(--font-size-caption);
+}
+</style>
