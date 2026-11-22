@@ -95,7 +95,12 @@ function auditTime(value: string) {
       </label>
       <label>
         <span>Action</span>
-        <PInputText v-model="action" placeholder="For example, approved" />
+        <PInputText
+          v-model="action"
+          placeholder="For example, approved"
+          autocapitalize="none"
+          :spellcheck="false"
+        />
       </label>
       <label>
         <span>Target</span>
