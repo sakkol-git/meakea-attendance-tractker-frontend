@@ -165,6 +165,13 @@ function cancel(id: string, version: number, delegateName: string) {
           />
         </div>
         <label for="delegate-reviewer">Reviewer · Required</label>
+        <p
+          v-if="candidates.isSuccess.value && !candidates.data.value?.items.length"
+          class="small-note"
+          role="status"
+        >
+          No eligible reviewers are available. Contact your workspace administrator.
+        </p>
         <PSelect
           input-id="delegate-reviewer"
           v-model="delegateId"
