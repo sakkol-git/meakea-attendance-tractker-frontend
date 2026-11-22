@@ -65,7 +65,12 @@ function auditTime(value: string) {
   <section class="panel no-padding">
     <div class="table-toolbar audit-toolbar">
       <h2>
-        Activity <span class="count-badge">{{ result.data.value?.total ?? '—' }}</span>
+        Activity
+        <span class="count-badge">{{
+          invalidRange || result.isPending.value || result.error.value
+            ? '—'
+            : (result.data.value?.total ?? '—')
+        }}</span>
       </h2>
       <PButton label="Clear filters" icon="pi pi-filter-slash" text @click="clearFilters" />
     </div>
