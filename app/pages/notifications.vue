@@ -81,3 +81,13 @@ async function mark(id?: string) {
     </QueryState>
   </section>
 </template>
+
+<style scoped>
+.notice-row > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.notice-row p {
+  white-space: pre-wrap;
+}
+</style>
