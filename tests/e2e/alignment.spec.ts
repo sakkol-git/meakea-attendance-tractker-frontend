@@ -29,6 +29,30 @@ test('weekday choices survive a shift save without exposing the numeric mask', a
   await expect(dialog.getByRole('checkbox', { name: 'Saturday', exact: true })).toBeChecked()
   await expect(dialog.getByRole('checkbox', { name: 'Sunday', exact: true })).toBeChecked()
   await expect(dialog.getByRole('checkbox', { name: 'Monday', exact: true })).not.toBeChecked()
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 })
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme })
+      await expect
+        .poll(() =>
+          page.locator('html').evaluate((element) => element.classList.contains('hrflow-dark')),
+        )
+        .toBe(colorScheme === 'dark')
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      )
+      await page.screenshot({
+        path: `test-results/weekday-picker-${width}-${colorScheme}.png`,
+        fullPage: true,
+        animations: 'disabled',
+      })
+    }
+  }
+  const audit = await new AxeBuilder({ page })
+    .include('[role="dialog"]')
+    .withTags(['wcag2a', 'wcag2aa'])
+    .analyze()
+  expect(audit.violations.map((violation) => violation.id)).toEqual([])
 })
 
 test('audit date recovery and delegation Escape preserve valid navigation', async ({ page }) => {

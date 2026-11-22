@@ -146,8 +146,8 @@ watch(
           errors.graceMinutes
         }}</small>
       </div>
-      <WorkingDaysPicker v-model="values.workingDays" :error="errors.workingDays" />
     </div>
+    <WorkingDaysPicker v-model="values.workingDays" :error="errors.workingDays" />
   </template>
   <div class="field">
     <label for="schedule-timezone">Timezone</label>
@@ -164,3 +164,15 @@ watch(
     <small id="schedule-error-timezone" class="field-error">{{ errors.timezone }}</small>
   </div>
 </template>
+
+<style scoped>
+#shift-site {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+</style>

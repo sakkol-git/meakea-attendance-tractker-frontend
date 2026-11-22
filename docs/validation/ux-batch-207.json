@@ -1,0 +1,904 @@
+{
+  "date": "2026-11-22",
+  "range": {
+    "first": 108,
+    "last": 207,
+    "cycles": 100
+  },
+  "completedImplementationCycles": [
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    156,
+    157,
+    158,
+    159,
+    160,
+    161,
+    162,
+    163,
+    164,
+    165,
+    166,
+    167,
+    168,
+    169,
+    170,
+    171,
+    172,
+    173,
+    174,
+    175,
+    176,
+    177,
+    178,
+    179,
+    180,
+    181,
+    182,
+    183,
+    184,
+    185,
+    186,
+    187,
+    188,
+    189,
+    190,
+    191,
+    192,
+    193,
+    194,
+    195,
+    196,
+    197,
+    198,
+    199,
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206
+  ],
+  "cycles": [
+    {
+      "cycle": 108,
+      "repo": "web",
+      "commit": "8a6217ab6c13a6300614b5ed4f719da2e5bb59ed",
+      "subject": "ux(forms): clear stale submission errors when drafts change [cycle 108]"
+    },
+    {
+      "cycle": 109,
+      "repo": "web",
+      "commit": "cc13e13fb6303f5b28aef5f2c689e437aea919f9",
+      "subject": "ux(forms): keep lookup retries separate from submissions [cycle 109]"
+    },
+    {
+      "cycle": 110,
+      "repo": "mobile",
+      "commit": "8b1ffce07661242cb44361af082baf809aaf0c19",
+      "subject": "ux(notifications): announce saving preferences [cycle 110]"
+    },
+    {
+      "cycle": 111,
+      "repo": "web",
+      "commit": "651b623ecf85c5465df94119de8d97ad86317e20",
+      "subject": "ux(profile): keep password editor stable during save [cycle 111]"
+    },
+    {
+      "cycle": 112,
+      "repo": "web",
+      "commit": "5b3f28831fbca9cf63f8552b1f7ef099a35a2950",
+      "subject": "ux(attachments): retry failed file listings in place [cycle 112]"
+    },
+    {
+      "cycle": 113,
+      "repo": "web",
+      "commit": "deb542f0fc1692e5ae1f726e26c6094fee988812",
+      "subject": "ux(attachments): show pending downloads and guard repeated clicks [cycle 113]"
+    },
+    {
+      "cycle": 114,
+      "repo": "web",
+      "commit": "5b04bae0a011c9f353106bec0d01a52db7b5474d",
+      "subject": "ux(attachments): report upload activity without simulated percentages [cycle 114]"
+    },
+    {
+      "cycle": 115,
+      "repo": "web",
+      "commit": "c958b79caed36ffe727a3bb701a4de283825c5df",
+      "subject": "fix(attendance): submit reviewed proposal versions [cycle 115]"
+    },
+    {
+      "cycle": 116,
+      "repo": "web",
+      "commit": "ae8fedcf1c2fcba24f9178905963382f86159e91",
+      "subject": "ux(approvals): explain filtered empty queues accurately [cycle 116]"
+    },
+    {
+      "cycle": 117,
+      "repo": "web",
+      "commit": "d108c250a782be8070a09e7408cca066a40dc891",
+      "subject": "ux(audit): explain inverted date filters [cycle 117]"
+    },
+    {
+      "cycle": 118,
+      "repo": "web",
+      "commit": "317a7658b00e3578a6f375ba1a2ee2c45fd86488",
+      "subject": "ux(audit): avoid stale counts after failed reads [cycle 118]"
+    },
+    {
+      "cycle": 119,
+      "repo": "web",
+      "commit": "1187a25115cbfa39a8ef361e0cd1064421c59dce",
+      "subject": "ux(audit): identify when filters can be cleared [cycle 119]"
+    },
+    {
+      "cycle": 120,
+      "repo": "web",
+      "commit": "6b0ae1c818a6fcce0e35ef76e5a073a1a263e4a9",
+      "subject": "ux(audit): identify the displayed time zone [cycle 120]"
+    },
+    {
+      "cycle": 121,
+      "repo": "web",
+      "commit": "58bd2490af4f9e7e2bf85e58177e10d3b03d74c6",
+      "subject": "ux(audit): preserve exact identifiers during entry [cycle 121]"
+    },
+    {
+      "cycle": 122,
+      "repo": "web",
+      "commit": "c0583a0de30ac83ac5aa7bc893624d1b2470db67",
+      "subject": "ux(audit): fit filters to tablet and phone widths [cycle 122]"
+    },
+    {
+      "cycle": 123,
+      "repo": "web",
+      "commit": "8ed46d247bee385da672e437f628982102b629c7",
+      "subject": "ux(audit): preserve multiline reasons [cycle 123]"
+    },
+    {
+      "cycle": 124,
+      "repo": "web",
+      "commit": "d5e1ab4d0d2f6d2bb8f6315c449949cf143da781",
+      "subject": "ux(delegation): prevent reviewer retries submitting forms [cycle 124]"
+    },
+    {
+      "cycle": 125,
+      "repo": "web",
+      "commit": "a951ae8cd6ec991779b6f4cf00161e3458d310a2",
+      "subject": "ux(delegation): explain empty reviewer choices [cycle 125]"
+    },
+    {
+      "cycle": 126,
+      "repo": "web",
+      "commit": "05c0ea43caa33d882bb08a659aeb84ad2bb2a545",
+      "subject": "ux(delegation): allow Escape through the discard guard [cycle 126]"
+    },
+    {
+      "cycle": 127,
+      "repo": "web",
+      "commit": "db500cb39a434b38f6a15c7598c64c62cb2fcf42",
+      "subject": "ux(delegation): lock cancellation controls during commands [cycle 127]"
+    },
+    {
+      "cycle": 128,
+      "repo": "web",
+      "commit": "b57d621ed2443b88300583df65c0235544698b4f",
+      "subject": "ux(delegation): make coverage dates readable with years [cycle 128]"
+    },
+    {
+      "cycle": 129,
+      "repo": "web",
+      "commit": "499db2d60b2c2969ed7d82a22682008b51e3691b",
+      "subject": "ux(notifications): distinguish updates across calendar years [cycle 129]"
+    },
+    {
+      "cycle": 130,
+      "repo": "web",
+      "commit": "e3b33963884a79ffa19e37abd2f7e37e686c48ab",
+      "subject": "ux(notifications): retain readable long and multiline updates [cycle 130]"
+    },
+    {
+      "cycle": 131,
+      "repo": "web",
+      "commit": "bd19a980de9680604e4d598c76476919dee3a748",
+      "subject": "ux(delegation): explain reason limits before submission [cycle 131]"
+    },
+    {
+      "cycle": 132,
+      "repo": "web",
+      "commit": "8443ba0bb99d5e9bf61204f9b412705a1f60aab9",
+      "subject": "ux(delegation): open new forms without stale command feedback [cycle 132]"
+    },
+    {
+      "cycle": 133,
+      "repo": "web",
+      "commit": "c4375b33160df6feba3356f3721a875ea3bf164b",
+      "subject": "ux(delegation): name and focus the scrollable record region [cycle 133]"
+    },
+    {
+      "cycle": 134,
+      "repo": "web",
+      "commit": "e795a64ab98cb6d3379ea8310fe35fe6344fd31c",
+      "subject": "ux(people): expose directory search as a search field [cycle 134]"
+    },
+    {
+      "cycle": 135,
+      "repo": "web",
+      "commit": "de315044dde3f9c0ff2fc5da279a8c18e38a30cc",
+      "subject": "ux(organization): recover from empty filtered records [cycle 135]"
+    },
+    {
+      "cycle": 136,
+      "repo": "web",
+      "commit": "0f49aff3a9fcd50e90e36db588808c0c0b0d2cd3",
+      "subject": "ux(organization): announce the filtered record count [cycle 136]"
+    },
+    {
+      "cycle": 137,
+      "repo": "mobile",
+      "commit": "74876cc704be1e9ad4a04ca4ba1a1a03def23f35",
+      "subject": "fix(profile): tolerate whitespace in avatar initials [cycle 137]"
+    },
+    {
+      "cycle": 138,
+      "repo": "mobile",
+      "commit": "f31bf2bf589fefdbd290a0b1d016bd462901b3bf",
+      "subject": "ux(profile): improve name-entry keyboard flow [cycle 138]"
+    },
+    {
+      "cycle": 139,
+      "repo": "mobile",
+      "commit": "d85452d5bc1d76eee5788ace7b645e2d7d72b5c7",
+      "subject": "ux(profile): preserve typed time-zone identifiers [cycle 139]"
+    },
+    {
+      "cycle": 140,
+      "repo": "mobile",
+      "commit": "2c075f9e7e1d215bf851e9ddacd2263e4fe2cb27",
+      "subject": "ux(login): avoid correcting work-email addresses [cycle 140]"
+    },
+    {
+      "cycle": 141,
+      "repo": "mobile",
+      "commit": "e41cd5b8cf64b8e8573484045c6e47c5021cfe44",
+      "subject": "ux(login): keep workspace identifiers unchanged during entry [cycle 141]"
+    },
+    {
+      "cycle": 142,
+      "repo": "mobile",
+      "commit": "8e052aa37f349bb0ce794e370c8ee5e22e506fd4",
+      "subject": "ux(audit): preserve exact native filter identifiers [cycle 142]"
+    },
+    {
+      "cycle": 143,
+      "repo": "mobile",
+      "commit": "1ca6d3ffe6c3f479a2ef402a56d0e1882077735b",
+      "subject": "ux(people): retain a label while native search has text [cycle 143]"
+    },
+    {
+      "cycle": 144,
+      "repo": "web",
+      "commit": "55ae941fa1cf79cbda5cb3e4e8b24d86d7692bf5",
+      "subject": "ux(reports): identify fixed demo data instead of inert period filters [cycle 144]"
+    },
+    {
+      "cycle": 145,
+      "repo": "web",
+      "commit": "68cd7c9b1a9928698981921a1f05b0285ea3ab38",
+      "subject": "fix(reports): avoid claiming attendance when expected data is empty [cycle 145]"
+    },
+    {
+      "cycle": 146,
+      "repo": "web",
+      "commit": "cab9172e1331b60eca5fb96d2eb09d1f02caf0f5",
+      "subject": "ux(reports): describe the aggregate attendance metric accurately [cycle 146]"
+    },
+    {
+      "cycle": 147,
+      "repo": "web",
+      "commit": "4004e98c2df8578b0807676db74e9a727fe55c00",
+      "subject": "ux(reports): align private attendance table columns [cycle 147]"
+    },
+    {
+      "cycle": 148,
+      "repo": "web",
+      "commit": "a87a20fc11c2e515760dce6b01b03dd817725f2f",
+      "subject": "ux(reports): announce empty recorded-session results [cycle 148]"
+    },
+    {
+      "cycle": 149,
+      "repo": "web",
+      "commit": "e0c3dd5bdd9c2f7ce01fcc0d72148e70535b4fd0",
+      "subject": "ux(reports): disable repeated export actions while pending [cycle 149]"
+    },
+    {
+      "cycle": 150,
+      "repo": "web",
+      "commit": "74a87d00e48e12baaf4cdff814c1a8df4a31f0be",
+      "subject": "ux(notifications): disable pending mark-all-read actions [cycle 150]"
+    },
+    {
+      "cycle": 151,
+      "repo": "web",
+      "commit": "195c9356f2d2022ff594e2bbd8b63c8d71108ccc",
+      "subject": "ux(shifts): choose weekdays by name instead of a numeric mask [cycle 151]"
+    },
+    {
+      "cycle": 152,
+      "repo": "web",
+      "commit": "09718ef515762f9ae8d4cf1250647f6e77ee9d1d",
+      "subject": "ux(work-sites): explain coordinate format and limits [cycle 152]"
+    },
+    {
+      "cycle": 153,
+      "repo": "web",
+      "commit": "6b3662f182e9045deff515863c32b2275ab9f901",
+      "subject": "ux(work-sites): explain the approved radius measurement [cycle 153]"
+    },
+    {
+      "cycle": 154,
+      "repo": "web",
+      "commit": "2f6efa8d2c83ab3e0789a79b0023e8ab1b49470e",
+      "subject": "ux(schedules): explain time-zone entry independently of placeholders [cycle 154]"
+    },
+    {
+      "cycle": 155,
+      "repo": "web",
+      "commit": "faba2634187350ffe3a3ed6acf25ef071b7bde0e",
+      "subject": "ux(shifts): show the supported grace range before validation [cycle 155]"
+    },
+    {
+      "cycle": 156,
+      "repo": "web",
+      "commit": "7a9dafe312a447d2eba43ee3a1a5e670eb37ff5a",
+      "subject": "ux(people): preserve exact employee references during entry [cycle 156]"
+    },
+    {
+      "cycle": 157,
+      "repo": "mobile",
+      "commit": "102614699451fe5024e5e0f195f3ae0131f2b8d6",
+      "subject": "ux(requests): freeze material quantity while saving [cycle 157]"
+    },
+    {
+      "cycle": 158,
+      "repo": "mobile",
+      "commit": "020383629d999d2c3b8d08c21aadf96f4211b03f",
+      "subject": "ux(requests): freeze the reviewed title during save [cycle 158]"
+    },
+    {
+      "cycle": 159,
+      "repo": "mobile",
+      "commit": "2fcdeb2b45e07209f555cb7edaa5e2534c893a1e",
+      "subject": "ux(delegation): keep the submitted reason stable while saving [cycle 159]"
+    },
+    {
+      "cycle": 160,
+      "repo": "mobile",
+      "commit": "5e6b0d0bc2ed5b8e61136dcf492916e193011542",
+      "subject": "ux(approvals): lock decision notes while the command runs [cycle 160]"
+    },
+    {
+      "cycle": 161,
+      "repo": "mobile",
+      "commit": "52f5e00f918dd6d37649652e1ef9fb4f7ed564f3",
+      "subject": "ux(delegation): announce failed saves to assistive technology [cycle 161]"
+    },
+    {
+      "cycle": 162,
+      "repo": "mobile",
+      "commit": "2900cff6b1677e63a2d8e767a8cb871481e2251f",
+      "subject": "ux(lookups): wrap pagination controls at large text sizes [cycle 162]"
+    },
+    {
+      "cycle": 163,
+      "repo": "mobile",
+      "commit": "291fcd478bb60df7609b4dda6fcf194b21c34b9e",
+      "subject": "ux(delegation): fit reviewer pagination at large text sizes [cycle 163]"
+    },
+    {
+      "cycle": 164,
+      "repo": "mobile",
+      "commit": "02d1d9e73f7394b2f5f8f03726d3d1621bc89e3d",
+      "subject": "ux(lookups): identify search actions on native keyboards [cycle 164]"
+    },
+    {
+      "cycle": 165,
+      "repo": "mobile",
+      "commit": "772799e9311bfccc5635bedb3e872b545215fae0",
+      "subject": "ux(lookups): clear native search and reset paging together [cycle 165]"
+    },
+    {
+      "cycle": 166,
+      "repo": "mobile",
+      "commit": "f6db7acb681f22e4461a450155fe24180575b4e8",
+      "subject": "ux(lookups): dismiss keyboards while browsing records [cycle 166]"
+    },
+    {
+      "cycle": 167,
+      "repo": "mobile",
+      "commit": "d1448a3bcabaf03118eeb46da21c62686a451914",
+      "subject": "ux(delegation): dismiss keyboards while browsing reviewers [cycle 167]"
+    },
+    {
+      "cycle": 168,
+      "repo": "mobile",
+      "commit": "36540d1d0e4e87844b6c172d8d6fa1da74b11afc",
+      "subject": "ux(delegation): distinguish empty eligibility from filtered results [cycle 168]"
+    },
+    {
+      "cycle": 169,
+      "repo": "mobile",
+      "commit": "f9486bd2e25974a97b40ce7e58b63258b97f2cad",
+      "subject": "ux(delegation): retry unavailable reviewer searches in place [cycle 169]"
+    },
+    {
+      "cycle": 170,
+      "repo": "mobile",
+      "commit": "e70d243d4ecf5a138b18ff9e2a13152662cb1c39",
+      "subject": "ux(lookups): announce empty search results [cycle 170]"
+    },
+    {
+      "cycle": 171,
+      "repo": "mobile",
+      "commit": "e5bd8ff137b790890e418ef71d20539b991d4b5f",
+      "subject": "ux(delegation): name reviewer loading progress [cycle 171]"
+    },
+    {
+      "cycle": 172,
+      "repo": "mobile",
+      "commit": "17d32a2f5fd2d04539749d37adca2b583412c2ab",
+      "subject": "ux(audit): wrap native paging controls for large text [cycle 172]"
+    },
+    {
+      "cycle": 173,
+      "repo": "mobile",
+      "commit": "5bb23f3c00cccfdac015df3dda5d6d17dbdcfda4",
+      "subject": "ux(audit): announce native page changes [cycle 173]"
+    },
+    {
+      "cycle": 174,
+      "repo": "mobile",
+      "commit": "f399727d3426d570e3e5dde430a7214db652e62a",
+      "subject": "ux(lookups): announce page navigation results [cycle 174]"
+    },
+    {
+      "cycle": 175,
+      "repo": "mobile",
+      "commit": "b5a28ff59712cf22091e233cf36a88fd10551885",
+      "subject": "ux(delegation): announce reviewer result pages [cycle 175]"
+    },
+    {
+      "cycle": 176,
+      "repo": "mobile",
+      "commit": "495c48493830d3a42bbc31362356ccc521daf4d5",
+      "subject": "ux(profile): align wrapped names within the profile header [cycle 176]"
+    },
+    {
+      "cycle": 177,
+      "repo": "mobile",
+      "commit": "00688d509506fad1f3b6e3873639b5cef7cf4229",
+      "subject": "ux(organization): avoid rewriting native record identifiers [cycle 177]"
+    },
+    {
+      "cycle": 178,
+      "repo": "mobile",
+      "commit": "ca4548d377752d84660357f91cb6f2c66f1fc928",
+      "subject": "ux(setup): improve company-name keyboard entry [cycle 178]"
+    },
+    {
+      "cycle": 179,
+      "repo": "mobile",
+      "commit": "6dce9b9c1e4b8877b5722874ab604fb82abdebdd",
+      "subject": "ux(setup): preserve workspace slugs during entry [cycle 179]"
+    },
+    {
+      "cycle": 180,
+      "repo": "mobile",
+      "commit": "5946fe106b9b8984cbb6b8bed39313a1e9a6ced9",
+      "subject": "ux(setup): support owner-name autofill and keyboard flow [cycle 180]"
+    },
+    {
+      "cycle": 181,
+      "repo": "mobile",
+      "commit": "2177c49c1a3599f7a84489920d20325e67c1c89e",
+      "subject": "ux(setup): support exact owner work-email entry [cycle 181]"
+    },
+    {
+      "cycle": 182,
+      "repo": "mobile",
+      "commit": "4530d7b9c73e8f534e7dc4f19e3a6ab3c911aa24",
+      "subject": "ux(people): identify native directory search keyboard actions [cycle 182]"
+    },
+    {
+      "cycle": 183,
+      "repo": "mobile",
+      "commit": "7d86322585a1e7f6226d8325517f0af87c883f0b",
+      "subject": "ux(people): announce the native directory result count [cycle 183]"
+    },
+    {
+      "cycle": 184,
+      "repo": "mobile",
+      "commit": "dd31b032404fd616e9f6df3f9cc0d28b3f7a57bd",
+      "subject": "ux(people): distinguish empty directories from unmatched searches [cycle 184]"
+    },
+    {
+      "cycle": 185,
+      "repo": "mobile",
+      "commit": "877c6c41786b7e7493696b2785f691a29fd24b35",
+      "subject": "ux(approvals): fit native filter labels at large text sizes [cycle 185]"
+    },
+    {
+      "cycle": 186,
+      "repo": "mobile",
+      "commit": "bd1e62d9cb608674130cff0fceba8c037d285d11",
+      "subject": "ux(approvals): separate native filter controls consistently [cycle 186]"
+    },
+    {
+      "cycle": 187,
+      "repo": "mobile",
+      "commit": "635dc20f895ae11204afb070487e96b7e9f71a3f",
+      "subject": "ux(approvals): explain native rejection reason requirements [cycle 187]"
+    },
+    {
+      "cycle": 188,
+      "repo": "mobile",
+      "commit": "6420ac548a5e4cbfdab7aca3f30e07de2cd29cbf",
+      "subject": "ux(approvals): announce native command failure feedback [cycle 188]"
+    },
+    {
+      "cycle": 189,
+      "repo": "mobile",
+      "commit": "d780f547e8c10d190ec4b2755ed619fdf16ee768",
+      "subject": "ux(exports): identify the download action visually [cycle 189]"
+    },
+    {
+      "cycle": 190,
+      "repo": "mobile",
+      "commit": "9f87e80f50887b07467dc9bc5769408557cd747a",
+      "subject": "ux(attendance): name the date-filter removal action [cycle 190]"
+    },
+    {
+      "cycle": 191,
+      "repo": "mobile",
+      "commit": "fe02ec4171ce7a7832b73b59bf587591f302d3e4",
+      "subject": "fix(attendance): ignore date-picker results after page disposal [cycle 191]"
+    },
+    {
+      "cycle": 192,
+      "repo": "mobile",
+      "commit": "6b01ec77aeb1cbf5890fbb71b8a07b1d75e8be0d",
+      "subject": "ux(leave): expose preview summaries as accessibility headings [cycle 192]"
+    },
+    {
+      "cycle": 193,
+      "repo": "mobile",
+      "commit": "8033bddb809dba9de7b88f5b94e4206fc5d0f6aa",
+      "subject": "ux(leave): announce changed preview warnings [cycle 193]"
+    },
+    {
+      "cycle": 194,
+      "repo": "mobile",
+      "commit": "a7d0237e75fef9c8047cc7c8907e486be1de9356",
+      "subject": "ux(accessibility): expose native section headings [cycle 194]"
+    },
+    {
+      "cycle": 195,
+      "repo": "mobile",
+      "commit": "e035cde447eb9736e80afbd942a1c60c0c700c85",
+      "subject": "ux(accessibility): identify empty-state headings for screen readers [cycle 195]"
+    },
+    {
+      "cycle": 196,
+      "repo": "mobile",
+      "commit": "a8e3181ed2b4e8ed06b6c67898b61093ba7062af",
+      "subject": "ux(accessibility): read detail labels together with their values [cycle 196]"
+    },
+    {
+      "cycle": 197,
+      "repo": "mobile",
+      "commit": "b4746e49994a2c8aea0a787a9e508b9fa8c1d08b",
+      "subject": "ux(accessibility): identify native load-failure headings [cycle 197]"
+    },
+    {
+      "cycle": 198,
+      "repo": "mobile",
+      "commit": "f53e317334aa5a667e865fc1ee686affcfac40c0",
+      "subject": "ux(requests): support readable sentence entry for request titles [cycle 198]"
+    },
+    {
+      "cycle": 199,
+      "repo": "web",
+      "commit": "47124eef440172e847d884dbb5568f00578b764a",
+      "subject": "ux(shifts): highlight selected weekday choices [cycle 199]"
+    },
+    {
+      "cycle": 200,
+      "repo": "web",
+      "commit": "c28e84694b59226d784b4de0228aa7b22b8142e9",
+      "subject": "ux(shifts): announce invalid weekday selections [cycle 200]"
+    },
+    {
+      "cycle": 201,
+      "repo": "web",
+      "commit": "1765e8bec686553f09d7d6aee45e5971934926c8",
+      "subject": "ux(audit): preserve exact action-filter terms [cycle 201]"
+    },
+    {
+      "cycle": 202,
+      "repo": "web",
+      "commit": "078c4792f26aba03e81506db9c2346084d3572d2",
+      "subject": "ux(delegation): keep long coverage reasons readable [cycle 202]"
+    },
+    {
+      "cycle": 203,
+      "repo": "web",
+      "commit": "1bf7bf40175bb36704b23c3341fb8ca2ebfdfb64",
+      "subject": "ux(reports): scroll wide records instead of crushing columns [cycle 203]"
+    },
+    {
+      "cycle": 204,
+      "repo": "web",
+      "commit": "2978b5134dffdf405342142a9c4da57826e6a872",
+      "subject": "ux(people): avoid stale counts when the directory is unavailable [cycle 204]"
+    },
+    {
+      "cycle": 205,
+      "repo": "web",
+      "commit": "824be0181e9fe92fd1250b54c7bc58b6c0e5192a",
+      "subject": "test(shifts): prevent saving schedules without weekdays [cycle 205]"
+    },
+    {
+      "cycle": 206,
+      "repo": "mobile",
+      "commit": "8efb32a812dcfea5808dd99c46c0f5a04fd8798f",
+      "subject": "docs(uat): record native accessibility and recovery acceptance [cycle 206]"
+    },
+    {
+      "cycle": 206,
+      "repo": "web",
+      "commit": "14947704693d2cfe32fc6e53ef8f425bfc432b51",
+      "subject": "docs(uat): cover the completed UX refinements [cycle 206]"
+    }
+  ],
+  "finalCycle": {
+    "number": 207,
+    "purpose": "Combined verification, layout fixes, cohesion correction and publication evidence"
+  },
+  "checks": {
+    "web": {
+      "format": "passed",
+      "structure": "passed",
+      "typecheck": "passed",
+      "dataTests": 10,
+      "configTests": 2,
+      "unitTests": 141,
+      "build": "passed",
+      "bundleBudgets": "passed",
+      "browserScenarios": 39,
+      "finalShiftVisualScenario": "passed at 390/1280px, light/dark, WCAG A/AA",
+      "note": "Full browser run followed by a focused rerun for final shift layout adjustments."
+    },
+    "mobile": {
+      "analyze": "passed",
+      "tests": 203,
+      "skipped": 3,
+      "failures": 0,
+      "lookupClearRegression": "passed",
+      "scope": "Flutter unit/widget/golden checks; physical devices not executed"
+    },
+    "foundation": {
+      "contractValidation": "passed; 181 operations",
+      "checkerTests": 12,
+      "compatibility": "passed against origin/main",
+      "documentationLint": "failed; 27 existing errors in separately reorganized docs/client-design files"
+    },
+    "omitted": [
+      "Backend reactor not rerun: client presentation changes only.",
+      "Installed-device UAT, human screen-reader review and deployed gateway acceptance not executed."
+    ]
+  },
+  "boundaries": "No HTTP/Avro changes, migrations, HR policy, authorization changes or new infrastructure. Weekday UI preserves the existing Monday-first bitmask.",
+  "fixesDuringVerification": [
+    "Corrected role-preserving browser-test navigation.",
+    "Imported nested weekday picker explicitly.",
+    "Extracted cohesive InfoRow widget without changing its public export to meet the existing source-size guard.",
+    "Corrected one unnecessary test import.",
+    "Made weekday choices full width and standardized the native site selector."
+  ],
+  "limitations": [
+    "No per-cycle before/after screenshots or measured field performance deltas.",
+    "Unrelated client documentation and backend reorganization preserved."
+  ],
+  "repository": "web",
+  "sourceRevisionBeforeFinalValidationCommit": "14947704693d2cfe32fc6e53ef8f425bfc432b51",
+  "sourceHashes": {
+    "app/api/attendance-clock.ts": "b05f2db8e53f461c87e7b7f09484a050354f6225589f01bb99b259d7ee3f06cd",
+    "app/api/auth.ts": "1c03886da9ae5c36634ee4947c1b83bf643c2e8947b92f844e03994b2aace36b",
+    "app/api/business.ts": "3f4cd61505bc0a3aa49a4b69219b6fe9e33f713d01e2a8d5ace30e7aa3a24213",
+    "app/api/collections.ts": "1ef0017344042dd38f78e10af09b00c49c6b1ff7db4832c9ad7d251a0dd83cc8",
+    "app/api/resource-paths.ts": "32a6c009d0ddc41093c5913be53e900ef4bb844197cbae431e912f9b51032e45",
+    "app/api/workspace.ts": "eba30b48e0a0e9162f0bbd07b3d98d5c6d358df4f578b8c0ba2fbcfff3710193",
+    "app/app.vue": "15724de2c498a602ec36c25910d9c8b5174277efce855b67207adf05c13159c6",
+    "app/assets/css/appearance.css": "3014533c9e739c63d6f0bc6fba78a7ba7ffba87dc3deb236f50c4381d883c6dc",
+    "app/assets/css/base.css": "6113b6bb02fcf37c50d1c44e9d067e4c6c4202cb8e5950034beb881f7035de79",
+    "app/assets/css/components.css": "c7f6889c96e2ec331a1131ec2d3a303f8c3aa517d99fa22467f5da8c2313fe5c",
+    "app/assets/css/layout.css": "654caafe90d6dba9964fd696ad57ec1528eed4f6cc155d85eb2025561e38a0bc",
+    "app/assets/css/main.css": "cc8e86cf7a8cb966f0dfd7a0324f957203ae784b66a19ebed56bf8d1051f94e8",
+    "app/assets/css/pages.css": "e94c638c08158e7fd3a96c2a79e38e07ab00de469da4b54c3225314afded76e8",
+    "app/assets/css/primevue.css": "5fcc9923f5540ea11902ede17ad999ebbcff4829138b70e6650729adc03b28f6",
+    "app/assets/css/responsive.css": "5fab28083dfaeebbd16323775958f88e8154667b799cba350e4626b8198dd83d",
+    "app/assets/css/tokens.css": "c95e937d7a70b5e801e299feaae097b271c89e11538c10f28e56623d0c97614e",
+    "app/assets/css/workspace-ux.css": "d7e9e115a5834dda761e59925fc578b8d98248f84f038e2871da9bf5371f0aea",
+    "app/components/AccessHelp.vue": "65a697ec1b3ac7416d1c7086e099d85f542953f98698f66548bf15ccacd18de4",
+    "app/components/AppIcon.vue": "c9206869b78c768b1f76c54b8b73caf8507bd6d659981450c6310b6b01e5ae76",
+    "app/components/ApprovalContext.vue": "8d8f05466473a2b4e2987636721e620b3ac500fecfe90c710fa8162f9e9d0ead",
+    "app/components/ApprovalFilters.vue": "f41b918a854484f2f7b5e4786df8f737d5c698c15d74d0820ac1d561096d4841",
+    "app/components/ApprovalTable.vue": "cf74467e3cb1b1ca15736c15c06b435a421bab432c7f098cd07babeac6fbc5a3",
+    "app/components/AttachmentManager.vue": "786d4383158ae3726ada845c7bb66191cb83cdb2ce8ccaccbc689fce8789d24e",
+    "app/components/AttendanceGeoCard.vue": "c37b20b243225e734fa7d8e56903df7bb529b391d3ef12f42022dec8c52cc973",
+    "app/components/AttendanceSessions.vue": "6d01b0c5c24b02e0da51ccc518d1a61207051265256f4e0090a3b08257bb61dd",
+    "app/components/BulkImportDialog.vue": "3b3eecec1c54a9eb2a27d8633afbdfcc672e274872326b78f16ed523f4a4d7de",
+    "app/components/CollectionPager.vue": "44b572d33524758cb04b3fbcf3f4ce601f98466e4295f12ba63ecf0bdc0560cb",
+    "app/components/CoverageDayDialog.vue": "86542f065c0627b4d645f5e5cdf70d3350d9072b685f6f9da4d4cbdd59f4d455",
+    "app/components/CsvDropzone.vue": "1780bcc611ef27c707d4f7968aa57da7f585bdcea515d6f154798275858b67d8",
+    "app/components/CsvImportPreview.vue": "ac5a6fe35ec9a226f634bdd1772a7c6b4546ab16e7a7757a795b2478fc91a4fb",
+    "app/components/DecisionReasonDialog.vue": "66693668b55ef5a240520e0f2d605029516448943e19d87e1ec3631c66ec8db9",
+    "app/components/DonutChart.vue": "1619025d8ba99c890e06e64b2db253e3d7f305aaed83854b3622cc88295078dc",
+    "app/components/LeaveCalendar.vue": "64709bb1088f41b4104354eadfcee7ce43aa1a27afad1008a54910156812ccd3",
+    "app/components/MaterialFulfillDialog.vue": "5c1270663f15a3f51a679ae84adf4c01ba72d1256d2ffd741281973e60d7ebda",
+    "app/components/MaterialIssueHistory.vue": "e550fb5ee284db6f545358dbd13bd697bef520a91589ce7ea28277ac91ece20b",
+    "app/components/OrgChart.vue": "a6848a95477d7239bb0a79c59efff266a42714bd6d9acfc22a5e09c71caa884a",
+    "app/components/PageHeading.vue": "f19a6f6369326f9811eff653742786612f7261798552fadbac190cafd67535c0",
+    "app/components/PageSearch.vue": "65af90abe0e88e6bfcde13642bc3ab1decaf5789aba89e9f4360e5905fd68c62",
+    "app/components/ProposedAttendanceCard.vue": "0a0a39c14a2c3ff41435ace37738b996a9ffeb085f0f3aa5d155cb65dc216435",
+    "app/components/QueryState.vue": "65a4abf1e8850af1cc1b0f2b77909886315c14cc210f885ab77568ef1aefa284",
+    "app/components/RecordDetail.vue": "ea0f10558c576bc2afd534ad4cb8a13ef4ff17a02177b6636e8c2532d06c8c6e",
+    "app/components/RemoteAttendanceReport.vue": "dc7a4ac7c9893391a8c278df061b283e192d53b4d690be2993177717fe809cc3",
+    "app/components/RequestTable.vue": "faa7877a110351a1903992f9f4897228207265668b7ae190ff8e44ff00d8c52b",
+    "app/components/ResourceForm.vue": "c9b79c85d990d6b1a36cf99b3cae20b0d53ea9654d469b4e29eb8faf874f122e",
+    "app/components/RoleWorkspace.vue": "7030342e14ce479a6d62fca4512b665ec9d9f2dadc8cd4e3ec5fd1ecc08dc335",
+    "app/components/StatusBadge.vue": "3fd222d2595a7eac25d1fa0bddfb8ae0218e9be69548f3d6dda443ac63177a7d",
+    "app/components/TaskReferences.vue": "1feaca72409c2694a6f42aaceba6342fada2a7bc26aa9451424d090b02d2425b",
+    "app/components/WorkflowActionForm.vue": "49a501069f031a76ab1de570ce1dc1c109f658bd3897326516c4aa587c50a54a",
+    "app/components/forms/CorrectionFormFields.vue": "cb3a82006669705691e86261e0d83ca899cfc7cee45c247bbbc4a60906cc61a6",
+    "app/components/forms/EmployeeFormFields.vue": "6a8ef16c5bee133965d5e8abb3be094a936c20cf6560b6023ce191612f262c0b",
+    "app/components/forms/FormReview.vue": "e75aa8b2010e85d80c3499b31dbf3ab5b4c2cfd2b80cfeb8cc56cf210ce0e339",
+    "app/components/forms/LeaveFormFields.vue": "ea4c76bf86a8751f0f62ee7ea8d63034f4aa4c4e637e81a970b07991bdf39bce",
+    "app/components/forms/LeaveOwnerPreview.vue": "de5c0862e1021a6b0de035ebac2b2aa0364e95d6b6375ad6fde915913adfde03",
+    "app/components/forms/MasterFormFields.vue": "b438372e77dc6474d34bd5e222d9946821a3e6033af626988103b6384c2a110c",
+    "app/components/forms/RequestFormFields.vue": "ce7af105163d39c7235355e7350221c0af4e34e6957f640721eb567781fac57e",
+    "app/components/forms/ScheduleFormFields.vue": "31f10a029d843ed76a1f4b49a6b6be8d295230e7e4aadd2cd9fb428d64f5f3f3",
+    "app/components/forms/WorkingDaysPicker.vue": "d5ac909963b67996a05854773ac7f1d01e82e59b13e1dd65797886ce78d6e868",
+    "app/composables/useRealtimeNotifications.ts": "3ec53de480a4687cd0781ca1546f0b02e2271bcde7f66590c86545b41c033ab6",
+    "app/composables/useWorkspace.ts": "4fae8bb94ef8a08a387a91e96d1324dc144806f6368d3526c9fe2f96ce9a3175",
+    "app/data/authenticated.ts": "65aac2da5d16192a2f32080c3b73729b9146c35f2d713e8a9549514f17fd5e1e",
+    "app/data/business-demo.ts": "800b739319bbad97d1b774195ddacf991b1696e3eca72f722545bd07bda3193c",
+    "app/data/client.ts": "7000ef6661b31d152cc67901dd5a6f190df703f0528887875e193f44361ec7a1",
+    "app/data/demo-people.ts": "f7657da8f200344314363a65835122652efec15d5a12d8741ebd922628c50574",
+    "app/data/demo.ts": "0eddff72191274bafb88af3920e574d7d18a756b690d1734c463941a4505c089",
+    "app/data/local.ts": "85a81288fc1d10c0e83fd28e6d4fd808cacf03c99d3064e42273d2cdaa34e69c",
+    "app/data/page.ts": "5e15dde48b18de5247d977205de96b0215ea23729f55d8775813c85cd14f4e16",
+    "app/data/remote-business.ts": "f5296347fe612215bcc2e6141b3b1beeb9456e82605d88e9433f32e57c24c25a",
+    "app/data/remote.ts": "413fc009fc06cb57e2b6650a2b6db6f8186ff6d65a6181c50542d5e634e610a2",
+    "app/data/source.ts": "f5377ad4f5e73e2886077ee6ca0a9a59bee8b9b0e09d26b0f04493b6b51c002c",
+    "app/error.vue": "9c81775562281d6b93179a2fbc2a413e7c92e86d6c545e2efc084f9eb1a00131",
+    "app/features/approvals/data/demo-delegation.ts": "bf4e43582f3a3bf8925d21ad74de040a42f50ede2474e51bf6d23519c11b2a7d",
+    "app/features/approvals/data/demo-review-context.ts": "07ac0b2cb2b1dd505ae4f600ad71162189de88e74c9a40742447c12be4b64e28",
+    "app/features/audit/data/audit.ts": "0a7c086620670ca59cc68708191cf42317a7ab275b801df100a0372e3425ef58",
+    "app/features/leave/data/demo-calendar.ts": "2a8f07cff1fbcfb3392157b48e187f7eaa1b1fc8c97d4be1765841f9687ec342",
+    "app/features/leave/data/leave-api.ts": "e4431db9f46c86efb7a93782dc73069ab61918316a0a9113b92c484f1de50816",
+    "app/features/navigation.ts": "29414cf114e1eb3d97ad4f2e5bff1e142ba49f232d993d8e4ac66d123fb2aa37",
+    "app/features/reporting/data.ts": "f36b1f2471228c3c72c6e9f7a5f9737b70ead794fb1a277c5c910c4b0c386bce",
+    "app/features/requests/data/attachment-records.ts": "26fef78a30e978376cc4ee594ffa564ea9877933163ad3bac321cec26287f293",
+    "app/features/requests/data/attachment-transfers.ts": "4fa61d273ea8b3158d1a75324b553968dc9755fe663fece4f741e25ab2adf83d",
+    "app/features/requests/data/material-options.ts": "47ef38d44ca3cbb03e622a737f5a03a1ca08e28fd6620606814246d982384e8f",
+    "app/features/requests/data/record.ts": "14f8d9abcec103a741961795d4ccc156a6f891742b4dee92342661c8559b2d4d",
+    "app/features/requests/permissions.ts": "5e6d845a933f44eb603f1cabc48d503824d88797f316615b46698d67ceab329b",
+    "app/features/workflows/catalog.ts": "b43c44022252e9abc1785621bba436c6e302ff451161f725cd03ecfd901495e0",
+    "app/features/workflows/data/remote-contracts.ts": "5ec3713e76650c8fd2ac659b59ba1e42bfc24e298f465bfd72d922650be8a813",
+    "app/features/workflows/forms.ts": "964e17581ab00a2b116dc2e745e821584dd6bd94dfdc0f8ac1f7c218ad0d0d18",
+    "app/features/workflows/tasks.ts": "63bee4e882a8d1d51b7334423d6e328f165d080be0f6afdb0953a3dc945e3e19",
+    "app/layouts/default.vue": "c3baa799536b176ec78ed222b015035f8cd9fe1d13d749945fcfa4812f00fb93",
+    "app/middleware/session.global.ts": "6124eee8f5133f361e28c52af94e2b6ff92182b6248b86d81a01b6381ad90139",
+    "app/pages/approvals.vue": "22e2948295240965832955fb24a494a8d9514c2c33b15c4fd059237f01304c4a",
+    "app/pages/attendance.vue": "7048c162e764be56ea79497b4175269426ab535814b9e9b7db94b47fa11461b4",
+    "app/pages/audit.vue": "f5c636cc0be0afc4afb4ab1f33da9e5eb6a37cf13ad1e31492fbf9b3fe115822",
+    "app/pages/delegations.vue": "c1d45774ce8a38f208bfd92802be2914f0153bfb957cd14327ad072b79336226",
+    "app/pages/forbidden.vue": "5a70bba19c7bac4bc1739efc8c6027380d375833076cf61d937ea6cc98faa143",
+    "app/pages/forgot-password.vue": "bad447b461c1a5eca7d9c05eaee98bcd4cd20d5f249045d17a1ed727f9d15648",
+    "app/pages/help.vue": "32aa6a6b1e22441fdb72edf80b07b610e268e6aa3ae1efd755e78f1703131138",
+    "app/pages/index.vue": "e308d9371d886a242cf6936006d2fd46f8ded24bdf5888aef6e72577d8ff544d",
+    "app/pages/leave/[id].vue": "398286bfad23a422c0273195a81e55b6bcace8ff6cc9c47ba43fc45f69e2a556",
+    "app/pages/leave/index.vue": "c1bd723de2d55d0cde62bd16db1f29498fa056427711bee6485a5adade8c4501",
+    "app/pages/login.vue": "bcdcbd63266146cb6eaff98750dd68b395430408198737debc80033ed201ec39",
+    "app/pages/notifications.vue": "a1fdb39ca224c4402b1088f2751495adb9163bd71b185a143ea4254ffc3ef3fe",
+    "app/pages/organization.vue": "3a1a356e9ba12b196a7bbe3bc6cac087ef20c03ec73838c659ead45da0913440",
+    "app/pages/people/[id].vue": "f42446c122f2a8e4656eb3c5f40e37235d7daf9a327ad1e2899f100c7b11d530",
+    "app/pages/people/index.vue": "574d1b4630ebe0cadb104fc6fc2e28627c727b2d45a26b58e930fde08f43d75d",
+    "app/pages/profile.vue": "941b78ffbd482508a4875a2b4a1ad9b4d55b20ad9749be1796b5b4a384235dd6",
+    "app/pages/reports.vue": "46225719c624679786e154b1135354b28471b8566fe6224a0cbfa9aa230aaa40",
+    "app/pages/requests/[id].vue": "77d13e4458ed479182bccb8e5d257c7b6d344e59fa0e223643eaae200e394693",
+    "app/pages/requests/index.vue": "34b92fa57d357334667f298d7bf8ac08370a17d821022a86880adb065ee8b7f6",
+    "app/pages/reset-password.vue": "651dbd8b99f5521492d73af2dcaf20280aff39e2e8237acb5de641c6fb4108da",
+    "app/pages/settings.vue": "3d3d4507b3aa24115418b5f2bdaeacf839037298cd8f34b938ad0f9ed4bb3774",
+    "app/pages/setup.vue": "93202e09228ae33ca563b58c15fac31851f26f38af1cec9c75f5a004adf389f4",
+    "app/pages/workflows/[id].vue": "8b7e7fe597766428c74162cac445f0361802dab00ef0bbaa7e7b739343f6639d",
+    "app/pages/workflows/index.vue": "bab58d9749bcdd05d4cc8346bc43559aac3276062ef091d933f15479c15585d7",
+    "app/plugins/appearance.client.ts": "cd6a2d37cb3686da942f71e2bc0bfa0d9d9492fe3750143468f1b79795ab34e4",
+    "app/plugins/data.ts": "09ac63ff3f409105b2b3ba5474084c7caf360080f89acfef12dff7a6a1b5721b",
+    "app/plugins/query.ts": "46b1e19eaa30e89f835b61134f088318f547bbc784d83d1806d333b6fa4c4a73",
+    "app/plugins/ui.ts": "3109dde0ed500a220535f2f80c304550ed52df7a8d5a73e4d72c2c3284abfb49",
+    "app/schemas/contracts.ts": "b7a0896330ae4422a2bbf0615ed851e2722b076810d40116f5bdd93d575d9a26",
+    "app/schemas/forms.ts": "eb4d8cfcdcd92bdb394c814691ca1d3ce617dcffd2b1dc438982af02a16343f3",
+    "app/stores/appearance.ts": "949c71b713cafc07481af32487d4d8c9d04a3260b73d025c9308df4644a09c4e",
+    "app/stores/list-views.ts": "5a7af69eb35aa0dc40acf17fd0f4c0860a8f65fe93ba7c0afed35fbb8e205dd1",
+    "app/stores/session.ts": "23bd78743c92107c03318a64a3b216a0e7b7a3db21892059a4e6f98fbc14ba3e",
+    "app/types/business.ts": "a612c2e57561aaa9aee4194c5991dfe8aa76ccca92ca60fcaa43ad661f4e49f3",
+    "app/types/workspace.ts": "46bd8ea64a17d261e9c3a13095b9b0d0d009246b2518091f530181162a3e6b35",
+    "app/utils/appearance.ts": "57b23389bedcad5a2ffd7d48c8ff58e591aefea575ba93d819707e5a4d056882",
+    "app/utils/approval.ts": "310b14615807a17cc35807909b18ccd781193142016165d82b0ef8ca9ef18ab7",
+    "app/utils/calendar.ts": "51b178bfc3948494452f7bc6c7b4aca5689632569eaf915ed514d2bdbe74c6f0",
+    "app/utils/chart.ts": "e6fce66399ed1f235f8db7e9efa11b7026d2f27390fac618a0be53356e8cdd7a",
+    "app/utils/correction-input.ts": "93f3980a08a33628056ca2a8ca404f49ca6d566aeb2a6892918bcf9994dc4c72",
+    "app/utils/csv.ts": "f2d8e103e71a0907c1bb6604662306e208ac2c91083288034c7beec932b75912",
+    "app/utils/download.ts": "71911f89016a4b850988f59fdbb22d3667f4f8e0bcd5f91acc8e801b3bfd7f75",
+    "app/utils/failure.ts": "b34583fd68659af099eb01c03c12889b57841b477d892537144ec2c5f71fecc1",
+    "app/utils/filter.ts": "9eeddbe4100ee84604965e55083916929e46355e1bbed332e48ecf9b95e72c81",
+    "app/utils/form-copy.ts": "b00832ba02195f7cdad7798580c77267e1c465e938ca4e973feb1421210bdcb5",
+    "app/utils/form-focus.ts": "bdc016a7c8e96e82113d97438fc46da9e0794679a23f62c58d2d55378cde95df",
+    "app/utils/format.ts": "4a94e08f093f308e2199c8c0840435ef685b82799ccea59a0003e5a19232dc38",
+    "app/utils/geofence.ts": "3d84919a66b7ccd37d60fc3606e6bd56cd45b849e6b6399acc8a281e63acb143",
+    "app/utils/notification-route.ts": "586045b3ec612a1a21331206287d3c70b92e3678fabab258605f6daff140e9e6",
+    "app/utils/report-summary.ts": "f4432c7a5d9744ba0c73f696b7da8c438118ba36bcc3b2887b99ca439f82ecae",
+    "app/utils/request-form.ts": "eb878a42911ff50dfb905b3b8d410667a51864a697638c19c16f0184690df712",
+    "app/utils/working-days.ts": "8497106c20ad31ebf3ccf67dcce15ca68cb92b1d4dc4a76065e70440e60d6afd"
+  }
+}
