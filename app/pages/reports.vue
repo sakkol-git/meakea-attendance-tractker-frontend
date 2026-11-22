@@ -10,14 +10,6 @@ const session = useSessionStore()
 const feedback = useFeedback()
 const config = useRuntimeConfig()
 
-const period = ref('this-month')
-const periodOptions = [
-  { label: 'This month', value: 'this-month' },
-  { label: 'Last month', value: 'last-month' },
-  { label: 'This quarter', value: 'this-quarter' },
-  { label: 'Year to date', value: 'ytd' },
-]
-
 const result = useWorkspaceQuery('reports', () =>
   session.mode === 'local' ? api.report() : Promise.resolve(null),
 )
@@ -76,13 +68,7 @@ async function download() {
         <NuxtLink v-if="session.isAdmin" to="/workflows/BF-031">
           <PButton label="Rebuild projections" icon="pi pi-database" outlined />
         </NuxtLink>
-        <PSelect
-          v-model="period"
-          :options="periodOptions"
-          option-label="label"
-          option-value="value"
-          aria-label="Report period"
-        />
+        <span class="small-note">Fixed demo dataset</span>
         <PButton
           label="Export leave CSV"
           icon="pi pi-download"
