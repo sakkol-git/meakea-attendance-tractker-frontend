@@ -248,6 +248,7 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
   let signedIn = false
   let rejectPreview = false
   let rejectTypes = false
+  let rejectSubmission = false
   let typeReads = 0
   const submitted: unknown[] = []
   await page.route('**/api/v1/**', async (route) => {
@@ -323,6 +324,8 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
           })
     if (path === '/leave/requests' && request.method() === 'POST') {
       submitted.push(request.postDataJSON())
+      if (rejectSubmission)
+        return reply(503, { detail: 'Leave requests are temporarily unavailable.' })
       return reply(200, { id: 'leave-result', version: 0, status: 'PENDING', type: 'UNPAID' })
     }
     return reply(200, { items: [], total: 0, page: 0, size: 25 })
@@ -372,10 +375,24 @@ test('remote leave uses owner catalog and preview, submits its code, and shows p
   expect(submitted).toHaveLength(0)
   await page.getByLabel('To', { exact: true }).fill('2026-11-02')
   await page.getByLabel('Reason', { exact: true }).fill('An owner-calculated UAT request.')
+  rejectSubmission = true
   await page.getByRole('button', { name: 'Send request', exact: true }).click()
   await expect.poll(() => submitted.length).toBe(1)
-  expect(submitted[0]).toMatchObject({ type: 'UNPAID', portion: 'MORNING' })
-  expect(submitted[0]).not.toHaveProperty('leaveTypeId')
+  await expect(
+    page.getByRole('dialog', { name: 'Request leave' }).getByRole('alert'),
+  ).toContainText('Leave requests are temporarily unavailable.')
+  await page.getByLabel('Reason', { exact: true }).fill('Updated owner-calculated UAT request.')
+  await expect(
+    page
+      .getByRole('dialog', { name: 'Request leave' })
+      .getByText('Leave requests are temporarily unavailable.', { exact: true }),
+  ).toHaveCount(0)
+  expect(submitted).toHaveLength(1)
+  rejectSubmission = false
+  await page.getByRole('button', { name: 'Send request', exact: true }).click()
+  await expect.poll(() => submitted.length).toBe(2)
+  expect(submitted[1]).toMatchObject({ type: 'UNPAID', portion: 'MORNING' })
+  expect(submitted[1]).not.toHaveProperty('leaveTypeId')
 })
 
 test('remote attachments show persisted files and keep failed transfers as failures with stable retry keys', async ({

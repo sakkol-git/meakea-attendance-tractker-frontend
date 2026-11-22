@@ -117,6 +117,10 @@ function close() {
   emit('update:visible', false)
 }
 
+function clearSubmitError() {
+  feedback.error.value = ''
+}
+
 async function save() {
   const master = z.object({
     name: z.string().trim().min(2, 'Enter a name.'),
@@ -235,6 +239,7 @@ async function save() {
       novalidate
       :aria-busy="feedback.busy.value"
       :inert="feedback.busy.value"
+      @input="clearSubmitError"
       @submit.prevent="save"
     >
       <p v-if="Object.keys(errors).length" class="form-error" role="alert">
