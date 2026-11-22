@@ -19,7 +19,6 @@ const toast = useToast()
 const fileInput = ref<HTMLInputElement>()
 const dragOver = ref(false)
 const uploading = ref(false)
-const uploadProgress = ref(0)
 const error = ref('')
 
 const api = useWorkspace()
@@ -67,12 +66,9 @@ async function handleFile(file: File) {
 
   error.value = ''
   uploading.value = true
-  uploadProgress.value = 25
 
   try {
-    uploadProgress.value = 60
     const result = await app.$business.upload(props.scope, props.recordId, file)
-    uploadProgress.value = 100
 
     if (api.mode === 'remote') await load()
     else
@@ -100,7 +96,6 @@ async function handleFile(file: File) {
     })
   } finally {
     uploading.value = false
-    uploadProgress.value = 0
   }
 }
 
@@ -148,7 +143,7 @@ async function downloadAttachment(item: AttachmentItem) {
     <div class="attachment-header">
       <h3 class="attachment-title">Attachments ({{ attachments.length }})</h3>
       <span v-if="uploading" class="attachment-uploading-status" role="status">
-        Uploading… {{ uploadProgress }}%
+        Uploading attachment…
       </span>
     </div>
 
