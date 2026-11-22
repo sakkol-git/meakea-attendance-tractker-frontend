@@ -114,6 +114,9 @@ function cancel(id: string, version: number, delegateName: string) {
         :value="delegations.data.value?.items ?? []"
         data-key="id"
         class="workspace-table"
+        :pt="{
+          tableContainer: { role: 'region', 'aria-label': 'Approval delegations', tabindex: 0 },
+        }"
       >
         <PColumn field="delegateName" header="Reviewer" />
         <PColumn header="Coverage period">
