@@ -141,19 +141,7 @@ watch(
           errors.graceMinutes
         }}</small>
       </div>
-      <div class="field">
-        <label for="shift-days">Working days mask</label>
-        <input
-          id="shift-days"
-          v-model.number="values.workingDays"
-          type="number"
-          min="1"
-          max="127"
-          :aria-invalid="!!errors.workingDays"
-          aria-describedby="schedule-error-workingDays"
-        />
-        <small id="schedule-error-workingDays" class="field-error">{{ errors.workingDays }}</small>
-      </div>
+      <WorkingDaysPicker v-model="values.workingDays" :error="errors.workingDays" />
     </div>
   </template>
   <div class="field">
