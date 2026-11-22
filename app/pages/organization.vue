@@ -97,6 +97,13 @@ watch(tab, () => {
         />
       </div>
     </div>
+    <p
+      v-if="!result.isPending.value && !result.error.value"
+      class="organization-count small-note"
+      role="status"
+    >
+      {{ rows.length }} matching records in this category
+    </p>
     <QueryState
       :pending="result.isPending.value"
       :error="result.error.value"
@@ -160,3 +167,9 @@ watch(tab, () => {
     @imported="() => result?.refetch()"
   />
 </template>
+
+<style scoped>
+.organization-count {
+  padding: 0 var(--space-6) var(--space-4);
+}
+</style>
