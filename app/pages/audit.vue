@@ -72,7 +72,13 @@ function auditTime(value: string) {
             : (result.data.value?.total ?? '—')
         }}</span>
       </h2>
-      <PButton label="Clear filters" icon="pi pi-filter-slash" text @click="clearFilters" />
+      <PButton
+        label="Clear filters"
+        icon="pi pi-filter-slash"
+        text
+        :disabled="!actor && !action && !target && !from && !to"
+        @click="clearFilters"
+      />
     </div>
     <form class="audit-filters" aria-label="Audit filters" @submit.prevent>
       <label>
