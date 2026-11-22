@@ -200,7 +200,17 @@ function cancel(id: string, version: number, delegateName: string) {
       </div>
       <div class="field">
         <label for="delegate-reason">Reason · Required</label>
-        <PTextarea id="delegate-reason" v-model="reason" minlength="5" maxlength="500" required />
+        <PTextarea
+          id="delegate-reason"
+          v-model="reason"
+          minlength="5"
+          maxlength="500"
+          aria-describedby="delegate-reason-help"
+          required
+        />
+        <small id="delegate-reason-help"
+          >Use 5–500 characters to explain the coverage needed.</small
+        >
       </div>
       <p v-if="feedback.error.value" role="alert" class="form-error">{{ feedback.error.value }}</p>
       <div class="dialog-actions">
