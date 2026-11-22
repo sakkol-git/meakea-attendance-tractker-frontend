@@ -28,6 +28,7 @@ const preview = useWorkspaceQuery(
   <div v-else-if="preview.error.value" role="alert" class="field-error">
     <p>{{ failureMessage(preview.error.value) }}</p>
     <PButton
+      type="button"
       label="Retry calculation"
       text
       :loading="preview.isFetching.value"

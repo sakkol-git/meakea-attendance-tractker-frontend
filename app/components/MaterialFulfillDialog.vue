@@ -114,6 +114,7 @@ async function issue() {
         <div v-if="materials.error.value" role="alert" class="field-error">
           {{ failureMessage(materials.error.value) }}
           <PButton
+            type="button"
             label="Retry materials"
             text
             :loading="materials.isFetching.value"
