@@ -48,6 +48,8 @@ const managerOptions = computed(() =>
       <label for="form-employeeNo">Employee ID</label>
       <PInputText
         id="form-employeeNo"
+        autocapitalize="none"
+        :spellcheck="false"
         v-model="values.employeeNo"
         placeholder="e.g. EMP-001"
         :aria-invalid="!!errors.employeeNo"
