@@ -92,6 +92,7 @@ const time = (value: string | null, zone: string | null) =>
 <style scoped>
 table {
   width: 100%;
+  min-width: 800px;
   border-collapse: collapse;
   text-align: left;
 }
