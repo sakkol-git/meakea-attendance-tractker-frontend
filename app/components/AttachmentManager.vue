@@ -25,6 +25,7 @@ const error = ref('')
 const api = useWorkspace()
 const attachments = ref<AttachmentItem[]>([])
 const loading = ref(false)
+const downloading = ref<string | null>(null)
 const loadError = ref('')
 async function load() {
   attachments.value = []
@@ -120,6 +121,8 @@ function onDrop(e: DragEvent) {
 }
 
 async function downloadAttachment(item: AttachmentItem) {
+  if (downloading.value) return
+  downloading.value = item.id
   error.value = ''
   try {
     if (api.mode === 'remote') {
@@ -134,6 +137,8 @@ async function downloadAttachment(item: AttachmentItem) {
       detail: error.value,
       life: 5000,
     })
+  } finally {
+    downloading.value = null
   }
 }
 </script>
@@ -209,6 +214,8 @@ async function downloadAttachment(item: AttachmentItem) {
           icon="pi pi-download"
           label="Download"
           :aria-label="`Download ${item.name}`"
+          :loading="downloading === item.id"
+          :disabled="!!downloading && downloading !== item.id"
           size="small"
           text
           @click="downloadAttachment(item)"
