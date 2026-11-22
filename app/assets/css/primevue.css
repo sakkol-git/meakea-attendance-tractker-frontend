@@ -54,6 +54,7 @@
 }
 .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
   inset-inline-start: 22px;
+  margin: 0;
 }
 .p-toggleswitch:has(input:focus-visible) .p-toggleswitch-slider {
   outline: 2px solid var(--teal);
