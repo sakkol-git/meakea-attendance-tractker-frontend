@@ -38,7 +38,9 @@ const time = (value: string | null, zone: string | null) =>
   >
     <section v-if="result.data.value" class="panel">
       <h2>{{ result.data.value.totalCount }} recorded sessions</h2>
-      <p v-if="!result.data.value.records.length">No recorded sessions are available.</p>
+      <p v-if="!result.data.value.records.length" role="status">
+        No recorded sessions are available.
+      </p>
       <div
         v-else
         style="overflow-x: auto"
