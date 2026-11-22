@@ -6,6 +6,8 @@ Use this runbook for a repeatable client review before connecting a live backend
 
 Attachment recovery: interrupt the attachment-list read, use Retry attachments, and confirm a failed list is not described as empty. During a private download, the download controls should show progress and remain disabled until the outcome is known. A failed download must show its error and enable an explicit retry. Uploads announce activity without estimating a percentage. Password editing remains stable while saving; lookup retry buttons must never submit their surrounding form.
 
+In the synthetic demo, confirm and decline a proposed attendance session in separate fresh sessions. Each action should remove the reviewed proposal from the pending card. This checks the existing proposal/version workflow; it does not prove a remote attendance-inference provider exists.
+
 For the Approvals toolbar, change search, status, waiting time and sort, then choose Clear filters. Confirm all four return to their defaults and the result count updates for the selected category. On phone, tablet and desktop widths, labels must remain visible and controls must fit inside the filter panel. Attendance issue counts describe pending items on the current page.
 
 1. Run `npm ci`, copy `.env.example` to `.env`, and run `npm run dev`.

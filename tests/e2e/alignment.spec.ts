@@ -20,6 +20,9 @@ test('approval filters reset together and fit phone and desktop widths', async (
   await page.getByRole('link', { name: 'Approvals', exact: false }).first().click()
   const search = page.getByRole('searchbox', { name: 'Search approvals' })
   await search.fill('No matching approval')
+  await expect(
+    page.getByRole('heading', { name: 'No matching leave requests', exact: true }),
+  ).toBeVisible()
   await page.getByRole('combobox', { name: 'Filter approval status' }).click()
   await page.getByRole('option', { name: 'Approved', exact: true }).click()
   await page.getByRole('combobox', { name: 'Filter waiting age' }).click()
