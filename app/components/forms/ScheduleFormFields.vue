@@ -40,8 +40,9 @@ watch(
           min="-90"
           max="90"
           :aria-invalid="!!errors.latitude"
-          aria-describedby="schedule-error-latitude"
+          aria-describedby="latitude-help schedule-error-latitude"
         />
+        <small id="latitude-help">Decimal degrees, from −90 to 90.</small>
         <small id="schedule-error-latitude" class="field-error">{{ errors.latitude }}</small>
       </div>
       <div class="field">
@@ -54,8 +55,9 @@ watch(
           min="-180"
           max="180"
           :aria-invalid="!!errors.longitude"
-          aria-describedby="schedule-error-longitude"
+          aria-describedby="longitude-help schedule-error-longitude"
         />
+        <small id="longitude-help">Decimal degrees, from −180 to 180.</small>
         <small id="schedule-error-longitude" class="field-error">{{ errors.longitude }}</small>
       </div>
     </div>
