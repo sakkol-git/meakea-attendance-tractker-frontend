@@ -108,18 +108,17 @@ watch(tab, () => {
         <PDataTable :value="rows" paginator :rows="10" data-key="id" class="table-org"
           ><PColumn field="name" header="Name" sortable /><PColumn
             field="description"
-            header="Description"
-          /><PColumn v-if="tab === 'holidays'" field="date" header="Date" /><PColumn
-            v-if="tab === 'shifts'"
-            header="Hours"
+            header="Description" /><PColumn
+            v-if="tab === 'holidays'"
+            field="date"
+            header="Date" /><PColumn v-if="tab === 'shifts'" header="Hours"
             ><template #body="{ data }"
               >{{ data.startTime || data.start }} – {{ data.endTime || data.end }}</template
             ></PColumn
           ><PColumn
             v-if="tab === 'materials'"
             field="quantity"
-            header="Available quantity"
-          /><PColumn header="Actions"
+            header="Available quantity" /><PColumn header="Actions"
             ><template #body="{ data }"
               ><div class="inline-actions">
                 <PButton
@@ -135,10 +134,16 @@ watch(tab, () => {
                   :disabled="feedback.busy.value"
                   @click="remove(data)"
                 /></div></template></PColumn
-          ><template #empty>No records match your search.</template></PDataTable
-        >
-      </div></QueryState
-    >
+          ><template #empty
+            ><p role="status">No records match your search.</p>
+            <PButton
+              v-if="search"
+              type="button"
+              label="Clear search"
+              text
+              @click="search = ''" /></template
+        ></PDataTable></div
+    ></QueryState>
   </section>
   <ResourceForm
     v-model:visible="visible"
