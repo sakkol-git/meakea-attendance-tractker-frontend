@@ -25,14 +25,16 @@ const error = ref('')
 const api = useWorkspace()
 const attachments = ref<AttachmentItem[]>([])
 const loading = ref(false)
+const loadError = ref('')
 async function load() {
   attachments.value = []
+  loadError.value = ''
   if (api.mode === 'local') return
   loading.value = true
   try {
     attachments.value = await api.attachmentItems(props.scope, props.recordId)
   } catch (failure) {
-    error.value = failure instanceof Error ? failure.message : 'Could not load attachments.'
+    loadError.value = failure instanceof Error ? failure.message : 'Could not load attachments.'
   } finally {
     loading.value = false
   }
@@ -146,6 +148,10 @@ async function downloadAttachment(item: AttachmentItem) {
     </div>
 
     <p v-if="loading" role="status">Loading attachments…</p>
+    <div v-if="loadError" role="alert" class="form-error">
+      <p>{{ loadError }}</p>
+      <PButton type="button" label="Retry attachments" text :loading="loading" @click="load" />
+    </div>
     <!-- Drop Zone -->
     <div
       v-if="!readonly && (api.mode === 'local' || scope === 'request')"
@@ -183,7 +189,7 @@ async function downloadAttachment(item: AttachmentItem) {
     </p>
 
     <p
-      v-if="!loading && !error && !uploading && !attachments.length"
+      v-if="!loading && !loadError && !error && !uploading && !attachments.length"
       class="small-note"
       role="status"
     >
