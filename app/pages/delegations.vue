@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { failureMessage } from '~/utils/failure'
+import { dateLabel } from '~/utils/format'
 import { useConfirm } from 'primevue/useconfirm'
 
 definePageMeta({ roles: ['MANAGER', 'HR_ADMIN', 'OWNER'] })
@@ -115,7 +116,9 @@ function cancel(id: string, version: number, delegateName: string) {
       >
         <PColumn field="delegateName" header="Reviewer" />
         <PColumn header="Coverage period">
-          <template #body="{ data }">{{ data.startsOn }} – {{ data.endsOn }}</template>
+          <template #body="{ data }"
+            >{{ dateLabel(data.startsOn) }} – {{ dateLabel(data.endsOn) }}</template
+          >
         </PColumn>
         <PColumn field="reason" header="Reason" />
         <PColumn header="Status"
