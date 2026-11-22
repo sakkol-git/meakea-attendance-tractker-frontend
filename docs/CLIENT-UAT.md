@@ -2,13 +2,21 @@
 
 Use this runbook for a repeatable client review before connecting a live backend. It validates the browser experience and synthetic workflow logic; it does not establish server authorization, persistence, tenant isolation or production integration.
 
-## Setup and evidence
+## UX batch acceptance through cycle 207
+
+- Audit: invert the date range and verify the inline explanation, then clear filters. Counts must not show cached totals after a failed read. Review filters on a phone and tablet, and check multiline reasons and the displayed time zone.
+- Delegation: Escape closes a clean form. With unsaved values, Escape asks before discarding; Keep editing retains the entries. Empty reviewer choices explain recovery, and cancellation controls stay disabled during pending commands.
+- Shifts: select weekdays by name. Saving with none selected must fail. Save a weekend schedule, reopen it and verify Saturday/Sunday remain selected. The wire representation is unchanged; backend attendance uses Monday as the first bit.
+- Reports: the synthetic report identifies its fixed dataset. Missing expected sessions must not be reported as 100% attendance. Private attendance tables scroll inside their region on narrow screens.
+- These local checks complement account, real-device, human screen-reader and deployed-provider UAT. They do not establish business acceptance by themselves.
 
 Attachment recovery: interrupt the attachment-list read, use Retry attachments, and confirm a failed list is not described as empty. During a private download, the download controls should show progress and remain disabled until the outcome is known. A failed download must show its error and enable an explicit retry. Uploads announce activity without estimating a percentage. Password editing remains stable while saving; lookup retry buttons must never submit their surrounding form.
 
 In the synthetic demo, confirm and decline a proposed attendance session in separate fresh sessions. Each action should remove the reviewed proposal from the pending card. This checks the existing proposal/version workflow; it does not prove a remote attendance-inference provider exists.
 
 For the Approvals toolbar, change search, status, waiting time and sort, then choose Clear filters. Confirm all four return to their defaults and the result count updates for the selected category. On phone, tablet and desktop widths, labels must remain visible and controls must fit inside the filter panel. Attendance issue counts describe pending items on the current page.
+
+## Setup and evidence
 
 1. Run `npm ci`, copy `.env.example` to `.env`, and run `npm run dev`.
 2. Use a fresh private browser window at `http://localhost:3000` for each role.
