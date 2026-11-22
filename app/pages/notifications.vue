@@ -24,7 +24,7 @@ async function mark(id?: string) {
         icon="pi pi-check"
         outlined
         :loading="feedback.busy.value"
-        :disabled="!result.data.value?.items.some((x) => !x.read)"
+        :disabled="feedback.busy.value || !result.data.value?.items.some((x) => !x.read)"
         @click="mark()"
       />
     </div>
