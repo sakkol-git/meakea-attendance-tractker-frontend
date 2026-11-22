@@ -168,6 +168,22 @@ function auditTime(value: string) {
 </template>
 
 <style scoped>
+.audit-filters {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.audit-filters label {
+  min-width: 0;
+}
+@media (max-width: 800px) {
+  .audit-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .audit-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .audit-timezone {
   padding: var(--space-4) var(--space-6) 0;
 }
