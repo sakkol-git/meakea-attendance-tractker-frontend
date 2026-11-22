@@ -26,7 +26,7 @@ function toggle(index: number, checked: boolean) {
         <span>{{ day }}</span>
       </label>
     </div>
-    <small id="working-days-error" class="field-error">{{ error }}</small>
+    <small id="working-days-error" class="field-error" aria-live="polite">{{ error }}</small>
   </fieldset>
 </template>
 
