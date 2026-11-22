@@ -36,6 +36,7 @@ const rows = computed(() =>
         <AppIcon name="search" /><PInputText
           v-model="search"
           aria-label="Search people"
+          type="search"
           placeholder="Search name, team or role"
         />
       </div>
