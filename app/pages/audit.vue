@@ -86,7 +86,12 @@ function auditTime(value: string) {
     <form class="audit-filters" aria-label="Audit filters" @submit.prevent>
       <label>
         <span>Actor</span>
-        <PInputText v-model="actor" placeholder="Account ID" />
+        <PInputText
+          v-model="actor"
+          placeholder="Account ID"
+          autocapitalize="none"
+          :spellcheck="false"
+        />
       </label>
       <label>
         <span>Action</span>
@@ -94,7 +99,12 @@ function auditTime(value: string) {
       </label>
       <label>
         <span>Target</span>
-        <PInputText v-model="target" placeholder="Record ID" />
+        <PInputText
+          v-model="target"
+          placeholder="Record ID"
+          autocapitalize="none"
+          :spellcheck="false"
+        />
       </label>
       <label>
         <span>From</span>
