@@ -1,6 +1,41 @@
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
+test('approval filters reset together and fit phone and desktop widths', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'Manager', exact: true }).click()
+  await page.getByRole('link', { name: 'Approvals', exact: false }).first().click()
+  const search = page.getByRole('searchbox', { name: 'Search approvals' })
+  await search.fill('No matching approval')
+  await page.getByRole('combobox', { name: 'Filter approval status' }).click()
+  await page.getByRole('option', { name: 'Approved', exact: true }).click()
+  await page.getByRole('combobox', { name: 'Filter waiting age' }).click()
+  await page.getByRole('option', { name: 'Waiting at least 3 days', exact: true }).click()
+  await page.getByRole('combobox', { name: 'Sort approvals' }).click()
+  await page.getByRole('option', { name: 'Newest first', exact: true }).click()
+  await page.getByRole('button', { name: 'Clear filters', exact: true }).click()
+  await expect(search).toHaveValue('')
+  await expect(page.getByRole('combobox', { name: 'Filter approval status' })).toContainText(
+    'Pending',
+  )
+  await expect(page.getByRole('combobox', { name: 'Filter waiting age' })).toContainText(
+    'Any waiting age',
+  )
+  await expect(page.getByRole('combobox', { name: 'Sort approvals' })).toContainText('Oldest first')
+  await expect(page.getByRole('button', { name: 'Clear filters', exact: true })).toHaveCount(0)
+  await expect(page.locator('.p-select-overlay')).toHaveCount(0)
+  for (const width of [1280, 768, 390]) {
+    await page.setViewportSize({ width, height: 900 })
+    const filters = page.getByRole('group', { name: 'Approval filters', exact: true })
+    await expect(filters).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    await page.screenshot({ path: `test-results/approval-toolbar-${width}.png`, fullPage: true })
+  }
+  const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+  expect(accessibility.violations.map((violation) => violation.id)).toEqual([])
+})
+
 test('focused request sections keep entries while the review follows edits', async ({ page }) => {
   await page.goto('/requests')
   await page.getByRole('button', { name: 'New request' }).click()

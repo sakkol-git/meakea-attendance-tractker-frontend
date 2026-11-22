@@ -4,6 +4,8 @@ Use this runbook for a repeatable client review before connecting a live backend
 
 ## Setup and evidence
 
+For the Approvals toolbar, change search, status, waiting time and sort, then choose Clear filters. Confirm all four return to their defaults and the result count updates for the selected category. On phone, tablet and desktop widths, labels must remain visible and controls must fit inside the filter panel. Attendance issue counts describe pending items on the current page.
+
 1. Run `npm ci`, copy `.env.example` to `.env`, and run `npm run dev`.
 2. Use a fresh private browser window at `http://localhost:3000` for each role.
 3. Test at 390 × 844, 820 × 1180 and at least 1440 × 900.

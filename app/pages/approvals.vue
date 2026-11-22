@@ -9,6 +9,19 @@ const search = ref('')
 const status = ref('PENDING')
 const sort = ref<'oldest' | 'newest'>('oldest')
 const minAgeDays = ref(0)
+const filtersChanged = computed(() =>
+  Boolean(
+    searchInput.value || status.value !== 'PENDING' || sort.value !== 'oldest' || minAgeDays.value,
+  ),
+)
+function clearFilters() {
+  clearTimeout(searchTimer)
+  searchInput.value = ''
+  search.value = ''
+  status.value = 'PENDING'
+  sort.value = 'oldest'
+  minAgeDays.value = 0
+}
 const page = ref(0)
 const pageSize = 25
 let searchTimer: ReturnType<typeof setTimeout> | undefined
@@ -43,6 +56,18 @@ const corrections = useWorkspaceQuery(
   () => api.list('corrections', queueOptions.value),
 )
 const feedback = useFeedback()
+const resultSummary = computed(() => {
+  const query =
+    selected.value === 'Leave' ? leave : selected.value === 'Requests' ? requests : corrections
+  if (query.isPending.value) return 'Loading results…'
+  if (query.error.value) return 'Results unavailable'
+  if (selected.value === 'Attendance issues') {
+    const count = query.data.value?.items.filter((row) => row.status === 'PENDING').length ?? 0
+    return `${count} pending attendance ${count === 1 ? 'issue' : 'issues'} on this page`
+  }
+  const count = query.data.value?.total ?? 0
+  return `${count} matching ${selected.value.toLowerCase()} ${count === 1 ? 'request' : 'requests'}`
+})
 const confirm = useConfirm()
 const decision = ref<{ id: string; version: number }>()
 function correction(id: string, version: number, action: string) {
@@ -72,11 +97,11 @@ async function rejectIssue(reasonText: string) {
 <template>
   <PageHeading
     title="Approvals"
-    description="A little clarity helps everyone move forward."
+    description="Review requests awaiting your decision."
     eyebrow="YOUR TEAM IS COUNTING ON YOU"
   >
     <NuxtLink to="/delegations">
-      <PButton label="Manage delegation" icon="pi pi-users" outlined />
+      <PButton label="Manage delegation" icon="pi pi-users" size="small" outlined />
     </NuxtLink>
   </PageHeading>
   <ApprovalFilters
@@ -85,6 +110,17 @@ async function rejectIssue(reasonText: string) {
     v-model:sort="sort"
     v-model:min-age-days="minAgeDays"
   />
+  <div class="approval-results">
+    <p class="small-note" role="status">{{ resultSummary }}</p>
+    <PButton
+      v-if="filtersChanged"
+      label="Clear filters"
+      type="button"
+      text
+      size="small"
+      @click="clearFilters"
+    />
+  </div>
   <div class="segmented-tabs" role="group" aria-label="Approval category">
     <button
       v-for="tab in [
@@ -184,3 +220,15 @@ async function rejectIssue(reasonText: string) {
     @confirm="rejectIssue"
   />
 </template>
+
+<style scoped>
+.approval-results {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  margin-bottom: var(--space-3);
+}
+</style>
