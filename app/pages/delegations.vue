@@ -17,6 +17,7 @@ const delegations = useWorkspaceQuery('approval-delegations', () => api.delegati
 const candidates = useWorkspaceQuery('eligible-delegates', () => api.eligibleDelegates())
 
 function openForm() {
+  feedback.error.value = ''
   delegateId.value = ''
   startsOn.value = ''
   endsOn.value = ''
