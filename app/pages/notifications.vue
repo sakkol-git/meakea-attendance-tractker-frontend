@@ -53,7 +53,7 @@ async function mark(id?: string) {
         <div>
           <h3>{{ row.title }} <span v-if="!row.read" class="count-badge">New</span></h3>
           <p>{{ row.detail }}</p>
-          <small>{{ dateLabel(row.createdAt, 'MMM d, h:mm a') }}</small>
+          <small>{{ dateLabel(row.createdAt, 'MMM d, yyyy, h:mm a') }}</small>
           <p v-if="!notificationRoute(row)" class="small-note">
             No linked record is available for this update.
           </p>
