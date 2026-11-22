@@ -156,8 +156,9 @@ watch(
       autocapitalize="none"
       :spellcheck="false"
       :aria-invalid="!!errors.timezone"
-      aria-describedby="schedule-error-timezone"
+      aria-describedby="timezone-help schedule-error-timezone"
     />
+    <small id="timezone-help">Use a time-zone name such as Asia/Phnom_Penh.</small>
     <small id="schedule-error-timezone" class="field-error">{{ errors.timezone }}</small>
   </div>
 </template>
