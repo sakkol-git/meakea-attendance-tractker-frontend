@@ -21,10 +21,49 @@
 }
 
 .p-toggleswitch {
-  min-width: var(--control-height);
-  min-height: var(--control-height);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
+}
+.p-toggleswitch .p-toggleswitch-slider {
+  position: absolute;
+  inset: 10px 0;
+  border: 0;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  transition: background-color 150ms;
+}
+.p-toggleswitch .p-toggleswitch-handle {
+  width: 20px;
+  height: 20px;
+  inset-inline-start: 2px;
+  top: 50%;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  transform: translateY(-50%);
+  transition: inset-inline-start 150ms;
+}
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: var(--teal);
+}
+.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-handle {
+  inset-inline-start: 22px;
+}
+.p-toggleswitch:has(input:focus-visible) .p-toggleswitch-slider {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .p-toggleswitch .p-toggleswitch-slider,
+  .p-toggleswitch .p-toggleswitch-handle {
+    transition: none;
+  }
 }
 
 .p-tag {
