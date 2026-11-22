@@ -25,6 +25,7 @@ const rows = computed(() => {
       ><PInputText
         id="workflow-search"
         v-model="search"
+        type="search"
         placeholder="Search attendance, rollover, export…"
       />
     </div>
@@ -38,7 +39,7 @@ const rows = computed(() => {
       />
     </div>
   </div>
-  <p class="small-note workflow-caption">
+  <p class="small-note workflow-caption" role="status">
     {{ rows.length }} tasks available for your workspace role.
   </p>
   <div class="workflow-grid">
@@ -72,3 +73,73 @@ const rows = computed(() => {
     </div>
   </details>
 </template>
+
+<style scoped>
+.workflow-filter {
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 280px);
+  align-items: end;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+.workflow-filter .field {
+  min-width: 0;
+  margin: 0;
+}
+.workflow-filter :deep(.p-inputtext),
+.workflow-filter :deep(.p-select) {
+  width: 100%;
+  min-height: var(--control-height);
+}
+.workflow-filter :deep(.p-inputtext) {
+  padding-block: var(--space-2);
+}
+.workflow-caption {
+  margin: var(--space-4) 0;
+}
+.workflow-grid {
+  gap: var(--space-4);
+}
+.workflow-card {
+  min-width: 0;
+  padding: var(--space-6);
+  gap: var(--space-3);
+  overflow-wrap: anywhere;
+}
+.workflow-card > div {
+  align-items: center;
+}
+.workflow-card > .small-note {
+  color: var(--teal);
+  font-weight: 650;
+  margin-top: var(--space-2);
+}
+.demo-catalog {
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+}
+.demo-catalog summary {
+  cursor: pointer;
+  font-size: var(--font-size-body);
+  font-weight: 650;
+}
+.demo-catalog[open] > p {
+  margin: var(--space-4) 0;
+}
+.demo-catalog .text-link {
+  padding-block: var(--space-2);
+}
+@media (max-width: 1000px) {
+  .workflow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .workflow-filter,
+  .workflow-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workflow-card {
+    padding: var(--space-4);
+  }
+}
+</style>
