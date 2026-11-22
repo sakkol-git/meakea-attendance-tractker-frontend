@@ -70,8 +70,9 @@ watch(
         min="1"
         max="10000"
         :aria-invalid="!!errors.radiusM"
-        aria-describedby="schedule-error-radiusM"
+        aria-describedby="radius-help schedule-error-radiusM"
       />
+      <small id="radius-help">Distance from the site coordinates, from 1 to 10,000 metres.</small>
       <small id="schedule-error-radiusM" class="field-error">{{ errors.radiusM }}</small>
     </div>
   </template>
