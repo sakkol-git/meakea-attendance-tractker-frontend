@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { failureMessage } from '~/utils/failure'
+import WorkingDaysPicker from '~/components/forms/WorkingDaysPicker.vue'
 const props = defineProps<{
   values: Record<string, any>
   errors: Record<string, string>

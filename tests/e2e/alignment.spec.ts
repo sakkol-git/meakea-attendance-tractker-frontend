@@ -1,6 +1,67 @@
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
+test('weekday choices survive a shift save without exposing the numeric mask', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'HR administrator', exact: true }).click()
+  await page.getByRole('link', { name: 'Organization', exact: true }).click()
+  await page.getByRole('button', { name: 'Shifts', exact: true }).click()
+  await page.getByRole('button', { name: 'Add a record', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Name', { exact: true }).fill('Weekend coverage')
+  await dialog.getByLabel('Work site', { exact: true }).selectOption({ index: 1 })
+  await dialog.getByLabel('Start time', { exact: true }).fill('09:00')
+  await dialog.getByLabel('End time', { exact: true }).fill('17:00')
+  for (const day of ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']) {
+    await dialog.getByRole('checkbox', { name: day, exact: true }).uncheck()
+  }
+  await dialog.getByRole('button', { name: 'Create record', exact: true }).click()
+  await expect(dialog.getByRole('group', { name: 'Working days', exact: true })).toHaveAttribute(
+    'aria-invalid',
+    'true',
+  )
+  await dialog.getByRole('checkbox', { name: 'Saturday', exact: true }).check()
+  await dialog.getByRole('checkbox', { name: 'Sunday', exact: true }).check()
+  await dialog.getByRole('button', { name: 'Create record', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+  await page.getByRole('button', { name: 'Edit Weekend coverage', exact: true }).click()
+  await expect(dialog.getByRole('checkbox', { name: 'Saturday', exact: true })).toBeChecked()
+  await expect(dialog.getByRole('checkbox', { name: 'Sunday', exact: true })).toBeChecked()
+  await expect(dialog.getByRole('checkbox', { name: 'Monday', exact: true })).not.toBeChecked()
+})
+
+test('audit date recovery and delegation Escape preserve valid navigation', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('combobox', { name: 'Demo role' }).click()
+  await page.getByRole('option', { name: 'Owner', exact: true }).click()
+  await page.getByRole('link', { name: 'Audit', exact: true }).click()
+  const filters = page.getByRole('form', { name: 'Audit filters' })
+  await expect(page.getByRole('button', { name: 'Clear filters', exact: true })).toBeDisabled()
+  await filters.getByLabel('From', { exact: true }).fill('2030-02-02')
+  await filters.getByLabel('To', { exact: true }).fill('2030-02-01')
+  await expect(page.getByRole('alert')).toContainText('To date must be on or after From date.')
+  await page.getByRole('button', { name: 'Clear filters', exact: true }).click()
+  await expect(filters.getByLabel('From', { exact: true })).toHaveValue('')
+  await expect(filters.getByLabel('To', { exact: true })).toHaveValue('')
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await page.getByRole('link', { name: 'Approvals', exact: false }).first().click()
+  await page.getByRole('link', { name: 'Manage delegation', exact: true }).click()
+  await page.getByRole('button', { name: 'New delegation' }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'New approval delegation' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'New delegation' }).click()
+  await page.getByLabel('Reason · Required', { exact: true }).fill('Coverage request in progress')
+  await page.keyboard.press('Escape')
+  await page
+    .getByRole('alertdialog')
+    .getByRole('button', { name: 'Keep editing', exact: true })
+    .click()
+  await expect(page.getByLabel('Reason · Required', { exact: true })).toHaveValue(
+    'Coverage request in progress',
+  )
+})
+
 for (const action of ['Confirm workday', 'Decline']) {
   test(`proposed attendance ${action.toLowerCase()} uses the reviewed version`, async ({
     page,
