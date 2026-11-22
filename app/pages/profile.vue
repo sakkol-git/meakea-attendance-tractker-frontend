@@ -114,6 +114,9 @@ async function savePassword() {
         />
         <PButton
           label="Change password"
+          :disabled="passwordBusy"
+          :aria-expanded="changePasswordOpen"
+          aria-controls="password-editor"
           icon="pi pi-key"
           size="small"
           outlined
@@ -171,9 +174,14 @@ async function savePassword() {
     </div>
 
     <!-- Change Password Form -->
-    <div v-if="changePasswordOpen" class="panel profile-subpanel">
+    <div v-if="changePasswordOpen" id="password-editor" class="panel profile-subpanel">
       <h3 class="form-heading">Update your password</h3>
-      <form class="app-form" @submit.prevent="savePassword">
+      <form
+        class="app-form"
+        :inert="passwordBusy"
+        :aria-busy="passwordBusy"
+        @submit.prevent="savePassword"
+      >
         <div class="field">
           <label for="currentPassword">Current password</label>
           <PInputText
