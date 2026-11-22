@@ -23,6 +23,7 @@ const time = (value: string | null, zone: string | null) =>
       icon="pi pi-download"
       outlined
       :loading="feedback.busy.value"
+      :disabled="feedback.busy.value"
       @click="feedback.run(() => api.downloadAttendanceReport())"
     />
   </PageHeading>

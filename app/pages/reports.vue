@@ -70,6 +70,7 @@ async function download() {
           icon="pi pi-download"
           outlined
           :loading="feedback.busy.value"
+          :disabled="feedback.busy.value"
           @click="download"
         />
       </div>
