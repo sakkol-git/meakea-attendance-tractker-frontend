@@ -157,6 +157,7 @@ function cancel(id: string, version: number, delegateName: string) {
         <div v-if="candidates.error.value" role="alert" class="field-error">
           {{ failureMessage(candidates.error.value) }}
           <PButton
+            type="button"
             label="Retry reviewers"
             text
             :loading="candidates.isFetching.value"
