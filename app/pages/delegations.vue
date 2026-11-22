@@ -142,7 +142,7 @@ function cancel(id: string, version: number, delegateName: string) {
     header="New approval delegation"
     class="dialog-md"
     :closable="!feedback.busy.value"
-    :close-on-escape="false"
+    :close-on-escape="!feedback.busy.value"
     @update:visible="updateVisible"
   >
     <form
