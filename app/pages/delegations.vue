@@ -126,6 +126,7 @@ function cancel(id: string, version: number, delegateName: string) {
             <PButton
               v-if="data.status === 'ACTIVE'"
               label="Cancel"
+              :disabled="feedback.busy.value"
               severity="danger"
               outlined
               @click="cancel(data.id, data.version, data.delegateName)"
