@@ -152,7 +152,9 @@ function auditTime(value: string) {
             >
           </PColumn>
           <PColumn header="Reason">
-            <template #body="{ data }">{{ data.reason || 'Not recorded' }}</template>
+            <template #body="{ data }"
+              ><span class="audit-reason">{{ data.reason || 'Not recorded' }}</span></template
+            >
           </PColumn>
           <template #empty>No audit activity matches these filters.</template>
         </PDataTable>
@@ -168,6 +170,10 @@ function auditTime(value: string) {
 </template>
 
 <style scoped>
+.audit-reason {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .audit-filters {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
